@@ -32,7 +32,7 @@ jobs:
       - name: Pastikan Gradle resolve dependency lewat Google Maven, Maven Central, dan storage Flutter
         run: |
           python3 - << 'PYEOF'
-          import re, pathlib
+          import pathlib
 
           p = pathlib.Path('android/settings.gradle.kts')
           content = p.read_text()
@@ -47,15 +47,27 @@ jobs:
           }
           """
 
-          if 'dependencyResolutionManagement' in content:
-              content = re.sub(
-                  r'dependencyResolutionManagement\s*\{.*?\n\}\n',
-                  block,
-                  content,
-                  flags=re.DOTALL,
-              )
+          key = 'dependencyResolutionManagement'
+          idx = content.find(key)
+
+          if idx == -1:
+              content = content.rstrip('\n') + '\n\n' + block
           else:
-              content += '\n' + block
+              # Cari kurung kurawal pembuka setelah keyword, lalu hitung kurung
+              # kurawal (bukan regex) biar aman walau blok-nya nested/berubah format.
+              brace_start = content.find('{', idx)
+              depth = 0
+              i = brace_start
+              while i < len(content):
+                  if content[i] == '{':
+                      depth += 1
+                  elif content[i] == '}':
+                      depth -= 1
+                      if depth == 0:
+                          break
+                  i += 1
+              block_end = i + 1
+              content = content[:idx] + block.rstrip('\n') + content[block_end:]
 
           p.write_text(content)
           print(content)
@@ -65,6 +77,11 @@ jobs:
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           sed -i 's/android:label="boredom"/android:label="Boredom"/' "$MANIFEST"
+          if ! grep -q 'android:label="Boredom"' "$MANIFEST"; then
+            echo "GAGAL: label 'Boredom' tidak ditemukan di manifest. Isi manifest saat ini:"
+            cat "$MANIFEST"
+            exit 1
+          fi
           cat "$MANIFEST"
 
       - name: Install dependency
@@ -78,7 +95,12 @@ jobs:
                   if (project.hasProperty('android')) {
                       def androidExt = project.extensions.findByName('android')
                       if (androidExt != null && androidExt.hasProperty('namespace') && androidExt.namespace == null) {
-                          androidExt.namespace project.group.toString()
+                          def groupStr = project.group?.toString()
+                          if (groupStr != null && groupStr.trim() != '' && groupStr != 'null') {
+                              androidExt.namespace groupStr
+                          } else {
+                              androidExt.namespace 'com.nikodwidharma.boredom.' + project.name.replace('-', '_')
+                          }
                       }
                       if (androidExt != null) {
                           androidExt.compileOptions {
