@@ -1,0 +1,87 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Regenerate folder android dari template resmi Flutter
+        run: |
+          rm -rf android
+          flutter create --platforms=android --org com.nikodwidharma --project-name boredom .
+
+      - name: Ganti label aplikasi jadi "Boredom"
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          sed -i 's/android:label="boredom"/android:label="Boredom"/' "$MANIFEST"
+          cat "$MANIFEST"
+
+      - name: Install dependency
+        run: flutter pub get
+
+      - name: Patch namespace untuk plugin lama yang belum kompatibel AGP terbaru
+        run: |
+          cat >> android/build.gradle << 'EOF'
+          subprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty('android')) {
+                      def androidExt = project.extensions.findByName('android')
+                      if (androidExt != null && androidExt.hasProperty('namespace') && androidExt.namespace == null) {
+                          androidExt.namespace project.group.toString()
+                      }
+                      if (androidExt != null) {
+                          androidExt.compileOptions {
+                              sourceCompatibility JavaVersion.VERSION_17
+                              targetCompatibility JavaVersion.VERSION_17
+                              coreLibraryDesugaringEnabled true
+                          }
+                          project.dependencies.add('coreLibraryDesugaring', 'com.android.tools:desugar_jdk_libs:2.1.4')
+                          if (androidExt.hasProperty('defaultConfig')) {
+                              androidExt.defaultConfig.multiDexEnabled = true
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+      - name: Build APK
+        run: flutter build apk --release
+        continue-on-error: true
+
+      - name: Cari file APK di manapun lokasinya
+        run: |
+          mkdir -p build/app/outputs/flutter-apk
+          FOUND=$(find . -name "app-release.apk" -not -path "*/node_modules/*" | head -n 1)
+          if [ -z "$FOUND" ]; then
+            echo "APK tidak ditemukan, menampilkan semua file .apk yang ada:"
+            find . -name "*.apk"
+            exit 1
+          fi
+          echo "APK ditemukan di: $FOUND"
+          cp "$FOUND" build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload APK sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: boredom-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
