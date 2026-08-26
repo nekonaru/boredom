@@ -28,7 +28,6 @@ ThemeData buildBoredomTheme() {
     colorScheme: base.colorScheme.copyWith(
       primary: AppColors.accent,
       surface: AppColors.surface,
-      background: AppColors.background,
     ),
     textTheme: base.textTheme.apply(
       bodyColor: AppColors.textPrimary,

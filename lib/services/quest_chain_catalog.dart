@@ -54,5 +54,8 @@ class QuestChainCatalog {
     ),
   ];
 
-  static QuestChain byId(String id) => all.firstWhere((c) => c.id == id);
+  /// orElse fallback ke entri pertama - jaga-jaga kalau id chain lama
+  /// (tersimpan di device user) nggak ketemu lagi di katalog saat ini.
+  static QuestChain byId(String id) =>
+      all.firstWhere((c) => c.id == id, orElse: () => all.first);
 }

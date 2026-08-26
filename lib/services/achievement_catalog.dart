@@ -180,5 +180,9 @@ class AchievementCatalog {
     ),
   ];
 
-  static Achievement byId(String id) => all.firstWhere((a) => a.id == id);
+  /// orElse fallback ke entri pertama - jaga-jaga kalau suatu saat ada
+  /// achievement lama yang dihapus/rename dari katalog tapi id-nya masih
+  /// kesimpen di progress user, biar app nggak crash pas render.
+  static Achievement byId(String id) =>
+      all.firstWhere((a) => a.id == id, orElse: () => all.first);
 }

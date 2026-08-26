@@ -85,5 +85,8 @@ class DailyChallengeCatalog {
     return all[index];
   }
 
-  static DailyChallenge byId(String id) => all.firstWhere((c) => c.id == id);
+  /// orElse fallback ke entri pertama - jaga-jaga kalau id challenge lama
+  /// (tersimpan di device user) nggak ketemu lagi di katalog saat ini.
+  static DailyChallenge byId(String id) =>
+      all.firstWhere((c) => c.id == id, orElse: () => all.first);
 }
