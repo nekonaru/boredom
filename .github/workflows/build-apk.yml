@@ -29,6 +29,37 @@ jobs:
           rm -rf android
           flutter create --platforms=android --org com.nikodwidharma --project-name boredom .
 
+      - name: Pastikan Gradle resolve dependency lewat Google Maven & Maven Central
+        run: |
+          python3 - << 'PYEOF'
+          import re, pathlib
+
+          p = pathlib.Path('android/settings.gradle.kts')
+          content = p.read_text()
+
+          block = """dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          """
+
+          if 'dependencyResolutionManagement' in content:
+              content = re.sub(
+                  r'dependencyResolutionManagement\s*\{.*?\n\}\n',
+                  block,
+                  content,
+                  flags=re.DOTALL,
+              )
+          else:
+              content += '\n' + block
+
+          p.write_text(content)
+          print(content)
+          PYEOF
+
       - name: Ganti label aplikasi jadi "Boredom"
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
@@ -40,7 +71,13 @@ jobs:
 
       - name: Patch namespace untuk plugin lama yang belum kompatibel AGP terbaru
         run: |
-          cat >> android/build.gradle << 'EOF'
+          PATCH=$(cat << 'EOF'
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
           subprojects {
               afterEvaluate { project ->
                   if (project.hasProperty('android')) {
@@ -63,6 +100,9 @@ jobs:
               }
           }
           EOF
+          )
+          echo "$PATCH" >> android/build.gradle
+          cat android/build.gradle
 
       - name: Build APK
         run: flutter build apk --release
