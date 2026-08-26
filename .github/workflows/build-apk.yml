@@ -112,6 +112,16 @@ jobs:
                           if (androidExt.hasProperty('defaultConfig')) {
                               androidExt.defaultConfig.multiDexEnabled = true
                           }
+                          // Samain target JVM Kotlin sama Java (17), biar nggak
+                          // "Inconsistent JVM-target compatibility" pas compile.
+                          if (project.plugins.hasPlugin('org.jetbrains.kotlin.android') ||
+                              project.plugins.hasPlugin('kotlin-android')) {
+                              project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                                  kotlinOptions {
+                                      jvmTarget = "17"
+                                  }
+                              }
+                          }
                       }
                   }
               }
