@@ -29,6 +29,15 @@ class UserProgress {
   final DateTime? rerollResetDate;
   final int totalMissionsCompleted;
 
+  // Dipakai buat Statistics & Achievements.
+  final int totalRerollsAllTime;
+  final int chaosMissionsCompleted;
+  final int questChainsCompleted;
+  final Map<String, int> categoryCounts; // key = MissionCategory.name
+  final int appOpensToday;
+  final DateTime? appOpensResetDate;
+  final int longestStreak;
+
   const UserProgress({
     this.totalXp = 0,
     this.streakDays = 0,
@@ -36,6 +45,13 @@ class UserProgress {
     this.rerollsUsedToday = 0,
     this.rerollResetDate,
     this.totalMissionsCompleted = 0,
+    this.totalRerollsAllTime = 0,
+    this.chaosMissionsCompleted = 0,
+    this.questChainsCompleted = 0,
+    this.categoryCounts = const {},
+    this.appOpensToday = 0,
+    this.appOpensResetDate,
+    this.longestStreak = 0,
   });
 
   // Kurva level: makin tinggi level, makin butuh banyak XP.
@@ -65,6 +81,13 @@ class UserProgress {
     int? rerollsUsedToday,
     DateTime? rerollResetDate,
     int? totalMissionsCompleted,
+    int? totalRerollsAllTime,
+    int? chaosMissionsCompleted,
+    int? questChainsCompleted,
+    Map<String, int>? categoryCounts,
+    int? appOpensToday,
+    DateTime? appOpensResetDate,
+    int? longestStreak,
   }) {
     return UserProgress(
       totalXp: totalXp ?? this.totalXp,
@@ -74,6 +97,15 @@ class UserProgress {
       rerollResetDate: rerollResetDate ?? this.rerollResetDate,
       totalMissionsCompleted:
           totalMissionsCompleted ?? this.totalMissionsCompleted,
+      totalRerollsAllTime: totalRerollsAllTime ?? this.totalRerollsAllTime,
+      chaosMissionsCompleted:
+          chaosMissionsCompleted ?? this.chaosMissionsCompleted,
+      questChainsCompleted:
+          questChainsCompleted ?? this.questChainsCompleted,
+      categoryCounts: categoryCounts ?? this.categoryCounts,
+      appOpensToday: appOpensToday ?? this.appOpensToday,
+      appOpensResetDate: appOpensResetDate ?? this.appOpensResetDate,
+      longestStreak: longestStreak ?? this.longestStreak,
     );
   }
 
@@ -84,6 +116,13 @@ class UserProgress {
         'rerollsUsedToday': rerollsUsedToday,
         'rerollResetDate': rerollResetDate?.toIso8601String(),
         'totalMissionsCompleted': totalMissionsCompleted,
+        'totalRerollsAllTime': totalRerollsAllTime,
+        'chaosMissionsCompleted': chaosMissionsCompleted,
+        'questChainsCompleted': questChainsCompleted,
+        'categoryCounts': categoryCounts,
+        'appOpensToday': appOpensToday,
+        'appOpensResetDate': appOpensResetDate?.toIso8601String(),
+        'longestStreak': longestStreak,
       };
 
   factory UserProgress.fromJson(Map<String, dynamic> json) => UserProgress(
@@ -97,6 +136,17 @@ class UserProgress {
             ? DateTime.parse(json['rerollResetDate'])
             : null,
         totalMissionsCompleted: json['totalMissionsCompleted'] ?? 0,
+        totalRerollsAllTime: json['totalRerollsAllTime'] ?? 0,
+        chaosMissionsCompleted: json['chaosMissionsCompleted'] ?? 0,
+        questChainsCompleted: json['questChainsCompleted'] ?? 0,
+        categoryCounts: json['categoryCounts'] != null
+            ? Map<String, int>.from(json['categoryCounts'])
+            : const {},
+        appOpensToday: json['appOpensToday'] ?? 0,
+        appOpensResetDate: json['appOpensResetDate'] != null
+            ? DateTime.parse(json['appOpensResetDate'])
+            : null,
+        longestStreak: json['longestStreak'] ?? 0,
       );
 }
 

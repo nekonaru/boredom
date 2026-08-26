@@ -200,6 +200,11 @@ class Mission {
 class MissionInstance {
   final Mission mission;
   final int missionNumber;
+  final bool isChaos;
 
-  MissionInstance({required this.mission, required this.missionNumber});
+  MissionInstance({
+    required this.mission,
+    required this.missionNumber,
+    this.isChaos = false,
+  });
 }

@@ -23,24 +23,20 @@ Boredom bukan aplikasi produktivitas. Ini game kecil buat kehidupan sehari-hari:
 
 Ada juga **☢️ Chaos Mode** — matiin semua filter, misi apapun bisa keluar.
 
-## Fitur (Phase 1 - MVP)
+## Fitur
 
 - Mood / waktu / lokasi / energi selector
 - Random mission generator dengan fallback pintar (kalau kombinasi filter kosong, filter dilonggarkan otomatis biar tetap dapat misi)
 - Accept / Reroll dengan limit harian
 - XP & level system dengan kurva progresif + judul level
-- Streak harian
+- Streak harian + longest streak
 - Riwayat misi yang sudah diselesaikan
-- Chaos Mode
+- **Daily Challenge** — satu tantangan spesial per hari (sama untuk semua orang di tanggal yang sama), reward XP besar
+- **Achievement system** — 21 achievement tersembunyi (progress-based & event-based seperti "Night Owl")
+- **Quest Chains** — 3 rantai misi bertahap ("Touch Grass Arc", "Creator Arc", "Reset Arc"), reward besar di step terakhir
+- **Statistics** — distribusi misi per kategori, total reroll, total misi Chaos Mode
+- Chaos Mode — abaikan semua filter
 - Semua data tersimpan lokal di HP (tidak ada server/API eksternal)
-
-## Roadmap (Phase 2+)
-
-- Daily Challenge dengan reward khusus
-- Achievement tersembunyi
-- Quest Chains (rantai misi bertahap)
-- Statistik & grafik per kategori misi
-- Sound effect & animasi tambahan
 
 ## Tech Stack
 
@@ -50,7 +46,7 @@ Ada juga **☢️ Chaos Mode** — matiin semua filter, misi apapun bisa keluar.
 | Penyimpanan lokal | shared_preferences |
 | Format tanggal | intl |
 
-Nggak ada dependency ke API eksternal — seluruh katalog misi ada di `lib/services/mission_catalog.dart`, tinggal edit/tambah di situ.
+Nggak ada dependency ke API eksternal — seluruh katalog misi/achievement/challenge/chain ada di `lib/services/`, tinggal edit/tambah di situ.
 
 ## Build APK
 
@@ -60,13 +56,17 @@ Push ke branch `main` (atau jalankan workflow secara manual dari tab **Actions**
 
 ```
 lib/
-  models/       # Mission, UserProgress, CompletedMission
-  services/     # Mission catalog, generator, local storage
+  models/       # Mission, UserProgress, Achievement, DailyChallenge, QuestChain
+  services/     # Katalog misi/achievement/challenge/chain + generator + local storage
   providers/    # BoredomProvider (state management)
-  screens/      # Home, History, Profile
-  widgets/      # Selector chips, mission sheet, XP bar
+  screens/      # Home, Missions, Stats, Achievements, Profile
+  widgets/      # Selector chips, mission sheet, XP bar, daily challenge card, quest chain section, achievement badge
   utils/        # Tema warna
 ```
+
+## Yang belum dibuat
+
+Sound effect & animasi tambahan (polish murni, nggak mempengaruhi fungsi) — satu-satunya item di roadmap awal yang sengaja dilewatin karena butuh aset audio/animasi custom yang di luar scope kode.
 
 ---
 

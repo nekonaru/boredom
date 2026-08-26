@@ -39,17 +39,11 @@ class ProfileScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _StatCard(
-                    label: 'Total Misi',
-                    value: '${progress.totalMissionsCompleted}',
-                  ),
+                  child: _StatCard(label: 'Total Misi', value: '${progress.totalMissionsCompleted}'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _StatCard(
-                    label: 'Streak',
-                    value: '${progress.streakDays} hari',
-                  ),
+                  child: _StatCard(label: 'Streak Aktif', value: '${progress.streakDays} hari'),
                 ),
               ],
             ),
@@ -57,10 +51,7 @@ class ProfileScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _StatCard(
-                    label: 'Total XP',
-                    value: '${progress.totalXp}',
-                  ),
+                  child: _StatCard(label: 'Total XP', value: '${progress.totalXp}'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -73,18 +64,15 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             const Text(
-              'Roadmap Selanjutnya',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
+              'Tentang Boredom',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const _RoadmapItem(text: 'Daily Challenge dengan reward khusus'),
-            const _RoadmapItem(text: 'Achievement tersembunyi'),
-            const _RoadmapItem(text: 'Quest Chains (rantai misi)'),
-            const _RoadmapItem(text: 'Statistik per kategori'),
+            const Text(
+              'Semua progress kamu (level, XP, streak, achievement, riwayat) tersimpan lokal di HP ini. '
+              'Nggak ada akun, nggak ada server.',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+            ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
@@ -114,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: AppColors.surfaceElevated,
         title: const Text('Reset semua progress?', style: TextStyle(color: AppColors.textPrimary)),
         content: const Text(
-          'Level, XP, streak, dan riwayat misi bakal kehapus semua. Nggak bisa dibalikin.',
+          'Level, XP, streak, achievement, quest chain, dan riwayat misi bakal kehapus semua. Nggak bisa dibalikin.',
           style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
@@ -156,26 +144,6 @@ class _StatCard extends StatelessWidget {
                   color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-        ],
-      ),
-    );
-  }
-}
-
-class _RoadmapItem extends StatelessWidget {
-  final String text;
-  const _RoadmapItem({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          const Text('•  ', style: TextStyle(color: AppColors.textSecondary)),
-          Expanded(
-            child: Text(text, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-          ),
         ],
       ),
     );

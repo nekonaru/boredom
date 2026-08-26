@@ -6,6 +6,7 @@ import '../utils/app_theme.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
+import '../widgets/daily_challenge_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -68,6 +69,8 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             XpBar(progress: progress),
+            const SizedBox(height: 16),
+            const DailyChallengeCard(),
             const SizedBox(height: 28),
 
             SelectorRow<Mood>(
@@ -168,7 +171,8 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () async {
                   provider.rollMission();
                   await showMissionSheet(context);
-                  if (provider.lastXpGained != null && context.mounted) {
+                  if (!context.mounted) return;
+                  if (provider.lastXpGained != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Mantap! +${provider.lastXpGained} XP 🎉'),
@@ -177,6 +181,15 @@ class HomeScreen extends StatelessWidget {
                     );
                     provider.clearLastXpGained();
                   }
+                  for (final a in provider.lastUnlockedAchievements) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Achievement unlocked: ${a.emoji} ${a.title}'),
+                        backgroundColor: AppColors.accent,
+                      ),
+                    );
+                  }
+                  provider.clearLastUnlockedAchievements();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
