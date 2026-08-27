@@ -59,7 +59,7 @@ ThemeData buildBoredomTheme() {
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.accent.withOpacity(0.25),
+      indicatorColor: AppColors.accent.withValues(alpha: 0.25),
       labelTextStyle: WidgetStateProperty.all(
         const TextStyle(fontSize: 11, color: AppColors.textSecondary),
       ),

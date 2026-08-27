@@ -67,7 +67,7 @@ class StatsScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Text(
                   'Belum ada data. Selesaikan beberapa misi dulu.',
-                  style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8)),
+                  style: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.8)),
                 ),
               )
             else

@@ -93,7 +93,7 @@ class ProfileScreen extends StatelessWidget {
             Center(
               child: Text(
                 'Boredom v$kAppVersion · github.com/nekonaru/boredom',
-                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 11),
+                style: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.6), fontSize: 11),
               ),
             ),
           ],

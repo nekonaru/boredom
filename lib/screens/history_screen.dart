@@ -57,7 +57,7 @@ class HistoryScreen extends StatelessWidget {
               child: Text(
                 'Belum ada misi yang selesai.\nBalik ke Home dan klik "I\'M BORED".',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8)),
+                style: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.8)),
               ),
             );
           }

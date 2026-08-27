@@ -13,10 +13,10 @@ class AchievementBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: unlocked ? AppColors.accent.withOpacity(0.12) : AppColors.surface,
+        color: unlocked ? AppColors.accent.withValues(alpha: 0.12) : AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: unlocked ? AppColors.accent.withOpacity(0.5) : Colors.white12,
+          color: unlocked ? AppColors.accent.withValues(alpha: 0.5) : Colors.white12,
         ),
       ),
       child: Column(

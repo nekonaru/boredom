@@ -17,10 +17,10 @@ class DailyChallengeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: completed ? AppColors.success.withOpacity(0.1) : AppColors.surface,
+        color: completed ? AppColors.success.withValues(alpha: 0.1) : AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: completed ? AppColors.success.withOpacity(0.4) : Colors.white12,
+          color: completed ? AppColors.success.withValues(alpha: 0.4) : Colors.white12,
         ),
       ),
       child: Row(

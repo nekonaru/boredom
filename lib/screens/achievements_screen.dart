@@ -46,7 +46,7 @@ class AchievementsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.18),
+                    color: AppColors.accent.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(

@@ -26,7 +26,7 @@ class MissionService {
   /// tetap selalu dapat misi, bukan layar kosong.
   static Mission generate(MissionFilter filter, {bool chaosMode = false}) {
     if (chaosMode) {
-      final pool = MissionCatalog.all;
+      const pool = MissionCatalog.all;
       return pool[_random.nextInt(pool.length)];
     }
 

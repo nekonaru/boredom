@@ -105,7 +105,7 @@ class MissionSheet extends StatelessWidget {
                           },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
-                      disabledForegroundColor: AppColors.textSecondary.withOpacity(0.4),
+                      disabledForegroundColor: AppColors.textSecondary.withValues(alpha: 0.4),
                       side: BorderSide(
                         color: provider.rerollsLeft <= 0 ? Colors.white10 : Colors.white24,
                       ),
@@ -161,7 +161,7 @@ class _InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: highlight ? AppColors.success.withOpacity(0.18) : Colors.white10,
+        color: highlight ? AppColors.success.withValues(alpha: 0.18) : Colors.white10,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

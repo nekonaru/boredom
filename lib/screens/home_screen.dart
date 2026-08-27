@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppColors.warning.withOpacity(0.15),
+                      color: AppColors.warning.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -119,7 +119,7 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: provider.chaosMode
-                      ? AppColors.danger.withOpacity(0.15)
+                      ? AppColors.danger.withValues(alpha: 0.15)
                       : AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
@@ -145,7 +145,7 @@ class HomeScreen extends StatelessWidget {
                           Text(
                             'Abaikan semua preferensi. Apapun bisa keluar.',
                             style: TextStyle(
-                              color: AppColors.textSecondary.withOpacity(0.9),
+                              color: AppColors.textSecondary.withValues(alpha: 0.9),
                               fontSize: 11,
                             ),
                           ),
@@ -155,7 +155,7 @@ class HomeScreen extends StatelessWidget {
                     Switch(
                       value: provider.chaosMode,
                       onChanged: provider.setChaosMode,
-                      activeColor: AppColors.danger,
+                      activeThumbColor: AppColors.danger,
                     ),
                   ],
                 ),
