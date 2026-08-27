@@ -34,8 +34,23 @@ jobs:
           echo "Isi folder android/ (level atas):"
           ls -la android/
           echo ""
-          echo "File *.gradle* yang ada:"
-          find android -maxdepth 2 -name "*.gradle*"
+          echo "=== android/settings.gradle.kts ==="
+          cat -n android/settings.gradle.kts 2>/dev/null || echo "(tidak ada)"
+          echo ""
+          echo "=== android/build.gradle.kts ==="
+          cat -n android/build.gradle.kts 2>/dev/null || echo "(tidak ada)"
+          echo ""
+          echo "=== android/build.gradle (Groovy) ==="
+          cat -n android/build.gradle 2>/dev/null || echo "(tidak ada)"
+          echo ""
+          echo "=== android/app/build.gradle.kts ==="
+          cat -n android/app/build.gradle.kts 2>/dev/null || echo "(tidak ada)"
+          echo ""
+          echo "=== android/gradle.properties ==="
+          cat -n android/gradle.properties 2>/dev/null || echo "(tidak ada)"
+          echo ""
+          echo "=== android/local.properties ==="
+          cat -n android/local.properties 2>/dev/null || echo "(tidak ada)"
 
       - name: Pastikan Gradle resolve dependency lewat Google Maven, Maven Central, dan storage Flutter
         run: |
