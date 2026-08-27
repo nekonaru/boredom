@@ -153,6 +153,17 @@ class BoredomProvider extends ChangeNotifier {
   Future<List<Achievement>> completeMission() async {
     final instance = currentMission;
     if (instance == null) return [];
+    // FIX (bug spam-tap): nol-in currentMission SEGERA di sini, sebelum ada
+    // proses async/await apa pun di bawah. Sebelumnya ini baru dilakukan di
+    // akhir fungsi, setelah beberapa kali await ke penyimpanan lokal (nyata
+    // makan waktu, bukan instan). Kalau tombol ACCEPT & COMPLETE di-tap
+    // berkali-kali dengan cepat, tap kedua/ketiga bisa nge-trigger
+    // completeMission() lagi sebelum tap pertama selesai nyimpen, dan karena
+    // currentMission masih belum di-null-kan, guard di atas (`if (instance
+    // == null) return [];`) nggak nangkep itu -> XP kehitung berkali-kali
+    // buat misi yang sama. Dengan nol-in di sini (sinkron, sebelum await
+    // pertama), tap susulan langsung ke-block oleh guard di atas.
+    currentMission = null;
     final mission = instance.mission;
     final now = DateTime.now();
 
@@ -212,7 +223,6 @@ class BoredomProvider extends ChangeNotifier {
     }
     lastUnlockedAchievements = newlyUnlocked;
 
-    currentMission = null;
     notifyListeners();
     return newlyUnlocked;
   }
@@ -313,15 +323,16 @@ class BoredomProvider extends ChangeNotifier {
     final nextIndex = qp.currentStepIndex + 1;
 
     if (nextIndex >= chain.steps.length) {
-      // Chain tuntas.
+      // Chain tuntas. Sama kayak fix di completeMission(): nol-in
+      // questChainProgress SEGERA (sebelum await), bukan di akhir, biar tap
+      // dobel di tombol terakhir chain nggak nge-trigger reward XP dua kali.
+      questChainProgress = null;
       progress = progress.copyWith(
         totalXp: progress.totalXp + chain.rewardXp,
         questChainsCompleted: progress.questChainsCompleted + 1,
       );
       lastXpGained = chain.rewardXp;
       await StorageService.instance.saveProgress(progress);
-
-      questChainProgress = null;
       await StorageService.instance.saveQuestChainProgress(null);
 
       final newlyUnlocked = _evaluateThresholdAchievements(DateTime.now());
