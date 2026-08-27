@@ -1,0 +1,13 @@
+include: package:flutter_lints/flutter.yaml
+
+# `flutter_lints` sudah ada di pubspec.yaml sejak awal sebagai dev_dependency,
+# tapi tanpa file analysis_options.yaml ini, Dart analyzer nggak pernah benar-benar
+# menjalankan rule-rule lint-nya. File ini yang mengaktifkannya.
+linter:
+  rules:
+    prefer_single_quotes: true
+    sort_child_properties_last: true
+
+analyzer:
+  exclude:
+    - build/**

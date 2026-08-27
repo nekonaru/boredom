@@ -10,10 +10,25 @@ class AchievementsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unlockedIds =
-        context.watch<BoredomProvider>().achievements.map((a) => a.achievementId).toSet();
-    final all = AchievementCatalog.all;
-    final unlockedCount = all.where((a) => unlockedIds.contains(a.id)).length;
+    final unlockedList = context.watch<BoredomProvider>().achievements;
+    final unlockedAtById = {
+      for (final u in unlockedList) u.achievementId: u.unlockedAt,
+    };
+    final unlockedIds = unlockedAtById.keys.toSet();
+
+    // Yang sudah ke-unlock tampil duluan (terbaru di atas), sisanya
+    // menyusul dalam urutan katalog aslinya biar "misteri" achievement
+    // yang belum dibuka tetap konsisten posisinya.
+    final all = [...AchievementCatalog.all]..sort((a, b) {
+        final aUnlocked = unlockedIds.contains(a.id);
+        final bUnlocked = unlockedIds.contains(b.id);
+        if (aUnlocked != bUnlocked) return aUnlocked ? -1 : 1;
+        if (aUnlocked && bUnlocked) {
+          return unlockedAtById[b.id]!.compareTo(unlockedAtById[a.id]!);
+        }
+        return 0;
+      });
+    final unlockedCount = unlockedIds.length;
 
     return SafeArea(
       child: SingleChildScrollView(

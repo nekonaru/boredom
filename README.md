@@ -6,6 +6,7 @@ Game kecil buat kehidupan sehari-hari. Klik satu tombol, dapet satu misi nyata, 
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.35-02569B?logo=flutter)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
@@ -66,7 +67,20 @@ lib/
 
 ## Yang belum dibuat
 
-Sound effect & animasi tambahan (polish murni, nggak mempengaruhi fungsi) — satu-satunya item di roadmap awal yang sengaja dilewatin karena butuh aset audio/animasi custom yang di luar scope kode.
+Sound effect & animasi tambahan (polish murni, nggak mempengaruhi fungsi) — satu-satunya item di roadmap awal yang sengaja dilewatin karena butuh aset audio/animasi custom yang di luar scope kode. App icon juga masih default Flutter — perlu aset gambar custom buat diganti.
+
+## Roadmap lanjutan (belum dikerjain)
+
+- Sound effect & haptic pattern yang lebih variatif (baru ditambah haptic dasar di v1.1.0)
+- Custom app icon & splash screen
+- Widget test untuk `MissionService.generate` (fallback filter) dan `UserProgress` (kurva level/XP)
+- Export/import data (backup manual sebelum ganti HP, mengingat semua data cuma lokal)
+- Sinkronisasi opsional (tetap privacy-first, misalnya lewat file backup, bukan akun/server)
+- Custom mission submission (misi buatan sendiri, di luar katalog bawaan)
+
+## License
+
+[MIT](LICENSE) © 2026 Nicolas Dwi Dharma — bebas dipakai, dimodifikasi, dan disebarluaskan asal kredit tetap dicantumkan.
 
 ---
 

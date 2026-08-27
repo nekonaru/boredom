@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/mission.dart';
 import '../providers/boredom_provider.dart';
@@ -93,19 +94,21 @@ class MissionSheet extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
-                      final ok = provider.rerollMission();
-                      if (!ok) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Reroll harian udah abis. Coba lagi besok 😅'),
-                          ),
-                        );
-                      }
-                    },
+                    // Disabled beneran (bukan cuma nunjukin snackbar) begitu
+                    // jatah reroll harian habis, biar user langsung ngeh
+                    // lewat tampilan tombolnya tanpa harus nge-tap dulu.
+                    onPressed: provider.rerollsLeft <= 0
+                        ? null
+                        : () {
+                            HapticFeedback.selectionClick();
+                            provider.rerollMission();
+                          },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: Colors.white24),
+                      disabledForegroundColor: AppColors.textSecondary.withOpacity(0.4),
+                      side: BorderSide(
+                        color: provider.rerollsLeft <= 0 ? Colors.white10 : Colors.white24,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -119,6 +122,7 @@ class MissionSheet extends StatelessWidget {
                   flex: 2,
                   child: ElevatedButton(
                     onPressed: () async {
+                      HapticFeedback.mediumImpact();
                       await provider.completeMission();
                       if (context.mounted) Navigator.of(context).pop();
                     },

@@ -89,6 +89,13 @@ class ProfileScreen extends StatelessWidget {
                 child: const Text('Reset Progress'),
               ),
             ),
+            const SizedBox(height: 24),
+            Center(
+              child: Text(
+                'Boredom v$kAppVersion · github.com/nekonaru/boredom',
+                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 11),
+              ),
+            ),
           ],
         ),
       ),

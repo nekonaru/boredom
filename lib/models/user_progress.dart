@@ -55,8 +55,18 @@ class UserProgress {
   });
 
   // Kurva level: makin tinggi level, makin butuh banyak XP.
-  // Level N butuh total XP = 50 * N * (N+1) / 2 (segitiga, biar smooth).
-  static int xpNeededForLevel(int level) => (50 * level * (level + 1)) ~/ 2;
+  // Level 1 = titik start gratis (0 XP). Level N (N>=2) butuh total XP
+  // = 50 * (N-1) * N / 2 (segitiga, biar smooth).
+  //
+  // FIX: sebelumnya formulanya `50 * level * (level+1) / 2`, yang berarti
+  // "level 1" sendiri dianggap butuh 50 XP buat dicapai - padahal user baru
+  // langsung start di level 1 dengan 0 XP. Akibatnya xpIntoCurrentLevel jadi
+  // NEGATIF (nampilin "-50/100 XP" dst) buat semua user baru sebelum total
+  // XP mereka tembus 50 (yaitu sebelum nyelesain misi pertama, karena XP
+  // misi paling kecil pun 15). Formula ini geser basis-nya biar level 1
+  // konsisten mulai dari 0 XP.
+  static int xpNeededForLevel(int level) =>
+      level <= 1 ? 0 : (50 * (level - 1) * level) ~/ 2;
 
   int get level {
     int lvl = 1;

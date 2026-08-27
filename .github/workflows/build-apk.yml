@@ -110,6 +110,13 @@ jobs:
       - name: Install dependency
         run: flutter pub get
 
+      - name: Analisis kode (flutter analyze)
+        # Default: gagal kalau ada error atau warning, tapi nggak fatal buat
+        # info-level lint (banyak dari flutter_lints yang baru pertama kali
+        # aktif di project ini lewat analysis_options.yaml). Kalau nanti udah
+        # bersih total, boleh ditambahin --fatal-infos biar makin ketat.
+        run: flutter analyze
+
       - name: Pasang Gradle init script buat patch plugin lama (namespace/JVM-target)
         run: |
           # Init script Gradle SELALU Groovy dan jalan otomatis di semua
