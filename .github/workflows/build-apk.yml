@@ -143,9 +143,14 @@ jobs:
                           }
                           if (project.plugins.hasPlugin('org.jetbrains.kotlin.android') ||
                               project.plugins.hasPlugin('kotlin-android')) {
-                              project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-                                  kotlinOptions {
-                                      jvmTarget = "17"
+                              // Duck-typing lewat nama+properti task, BUKAN referensi
+                              // class org.jetbrains.kotlin... langsung - class Kotlin
+                              // plugin nggak ke-load di classpath init script, dan
+                              // Groovy salah nafsirin "org" jadi property lookup di
+                              // project kalau class-nya nggak ke-resolve.
+                              project.tasks.configureEach { task ->
+                                  if (task.name.contains('Kotlin') && task.hasProperty('kotlinOptions')) {
+                                      task.kotlinOptions.jvmTarget = "17"
                                   }
                               }
                           }
