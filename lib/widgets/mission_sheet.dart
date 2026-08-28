@@ -190,7 +190,7 @@ class _InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: highlight ? AppColors.success.withOpacity(0.18) : Colors.white10,
+        color: highlight ? AppColors.success.withValues(alpha: 0.18) : Colors.white10,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
