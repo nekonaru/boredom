@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/mission.dart';
 import '../providers/boredom_provider.dart';
@@ -18,8 +17,20 @@ Future<void> showMissionSheet(BuildContext context) {
   );
 }
 
-class MissionSheet extends StatelessWidget {
+class MissionSheet extends StatefulWidget {
   const MissionSheet({super.key});
+
+  @override
+  State<MissionSheet> createState() => _MissionSheetState();
+}
+
+class _MissionSheetState extends State<MissionSheet> {
+  // Guard di level UI: begitu ACCEPT ke-tap, semua tombol langsung
+  // ke-disable sampai proses selesai/sheet ketutup. Lapis pertahanan kedua
+  // di atas guard yang udah ada di BoredomProvider.completeMission() -
+  // provider-nya emang udah aman dari dobel XP walau tombol ini nggak ada,
+  // tapi ini nyegah spam-tap keliatan "nyala-nyala" sebelum sheet ketutup.
+  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -94,21 +105,21 @@ class MissionSheet extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    // Disabled beneran (bukan cuma nunjukin snackbar) begitu
-                    // jatah reroll harian habis, biar user langsung ngeh
-                    // lewat tampilan tombolnya tanpa harus nge-tap dulu.
-                    onPressed: provider.rerollsLeft <= 0
+                    onPressed: _isSubmitting
                         ? null
                         : () {
-                            HapticFeedback.selectionClick();
-                            provider.rerollMission();
+                            final ok = provider.rerollMission();
+                            if (!ok) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Reroll harian udah abis. Coba lagi besok 😅'),
+                                ),
+                              );
+                            }
                           },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
-                      disabledForegroundColor: AppColors.textSecondary.withValues(alpha: 0.4),
-                      side: BorderSide(
-                        color: provider.rerollsLeft <= 0 ? Colors.white10 : Colors.white24,
-                      ),
+                      side: const BorderSide(color: Colors.white24),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -121,12 +132,28 @@ class MissionSheet extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      HapticFeedback.mediumImpact();
-                      await provider.completeMission();
-                      if (context.mounted) Navigator.of(context).pop();
-                    },
-                    child: const Text('ACCEPT & COMPLETE'),
+                    onPressed: _isSubmitting
+                        ? null
+                        : () async {
+                            setState(() => _isSubmitting = true);
+                            await provider.completeMission();
+                            // Nggak perlu setState(_isSubmitting = false) lagi:
+                            // widget ini bakal ke-pop/dispose begitu
+                            // currentMission jadi null (lewat postFrameCallback
+                            // di atas), jadi state ini nggak akan sempat
+                            // dipakai buat rebuild lagi.
+                            if (context.mounted) Navigator.of(context).pop();
+                          },
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : const Text('ACCEPT & COMPLETE'),
                   ),
                 ),
               ],
@@ -134,10 +161,12 @@ class MissionSheet extends StatelessWidget {
             const SizedBox(height: 8),
             Center(
               child: TextButton(
-                onPressed: () {
-                  provider.dismissMission();
-                  Navigator.of(context).pop();
-                },
+                onPressed: _isSubmitting
+                    ? null
+                    : () {
+                        provider.dismissMission();
+                        Navigator.of(context).pop();
+                      },
                 child: const Text(
                   'Skip buat sekarang',
                   style: TextStyle(color: AppColors.textSecondary),
@@ -161,7 +190,7 @@ class _InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: highlight ? AppColors.success.withValues(alpha: 0.18) : Colors.white10,
+        color: highlight ? AppColors.success.withOpacity(0.18) : Colors.white10,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
