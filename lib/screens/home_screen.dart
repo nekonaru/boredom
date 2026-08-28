@@ -155,7 +155,7 @@ class HomeScreen extends StatelessWidget {
                     Switch(
                       value: provider.chaosMode,
                       onChanged: provider.setChaosMode,
-                      activeColor: AppColors.danger,
+                      activeThumbColor: AppColors.danger,
                     ),
                   ],
                 ),

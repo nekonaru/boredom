@@ -12,7 +12,7 @@ class AchievementsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final unlockedIds =
         context.watch<BoredomProvider>().achievements.map((a) => a.achievementId).toSet();
-    final all = AchievementCatalog.all;
+    const all = AchievementCatalog.all;
     final unlockedCount = all.where((a) => unlockedIds.contains(a.id)).length;
 
     return SafeArea(
