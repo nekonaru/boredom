@@ -39,6 +39,15 @@ jobs:
           rm -rf android
           flutter create --platforms=android --org com.nikodwidharma --project-name boredom .
 
+      - name: Pasang icon dan splash custom dari repo
+        run: |
+          mkdir -p android/app/src/main/res/drawable
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+          mkdir -p android/app/src/main/res/values
+          cp android_res_extra/drawable/*.xml android/app/src/main/res/drawable/
+          cp android_res_extra/launcher/mipmap-anydpi-v26/*.xml android/app/src/main/res/mipmap-anydpi-v26/
+          cp android_res_extra/launcher/values/*.xml android/app/src/main/res/values/
+
       - name: Cek format file Gradle yang beneran ke-generate (debug)
         run: |
           echo "Isi folder android/ (level atas):"
@@ -179,7 +188,7 @@ jobs:
           cat ~/.gradle/init.d/boredom-patch.gradle
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --obfuscate --split-debug-info=build/symbols
 
       - name: Cari file APK di manapun lokasinya
         run: |

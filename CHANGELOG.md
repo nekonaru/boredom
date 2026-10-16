@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.1.0
+
+Build and first-impression release. Smaller APKs, custom branding, and
+a proper welcome for new users.
+
+### Added
+- 3-page onboarding shown once on first launch (skippable), in English
+  and Bahasa Indonesia.
+- Custom launcher icon (dice mark) and dark launch background,
+  replacing the default Flutter branding. Vector-only, no new
+  dependencies.
+
+### Improved
+- Release builds are now obfuscated with split debug info, and the
+  unused x86_64 slice is dropped, so downloads are smaller.
+- Startup reads run concurrently instead of one by one.
+
 ## v2.0.2
 
 Fixes a pre-existing CI bug where the APK finder step copied

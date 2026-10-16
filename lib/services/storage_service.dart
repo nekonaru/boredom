@@ -18,6 +18,7 @@ class StorageService {
   static const _kQuestChain = 'boredom_quest_chain';
   static const _kCustomMissions = 'boredom_custom_missions';
   static const _kFavorites = 'boredom_favorites';
+  static const _kOnboarding = 'boredom_onboarding_done';
 
   SharedPreferences? _cache;
 
@@ -167,6 +168,16 @@ class StorageService {
   Future<void> saveFavorites(Set<String> ids) async {
     final p = await prefs;
     await p.setStringList(_kFavorites, ids.toList());
+  }
+
+  Future<bool> isOnboardingDone() async {
+    final p = await prefs;
+    return p.getBool(_kOnboarding) ?? false;
+  }
+
+  Future<void> setOnboardingDone(bool done) async {
+    final p = await prefs;
+    await p.setBool(_kOnboarding, done);
   }
 
   Future<void> resetAll() async {

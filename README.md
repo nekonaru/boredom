@@ -150,14 +150,17 @@ boredom/
 │   │                             # QuestChain, CustomMission
 │   ├── providers/                # BoredomProvider (game state), LanguageProvider
 │   ├── screens/                  # Home, Missions, Stats, Achievements, Profile, shell
+│   │                             # onboarding (first-run walkthrough)
 │   ├── services/                 # catalogs, generator, local storage
 │   ├── utils/                    # theme, lightweight date formatting
 │   └── widgets/                  # selector chips, mission sheet, XP bar, charts, ...
 ├── test/
-│   ├── widget_test.dart          # app boots without crashing
+│   ├── widget_test.dart          # app boots, onboarding on fresh installs
 │   ├── user_progress_test.dart   # level curve
 │   ├── mission_service_test.dart # generator fallback, filters, exclusions
-│   └── localization_test.dart    # string coverage, catalog sanity
+│   ├── localization_test.dart    # string coverage, catalog sanity
+│   └── onboarding_test.dart      # onboarding flag persists
+├── android_res_extra/            # launcher icon + splash drawn into the APK by CI
 ├── .github/
 │   └── workflows/
 │       ├── build-apk.yml         # CI: analyze + build APK on push to main/master

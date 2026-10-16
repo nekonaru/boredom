@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/boredom_provider.dart';
 import 'providers/language_provider.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/root_shell.dart';
 import 'utils/app_theme.dart';
 
@@ -48,6 +49,10 @@ class _AppGate extends StatelessWidget {
         ),
       );
     }
+    final seenOnboarding = context.select<BoredomProvider, bool>(
+      (p) => p.onboardingDone,
+    );
+    if (!seenOnboarding) return const OnboardingScreen();
     return const RootShell();
   }
 }

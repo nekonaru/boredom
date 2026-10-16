@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.1.0
+
+Rilis build dan kesan pertama. APK lebih kecil, branding sendiri, dan
+sambutan yang layak untuk user baru.
+
+### Ditambahkan
+- Onboarding 3 halaman yang tampil sekali saat pertama buka (bisa
+  dilewati), dalam English dan Bahasa Indonesia.
+- Icon launcher custom (gambar dadu) dan latar splash gelap,
+  menggantikan branding default Flutter. Murni vektor, tanpa dependency
+  baru.
+
+### Ditingkatkan
+- Build rilis kini obfuscated dengan debug info terpisah, dan slice
+  x86_64 yang tak terpakai dibuang, sehingga unduhan lebih kecil.
+- Pembacaan data saat startup jalan bersamaan, bukan satu per satu.
+
 ## v2.0.2
 
 Memperbaiki bug CI yang sudah ada sejak lama: step pencari APK menyalin

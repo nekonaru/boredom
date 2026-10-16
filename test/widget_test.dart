@@ -8,7 +8,10 @@ void main() {
   testWidgets('Boredom app boots without crashing', (WidgetTester tester) async {
     // Mock SharedPreferences so StorageService never touches the real
     // platform channel, which does not exist in the test environment.
-    SharedPreferences.setMockInitialValues({});
+    // Onboarding is marked done so the test lands straight on Home.
+    SharedPreferences.setMockInitialValues({
+      'boredom_onboarding_done': true,
+    });
 
     await tester.pumpWidget(const BoredomApp());
 
@@ -22,5 +25,14 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('YOU ARE BORED.'), findsOneWidget);
+  });
+
+  testWidgets('Onboarding shows on fresh installs', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await tester.pumpWidget(const BoredomApp());
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('One tap, one mission'), findsOneWidget);
   });
 }

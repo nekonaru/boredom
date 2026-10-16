@@ -150,6 +150,7 @@ boredom/
 │   │                             # QuestChain, CustomMission
 │   ├── providers/                # BoredomProvider (state game), LanguageProvider
 │   ├── screens/                  # Beranda, Misi, Statistik, Pencapaian, Profil, shell
+│   │                             # onboarding (tur perkenalan pertama buka)
 │   ├── services/                 # katalog, generator, penyimpanan lokal
 │   ├── utils/                    # tema, format tanggal yang ringan
 │   └── widgets/                  # chip selector, mission sheet, XP bar, grafik, ...
@@ -158,6 +159,8 @@ boredom/
 │   ├── user_progress_test.dart   # kurva level
 │   ├── mission_service_test.dart # fallback generator, filter, pengecualian
 │   └── localization_test.dart    # cakupan string, kewarasan katalog
+│   └── onboarding_test.dart      # flag onboarding tersimpan
+├── android_res_extra/            # icon launcher + splash yang dipasang CI ke APK
 ├── .github/
 │   └── workflows/
 │       ├── build-apk.yml         # CI: analyze + build APK tiap push ke main/master

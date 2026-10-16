@@ -172,6 +172,25 @@ class AppStrings {
   String get resetConfirm => _pick('Reset', 'Hapus');
   String versionFooter(String v) => 'Boredom v$v';
 
+  // Onboarding (v2.1)
+  String get onbSkip => _pick('Skip', 'Lewati');
+  String get onbNext => _pick('Next', 'Lanjut');
+  String get onbStart => _pick('Start playing', 'Mulai main');
+  String get onb1Title => _pick('One tap, one mission', 'Satu ketuk, satu misi');
+  String get onb1Body => _pick(
+        'Tell Boredom your mood, time, place, and energy. One tap rolls a real-world mission you can do right now.',
+        'Beri tahu Boredom mood, waktu, tempat, dan energimu. Satu ketuk menghasilkan misi nyata yang bisa langsung dikerjakan.',
+      );
+  String get onb2Title => _pick('Earn XP, keep streaks', 'Kumpulkan XP, jaga streak');
+  String get onb2Body => _pick(
+        'Accept missions for XP and level up from Bored to the Final Boss of Boredom. Come back daily to grow your streak.',
+        'Terima misi untuk XP dan naik level dari Bored sampai Final Boss of Boredom. Kembali tiap hari untuk memperbesar streak.',
+      );
+  String get onb3Title => _pick('Yours, offline, in your language', 'Milikmu, offline, dalam bahasamu');
+  String get onb3Body => _pick(
+        'Custom missions, favorites, and backups live only on this phone. Switch between English and Bahasa Indonesia anytime.',
+        'Misi buatanmu, favorit, dan cadangan hanya ada di HP ini. Ganti antara English dan Bahasa Indonesia kapan saja.',
+      );
   // History search (v1.3)
   String get searchHint => _pick('Search history...', 'Cari riwayat...');
   String get searchEmpty => _pick(

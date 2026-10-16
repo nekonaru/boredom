@@ -41,6 +41,15 @@ jobs:
           rm -rf android
           flutter create --platforms=android --org com.nikodwidharma --project-name boredom .
 
+      - name: Install custom icons and splash from the repo
+        run: |
+          mkdir -p android/app/src/main/res/drawable
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+          mkdir -p android/app/src/main/res/values
+          cp android_res_extra/drawable/*.xml android/app/src/main/res/drawable/
+          cp android_res_extra/launcher/mipmap-anydpi-v26/*.xml android/app/src/main/res/mipmap-anydpi-v26/
+          cp android_res_extra/launcher/values/*.xml android/app/src/main/res/values/
+
       - name: Ensure Gradle resolves from Google Maven, Maven Central, and Flutter storage
         run: |
           python3 - << 'PYEOF'
@@ -143,7 +152,9 @@ jobs:
           EOF
 
       - name: Build split APKs
-        run: flutter build apk --release --split-per-abi
+        run: |
+          flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/symbols
+          rm -f build/app/outputs/flutter-apk/*x86_64*.apk
 
       - name: Read version from pubspec.yaml
         id: version

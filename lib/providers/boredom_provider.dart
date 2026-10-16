@@ -43,24 +43,38 @@ class BoredomProvider extends ChangeNotifier {
   bool _loaded = false;
   bool get loaded => _loaded;
 
+  bool onboardingDone = true;
+
   int? lastXpGained;
   List<Achievement> lastUnlockedAchievements = [];
 
   Future<void> init() async {
     final storage = StorageService.instance;
-    progress = await storage.loadProgress();
-    history = await storage.loadHistory();
-    achievements = await storage.loadAchievements();
-    questChainProgress = await storage.loadQuestChainProgress();
-    customMissions = await storage.loadCustomMissions();
-    favoriteIds = await storage.loadFavorites();
+    // Independent reads run concurrently so first paint comes sooner.
+    final results = await Future.wait([
+      storage.loadProgress(),
+      storage.loadHistory(),
+      storage.loadAchievements(),
+      storage.loadQuestChainProgress(),
+      storage.loadCustomMissions(),
+      storage.loadFavorites(),
+      storage.loadDailyChallengeState(),
+      storage.isOnboardingDone(),
+    ]);
+    progress = results[0] as UserProgress;
+    history = results[1] as List<CompletedMission>;
+    achievements = results[2] as List<UnlockedAchievement>;
+    questChainProgress = results[3] as QuestChainProgress?;
+    customMissions = results[4] as List<CustomMission>;
+    favoriteIds = results[5] as Set<String>;
+    final storedChallenge = results[6] as DailyChallengeState?;
+    onboardingDone = results[7] as bool;
     _missionCounter = history.length;
 
     final now = DateTime.now();
     progress = _resetRerollsIfNewDay(progress, now);
     progress = _handleAppOpen(progress, now);
 
-    final storedChallenge = await storage.loadDailyChallengeState();
     if (storedChallenge == null || !_isSameDay(storedChallenge.date, now)) {
       final challenge = DailyChallengeCatalog.forDate(now);
       dailyChallengeState =
@@ -72,6 +86,12 @@ class BoredomProvider extends ChangeNotifier {
 
     await storage.saveProgress(progress);
     _loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> completeOnboarding() async {
+    onboardingDone = true;
+    await StorageService.instance.setOnboardingDone(true);
     notifyListeners();
   }
 
