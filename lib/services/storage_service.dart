@@ -27,6 +27,12 @@ class StorageService {
   Future<SharedPreferences> get prefs async =>
       _cache ??= await SharedPreferences.getInstance();
 
+  /// Test-only: drops the cached instance so the next read picks up fresh
+  /// mock values. Each test must call this after setMockInitialValues.
+  void clearCache() {
+    _cache = null;
+  }
+
   Future<UserProgress> loadProgress() async {
     final p = await prefs;
     final raw = p.getString(_kProgress);
