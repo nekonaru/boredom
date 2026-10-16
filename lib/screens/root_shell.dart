@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
+import '../providers/theme_provider.dart';
 import 'home_screen.dart';
 import 'history_screen.dart';
 import 'stats_screen.dart';
 import 'achievements_screen.dart';
 import 'profile_screen.dart';
-import '../utils/app_theme.dart';
 
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
@@ -28,12 +28,13 @@ class _RootShellState extends State<RootShell> {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     return Scaffold(
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        backgroundColor: AppColors.surface,
+        backgroundColor: pal.surface,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: [
           NavigationDestination(icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home), label: s.navHome),
