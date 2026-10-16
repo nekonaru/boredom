@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/boredom_provider.dart';
 import 'providers/language_provider.dart';
-import 'providers/theme_provider.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/root_shell.dart';
 import 'utils/app_theme.dart';
@@ -20,15 +19,12 @@ class BoredomApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => BoredomProvider()..init()),
         ChangeNotifierProvider.value(value: LanguageProvider.instance..load()),
-        ChangeNotifierProvider.value(value: ThemeProvider.instance..load()),
       ],
-      child: Consumer2<LanguageProvider, ThemeProvider>(
-        builder: (context, lang, tp, _) => MaterialApp(
+      child: Consumer<LanguageProvider>(
+        builder: (context, lang, _) => MaterialApp(
           title: 'Boredom',
           debugShowCheckedModeBanner: false,
-          theme: buildBoredomTheme(light: true, accent: tp.accent),
-          darkTheme: buildBoredomTheme(light: false, accent: tp.accent),
-          themeMode: tp.isLight ? ThemeMode.light : ThemeMode.dark,
+          theme: buildBoredomTheme(),
           locale: lang.locale,
           home: const _AppGate(),
         ),
@@ -46,11 +42,10 @@ class _AppGate extends StatelessWidget {
   Widget build(BuildContext context) {
     final loaded = context.select<BoredomProvider, bool>((p) => p.loaded);
     if (!loaded) {
-      final pal = context.palette;
-      return Scaffold(
-        backgroundColor: pal.background,
+      return const Scaffold(
+        backgroundColor: AppColors.background,
         body: Center(
-          child: CircularProgressIndicator(color: pal.accent),
+          child: CircularProgressIndicator(color: AppColors.accent),
         ),
       );
     }

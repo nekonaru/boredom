@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user_progress.dart';
-import '../providers/theme_provider.dart';
+import '../utils/app_theme.dart';
 
 class XpBar extends StatelessWidget {
   final UserProgress progress;
@@ -8,19 +8,18 @@ class XpBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pal = context.palette;
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: pal.accent.withValues(alpha: 0.18),
+            color: AppColors.accent.withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             'LV.${progress.level}',
-            style: TextStyle(
-              color: pal.accent,
+            style: const TextStyle(
+              color: AppColors.accent,
               fontWeight: FontWeight.bold,
               fontSize: 13,
             ),
@@ -33,8 +32,8 @@ class XpBar extends StatelessWidget {
             children: [
               Text(
                 progress.levelTitle,
-                style: TextStyle(
-                  color: pal.textPrimary,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
@@ -45,8 +44,8 @@ class XpBar extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: progress.levelProgress.clamp(0, 1),
                   minHeight: 6,
-                  backgroundColor: pal.emptyBar,
-                  valueColor: AlwaysStoppedAnimation(pal.accent),
+                  backgroundColor: Colors.white12,
+                  valueColor: const AlwaysStoppedAnimation(AppColors.accent),
                 ),
               ),
             ],
@@ -55,7 +54,7 @@ class XpBar extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           '${progress.xpIntoCurrentLevel}/${progress.xpNeededForNextLevel} XP',
-          style: TextStyle(color: pal.textSecondary, fontSize: 11),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
         ),
       ],
     );
