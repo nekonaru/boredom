@@ -19,9 +19,8 @@ void main() {
     });
 
     test('accent index clamps into range', () {
-      final tp = ThemeProvider.instance;
-      expect(tp.accents.length, 5);
-      expect(tp.accent, ThemeProvider.accents[0]);
+      expect(ThemeProvider.accents.length, 5);
+      expect(ThemeProvider.instance.accent, ThemeProvider.accents[0]);
     });
   });
 

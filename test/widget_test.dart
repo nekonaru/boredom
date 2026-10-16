@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:boredom/main.dart';
+import 'package:boredom/services/storage_service.dart';
 
 void main() {
   testWidgets('Boredom app boots without crashing', (WidgetTester tester) async {
@@ -12,6 +13,7 @@ void main() {
     SharedPreferences.setMockInitialValues({
       'boredom_onboarding_done': true,
     });
+    StorageService.instance.clearCache();
 
     await tester.pumpWidget(const BoredomApp());
 
@@ -29,6 +31,7 @@ void main() {
 
   testWidgets('Onboarding shows on fresh installs', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
+    StorageService.instance.clearCache();
 
     await tester.pumpWidget(const BoredomApp());
     await tester.pump(const Duration(seconds: 1));
