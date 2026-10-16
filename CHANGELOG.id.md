@@ -1,5 +1,24 @@
 # Changelog
 
+## v2.2.0
+
+Rilis personalisasi dan insight. Murni Dart, tanpa plugin atau izin
+baru.
+
+### Ditambahkan
+- Tema terang plus 5 warna aksen, diganti di Profil bagian Tampilan.
+  Setiap layar kini membaca palet semantik, bukan warna gelap yang
+  di-hardcode.
+- Haptic feedback saat ketuk dan selesai, dengan toggle di Profil.
+- Statistik bulanan: grafik 30 hari terakhir, rata-rata XP per hari
+  aktif, dan hari tersibuk.
+- Tombol dislike di mission sheet: misi yang di-dislike berhenti keluar
+  dari generator, dan dislike ikut dalam cadangan.
+
+### Ditingkatkan
+- Pill info, chip, dan batang grafik kini mengikuti tema aktif,
+  bukan mengasumsikan latar gelap.
+
 ## v2.1.0
 
 Rilis build dan kesan pertama. APK lebih kecil, branding sendiri, dan

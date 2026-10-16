@@ -1,5 +1,24 @@
 # Changelog
 
+## v2.2.0
+
+Personalization and insight release. Pure Dart, no new plugins or
+permissions.
+
+### Added
+- Light theme plus 5 accent colors, switched in Profile under
+  Appearance. Every screen now reads a semantic palette instead of
+  hardcoded dark colors.
+- Haptic feedback on taps and completions, with a toggle in Profile.
+- Monthly stats: last-30-days chart, average XP per active day, and
+  busiest weekday.
+- Dislike button on the mission sheet: disliked missions stop coming
+  out of the generator, and dislikes are included in backups.
+
+### Improved
+- Info pills, chips, and chart bars now adapt to the active theme
+  instead of assuming a dark background.
+
 ## v2.1.0
 
 Build and first-impression release. Smaller APKs, custom branding, and

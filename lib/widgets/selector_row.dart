@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
 
 class SelectorOption<T> {
   final T value;
@@ -25,6 +25,7 @@ class SelectorRow<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -32,8 +33,8 @@ class SelectorRow<T> extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8, left: 2),
           child: Text(
             title,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: pal.textSecondary,
               fontSize: 13,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.3,
@@ -54,15 +55,17 @@ class SelectorRow<T> extends StatelessWidget {
                 selected: isSelected,
                 onSelected: (_) => onChanged(opt.value),
                 showCheckmark: false,
-                backgroundColor: AppColors.surface,
-                selectedColor: AppColors.accent,
+                backgroundColor: pal.surface,
+                selectedColor: pal.accent,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? Colors.white : pal.textSecondary,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
                 side: BorderSide(
-                  color: isSelected ? AppColors.accent : Colors.white12,
+                  color: isSelected
+                      ? pal.accent
+                      : pal.textSecondary.withValues(alpha: 0.3),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),

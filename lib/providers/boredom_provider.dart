@@ -33,6 +33,7 @@ class BoredomProvider extends ChangeNotifier {
   QuestChainProgress? questChainProgress;
   List<CustomMission> customMissions = [];
   Set<String> favoriteIds = {};
+  Set<String> dislikedIds = {};
 
   // Undo snapshot of the last completion (cleared after the window ends
   // or once undo is used).
@@ -44,6 +45,7 @@ class BoredomProvider extends ChangeNotifier {
   bool get loaded => _loaded;
 
   bool onboardingDone = true;
+  bool hapticsEnabled = true;
 
   int? lastXpGained;
   List<Achievement> lastUnlockedAchievements = [];
@@ -60,6 +62,8 @@ class BoredomProvider extends ChangeNotifier {
       storage.loadFavorites(),
       storage.loadDailyChallengeState(),
       storage.isOnboardingDone(),
+      storage.loadHapticsEnabled(),
+      storage.loadDisliked(),
     ]);
     progress = results[0] as UserProgress;
     history = results[1] as List<CompletedMission>;
@@ -69,6 +73,8 @@ class BoredomProvider extends ChangeNotifier {
     favoriteIds = results[5] as Set<String>;
     final storedChallenge = results[6] as DailyChallengeState?;
     onboardingDone = results[7] as bool;
+    hapticsEnabled = results[8] as bool;
+    dislikedIds = results[9] as Set<String>;
     _missionCounter = history.length;
 
     final now = DateTime.now();
@@ -192,7 +198,9 @@ class BoredomProvider extends ChangeNotifier {
     final mission = MissionService.generate(
       filter,
       chaosMode: chaosMode,
-      excludeIds: chaosMode ? const {} : recentMissionIds,
+      // Disliked missions are excluded alongside recent ones, so the
+      // generator learns what the user does not want to see again.
+      excludeIds: chaosMode ? const {} : {...recentMissionIds, ...dislikedIds},
     );
     _missionCounter++;
     currentMission = MissionInstance(
@@ -361,7 +369,7 @@ class BoredomProvider extends ChangeNotifier {
     lastUnlockedAchievements = [];
   }
 
-  // ---------------- Favorites ----------------
+  // ---------------- Favorites and dislikes ----------------
 
   bool isFavorite(String missionId) => favoriteIds.contains(missionId);
 
@@ -372,6 +380,26 @@ class BoredomProvider extends ChangeNotifier {
       favoriteIds.add(missionId);
     }
     await StorageService.instance.saveFavorites(favoriteIds);
+    notifyListeners();
+  }
+
+  bool isDisliked(String missionId) => dislikedIds.contains(missionId);
+
+  Future<void> toggleDislike(String missionId) async {
+    if (dislikedIds.contains(missionId)) {
+      dislikedIds.remove(missionId);
+    } else {
+      dislikedIds.add(missionId);
+    }
+    await StorageService.instance.saveDisliked(dislikedIds);
+    notifyListeners();
+  }
+
+  // ---------------- Haptics ----------------
+
+  Future<void> setHapticsEnabled(bool value) async {
+    hapticsEnabled = value;
+    await StorageService.instance.saveHapticsEnabled(value);
     notifyListeners();
   }
 
@@ -479,6 +507,7 @@ class BoredomProvider extends ChangeNotifier {
             },
       'customMissions': customMissions.map((m) => m.toJson()).toList(),
       'favorites': favoriteIds.toList(),
+      'disliked': dislikedIds.toList(),
     };
     return _encodeJson(data);
   }
@@ -512,6 +541,7 @@ class BoredomProvider extends ChangeNotifier {
           .map((e) => CustomMission.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
       favoriteIds = ((data['favorites'] as List?) ?? []).map((e) => '$e').toSet();
+      dislikedIds = ((data['disliked'] as List?) ?? []).map((e) => '$e').toSet();
 
       await storage.saveProgress(progress);
       await storage.saveAchievements(achievements);
@@ -521,6 +551,7 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveQuestChainProgress(questChainProgress);
       await storage.saveCustomMissions(customMissions);
       await storage.saveFavorites(favoriteIds);
+      await storage.saveDisliked(dislikedIds);
       _missionCounter = history.length;
       _undoProgress = null;
       _undoEntry = null;
@@ -647,6 +678,48 @@ class BoredomProvider extends ChangeNotifier {
       if (diff >= 0 && diff < 7) counts[6 - diff]++;
     }
     return counts;
+  }
+
+  // ---------------- Monthly stats (v2.2) ----------------
+
+  /// Completed-mission counts for the last 30 days, oldest first.
+  /// Index 29 is today.
+  List<int> get last30DaysCounts {
+    final now = DateTime.now();
+    final counts = List<int>.filled(30, 0);
+    for (final e in history) {
+      final diff = DateTime(now.year, now.month, now.day)
+          .difference(DateTime(e.completedAt.year, e.completedAt.month, e.completedAt.day))
+          .inDays;
+      if (diff >= 0 && diff < 30) counts[29 - diff]++;
+    }
+    return counts;
+  }
+
+  /// Average XP per active day (days with at least one completion).
+  double get avgXpPerActiveDay {
+    if (history.isEmpty) return 0;
+    final days = history
+        .map((e) => DateTime(e.completedAt.year, e.completedAt.month, e.completedAt.day))
+        .toSet()
+        .length;
+    if (days == 0) return 0;
+    final total = history.fold<int>(0, (sum, e) => sum + e.xpEarned);
+    return total / days;
+  }
+
+  /// Weekday (1=Monday, 7=Sunday) with the most completions, or null.
+  int? get busiestWeekday {
+    if (history.isEmpty) return null;
+    final counts = List<int>.filled(7, 0);
+    for (final e in history) {
+      counts[e.completedAt.weekday - 1]++;
+    }
+    var best = 0;
+    for (var i = 1; i < 7; i++) {
+      if (counts[i] > counts[best]) best = i;
+    }
+    return best + 1;
   }
 }
 

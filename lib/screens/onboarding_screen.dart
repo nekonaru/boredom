@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../providers/boredom_provider.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
 
 /// First-run walkthrough: 3 pages, skippable, shown once.
 /// Existing users see it exactly once after updating.
@@ -26,6 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final pages = [
       _OnboardingPageData(emoji: '🎲', title: s.onb1Title, body: s.onb1Body),
       _OnboardingPageData(emoji: '🔥', title: s.onb2Title, body: s.onb2Body),
@@ -34,7 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final last = _page == pages.length - 1;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: pal.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -44,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPressed: () => _finish(context),
                 child: Text(
                   s.onbSkip,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: pal.textSecondary),
                 ),
               ),
             ),
@@ -67,8 +68,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: i == _page
-                        ? AppColors.accent
-                        : Colors.white24,
+                        ? pal.accent
+                        : pal.textSecondary.withValues(alpha: 0.4),
                   ),
                 ),
               ),
@@ -123,6 +124,7 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
@@ -133,8 +135,8 @@ class _OnboardingPage extends StatelessWidget {
           Text(
             data.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: pal.textPrimary,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
@@ -143,8 +145,8 @@ class _OnboardingPage extends StatelessWidget {
           Text(
             data.body,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: pal.textSecondary,
               fontSize: 15,
               height: 1.5,
             ),

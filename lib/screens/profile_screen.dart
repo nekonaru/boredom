@@ -5,6 +5,7 @@ import '../l10n/app_strings.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
 import '../utils/app_theme.dart';
 import '../widgets/xp_bar.dart';
 
@@ -14,14 +15,24 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final progress = context.select<BoredomProvider, UserProgress>(
       (p) => p.progress,
     );
     final rerollsLeft = context.select<BoredomProvider, int>(
       (p) => p.rerollsLeft,
     );
+    final hapticsEnabled = context.select<BoredomProvider, bool>(
+      (p) => p.hapticsEnabled,
+    );
     final isIndonesian = context.select<LanguageProvider, bool>(
       (p) => p.isIndonesian,
+    );
+    final isLight = context.select<ThemeProvider, bool>(
+      (p) => p.isLight,
+    );
+    final accentIndex = context.select<ThemeProvider, int>(
+      (p) => p.accentIndex,
     );
     final provider = context.read<BoredomProvider>();
 
@@ -33,8 +44,8 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Text(
               s.profileTitle,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: pal.textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -43,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: pal.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: XpBar(progress: progress),
@@ -77,14 +88,107 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
+              s.appearanceTitle,
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: pal.surface,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SegmentedButton<bool>(
+                    segments: [
+                      ButtonSegment(value: false, label: Text(s.themeDark)),
+                      ButtonSegment(value: true, label: Text(s.themeLight)),
+                    ],
+                    selected: {isLight},
+                    onSelectionChanged: (selected) {
+                      context.read<ThemeProvider>().setLight(selected.first);
+                    },
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    s.accentTitle,
+                    style: TextStyle(color: pal.textSecondary, fontSize: 12),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: List.generate(
+                      ThemeProvider.accents.length,
+                      (i) => Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () =>
+                              context.read<ThemeProvider>().setAccent(i),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ThemeProvider.accents[i],
+                              border: Border.all(
+                                color: i == accentIndex
+                                    ? pal.textPrimary
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            child: i == accentIndex
+                                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              s.hapticsTitle,
+                              style: TextStyle(color: pal.textPrimary, fontSize: 14),
+                            ),
+                            Text(
+                              s.hapticsDesc,
+                              style: TextStyle(color: pal.textSecondary, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Switch(
+                        value: hapticsEnabled,
+                        onChanged: provider.setHapticsEnabled,
+                        activeThumbColor: pal.accent,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
               s.languageTitle,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: pal.surface,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -94,7 +198,7 @@ class ProfileScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       isIndonesian ? s.languageIndonesian : s.languageEnglish,
-                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                      style: TextStyle(color: pal.textPrimary, fontSize: 14),
                     ),
                   ),
                   SegmentedButton<bool>(
@@ -119,12 +223,12 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               s.backupTitle,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               s.backupDesc,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
             ),
             const SizedBox(height: 12),
             Row(
@@ -143,8 +247,8 @@ class ProfileScreen extends StatelessWidget {
                     icon: const Icon(Icons.upload_outlined, size: 18),
                     label: Text(s.backupExport),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.accent,
-                      side: const BorderSide(color: AppColors.accent),
+                      foregroundColor: pal.accent,
+                      side: BorderSide(color: pal.accent),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -159,8 +263,8 @@ class ProfileScreen extends StatelessWidget {
                     icon: const Icon(Icons.download_outlined, size: 18),
                     label: Text(s.backupImport),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.accent,
-                      side: const BorderSide(color: AppColors.accent),
+                      foregroundColor: pal.accent,
+                      side: BorderSide(color: pal.accent),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -173,12 +277,12 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               s.aboutTitle,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               s.aboutBody,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
             ),
             const SizedBox(height: 32),
             SizedBox(
@@ -186,8 +290,8 @@ class ProfileScreen extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () => _confirmReset(context, s, provider),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.danger,
-                  side: const BorderSide(color: AppColors.danger),
+                  foregroundColor: pal.danger,
+                  side: BorderSide(color: pal.danger),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -200,7 +304,7 @@ class ProfileScreen extends StatelessWidget {
             Center(
               child: Text(
                 '${s.versionFooter(kAppVersion)} · github.com/nekonaru/boredom',
-                style: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.6), fontSize: 11),
+                style: TextStyle(color: pal.textSecondary.withValues(alpha: 0.6), fontSize: 11),
               ),
             ),
           ],
@@ -214,17 +318,18 @@ class ProfileScreen extends StatelessWidget {
     AppStrings s,
     BoredomProvider provider,
   ) {
+    final pal = context.palette;
     final ctrl = TextEditingController();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
-        title: Text(s.backupImport, style: const TextStyle(color: AppColors.textPrimary, fontSize: 17)),
+        backgroundColor: pal.surfaceElevated,
+        title: Text(s.backupImport, style: TextStyle(color: pal.textPrimary, fontSize: 17)),
         content: TextField(
           controller: ctrl,
           maxLines: 5,
           decoration: InputDecoration(hintText: s.backupPasteHint),
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
+          style: TextStyle(color: pal.textPrimary, fontSize: 12),
         ),
         actions: [
           TextButton(
@@ -252,14 +357,15 @@ class ProfileScreen extends StatelessWidget {
     AppStrings s,
     BoredomProvider provider,
   ) {
+    final pal = context.palette;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
-        title: Text(s.resetTitle, style: const TextStyle(color: AppColors.textPrimary)),
+        backgroundColor: pal.surfaceElevated,
+        title: Text(s.resetTitle, style: TextStyle(color: pal.textPrimary)),
         content: Text(
           s.resetBody,
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: pal.textSecondary),
         ),
         actions: [
           TextButton(
@@ -271,7 +377,7 @@ class ProfileScreen extends StatelessWidget {
               provider.resetProgress();
               Navigator.of(context).pop();
             },
-            child: Text(s.resetConfirm, style: const TextStyle(color: AppColors.danger)),
+            child: Text(s.resetConfirm, style: TextStyle(color: pal.danger)),
           ),
         ],
       ),
@@ -286,20 +392,21 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: pal.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(value,
-              style: const TextStyle(
-                  color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  color: pal.textPrimary, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+          Text(label, style: TextStyle(color: pal.textSecondary, fontSize: 12)),
         ],
       ),
     );

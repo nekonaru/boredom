@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
 
 /// Last-7-days activity bars, drawn with a CustomPainter instead of a
 /// chart package so the APK stays small. No animation, no dependencies.
@@ -9,26 +9,70 @@ class WeeklyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: pal.surface,
         borderRadius: BorderRadius.circular(18),
       ),
       child: SizedBox(
         height: 120,
         width: double.infinity,
         child: CustomPaint(
-          painter: _WeeklyChartPainter(counts: counts),
+          painter: ActivityBarsPainter(
+            counts: counts,
+            active: pal.accent,
+            inactive: pal.accent.withValues(alpha: 0.45),
+            empty: pal.emptyBar,
+          ),
         ),
       ),
     );
   }
 }
 
-class _WeeklyChartPainter extends CustomPainter {
+/// Last-30-days activity bars. Same painter, thinner bars.
+class MonthlyChart extends StatelessWidget {
   final List<int> counts;
-  _WeeklyChartPainter({required this.counts});
+  const MonthlyChart({super.key, required this.counts});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: pal.surface,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: SizedBox(
+        height: 100,
+        width: double.infinity,
+        child: CustomPaint(
+          painter: ActivityBarsPainter(
+            counts: counts,
+            active: pal.accent,
+            inactive: pal.accent.withValues(alpha: 0.45),
+            empty: pal.emptyBar,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ActivityBarsPainter extends CustomPainter {
+  final List<int> counts;
+  final Color active;
+  final Color inactive;
+  final Color empty;
+  ActivityBarsPainter({
+    required this.counts,
+    required this.active,
+    required this.inactive,
+    required this.empty,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -45,10 +89,10 @@ class _WeeklyChartPainter extends CustomPainter {
       final isToday = i == todayIndex;
       final paint = Paint()
         ..color = isToday
-            ? AppColors.accent
+            ? active
             : counts[i] == 0
-                ? const Color(0xFF2A2A33)
-                : AppColors.accent.withValues(alpha: 0.45);
+                ? empty
+                : inactive;
       final rect = RRect.fromRectAndRadius(
         Rect.fromLTWH(x, y, barWidth, barHeight < 4 ? 4 : barHeight),
         const Radius.circular(5),
@@ -58,6 +102,6 @@ class _WeeklyChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WeeklyChartPainter oldDelegate) =>
+  bool shouldRepaint(covariant ActivityBarsPainter oldDelegate) =>
       oldDelegate.counts != counts;
 }

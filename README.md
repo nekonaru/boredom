@@ -40,9 +40,12 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | 🔍 **History search** | Filter completed missions by title or category |
 | ↩️ **Undo** | 5-minute window to restore the last completion |
 | 💾 **Backup and restore** | Export all local data as text, import it back (phone-switch friendly, no account needed) |
-| 📊 **Statistics** | Last-7-days chart drawn dependency-free, per-category distribution, reroll and chaos totals |
+| 📊 **Statistics** | Last-7-days and last-30-days charts drawn dependency-free, average XP per active day, busiest weekday, per-category distribution, reroll and chaos totals |
+| 👎 **Dislikes** | Downvote missions so the generator stops rolling them |
 | 📤 **Share** | Copy any mission as text and paste it anywhere |
 | 🌍 **English and Indonesian UI** | English by default, switch to Bahasa Indonesia in Profile |
+| 🎨 **Light and dark themes** | Dark by default, light mode plus 5 accent colors in Profile |
+| 📳 **Haptic feedback** | Tiny vibration on taps and completions, toggleable |
 | 🔒 **Fully offline** | Everything is stored locally on the phone, no account, no server, no new permissions |
 
 ## 📦 Requirements
@@ -149,6 +152,7 @@ boredom/
 │   ├── models/                   # Mission, UserProgress, Achievement, DailyChallenge,
 │   │                             # QuestChain, CustomMission
 │   ├── providers/                # BoredomProvider (game state), LanguageProvider
+│   │                             # ThemeProvider (dark/light, accent)
 │   ├── screens/                  # Home, Missions, Stats, Achievements, Profile, shell
 │   │                             # onboarding (first-run walkthrough)
 │   ├── services/                 # catalogs, generator, local storage

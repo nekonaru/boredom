@@ -18,6 +18,8 @@ class StorageService {
   static const _kQuestChain = 'boredom_quest_chain';
   static const _kCustomMissions = 'boredom_custom_missions';
   static const _kFavorites = 'boredom_favorites';
+  static const _kDisliked = 'boredom_disliked';
+  static const _kHaptics = 'boredom_haptics';
   static const _kOnboarding = 'boredom_onboarding_done';
 
   SharedPreferences? _cache;
@@ -168,6 +170,26 @@ class StorageService {
   Future<void> saveFavorites(Set<String> ids) async {
     final p = await prefs;
     await p.setStringList(_kFavorites, ids.toList());
+  }
+
+  Future<Set<String>> loadDisliked() async {
+    final p = await prefs;
+    return (p.getStringList(_kDisliked) ?? []).toSet();
+  }
+
+  Future<void> saveDisliked(Set<String> ids) async {
+    final p = await prefs;
+    await p.setStringList(_kDisliked, ids.toList());
+  }
+
+  Future<bool> loadHapticsEnabled() async {
+    final p = await prefs;
+    return p.getBool(_kHaptics) ?? true;
+  }
+
+  Future<void> saveHapticsEnabled(bool value) async {
+    final p = await prefs;
+    await p.setBool(_kHaptics, value);
   }
 
   Future<bool> isOnboardingDone() async {

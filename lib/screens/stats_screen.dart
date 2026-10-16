@@ -4,7 +4,7 @@ import '../l10n/app_strings.dart';
 import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
 import '../widgets/weekly_chart.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -13,11 +13,21 @@ class StatsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final progress = context.select<BoredomProvider, UserProgress>(
       (p) => p.progress,
     );
     final weekCounts = context.select<BoredomProvider, List<int>>(
       (p) => p.last7DaysCounts,
+    );
+    final monthCounts = context.select<BoredomProvider, List<int>>(
+      (p) => p.last30DaysCounts,
+    );
+    final avgXp = context.select<BoredomProvider, double>(
+      (p) => p.avgXpPerActiveDay,
+    );
+    final bestDay = context.select<BoredomProvider, int?>(
+      (p) => p.busiestWeekday,
     );
 
     final categoryCounts = progress.categoryCounts;
@@ -40,7 +50,7 @@ class StatsScreen extends StatelessWidget {
           children: [
             Text(
               s.statsTitle,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(color: pal.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             Row(
@@ -66,10 +76,30 @@ class StatsScreen extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _MetricCard(
+                    label: s.mAvgXp,
+                    value: avgXp.toStringAsFixed(1),
+                    emoji: '⚡',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetricCard(
+                    label: s.mBestDay,
+                    value: bestDay == null ? '-' : s.weekdayName(bestDay),
+                    emoji: '📅',
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 28),
             Text(
               s.weekTitle,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             RepaintBoundary(
@@ -77,8 +107,17 @@ class StatsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             Text(
+              s.monthTitle,
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            RepaintBoundary(
+              child: MonthlyChart(counts: monthCounts),
+            ),
+            const SizedBox(height: 28),
+            Text(
               s.perCategory,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             if (progress.totalMissionsCompleted == 0)
@@ -86,7 +125,7 @@ class StatsScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Text(
                   s.statsEmpty,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: pal.textSecondary),
                 ),
               )
             else
@@ -102,9 +141,9 @@ class StatsScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(cat.labelFor(s.code),
-                              style: const TextStyle(color: AppColors.textPrimary, fontSize: 13)),
+                              style: TextStyle(color: pal.textPrimary, fontSize: 13)),
                           Text('$count',
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                              style: TextStyle(color: pal.textSecondary, fontSize: 12)),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -113,8 +152,8 @@ class StatsScreen extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: ratio,
                           minHeight: 10,
-                          backgroundColor: Colors.white10,
-                          valueColor: const AlwaysStoppedAnimation(AppColors.accent),
+                          backgroundColor: pal.emptyBar,
+                          valueColor: AlwaysStoppedAnimation(pal.accent),
                         ),
                       ),
                     ],
@@ -136,18 +175,19 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: pal.surface, borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(emoji, style: const TextStyle(fontSize: 18)),
           const SizedBox(height: 8),
           Text(value,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+              style: TextStyle(color: pal.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+          Text(label, style: TextStyle(color: pal.textSecondary, fontSize: 11)),
         ],
       ),
     );

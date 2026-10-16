@@ -40,9 +40,12 @@ Ada juga **Chaos Mode** yang mengabaikan semua filter, jadi misi apa pun bisa ke
 | 🔍 **Pencarian riwayat** | Saring misi yang selesai berdasarkan judul atau kategori |
 | ↩️ **Urungkan** | Jendela 5 menit untuk mengembalikan misi terakhir yang diselesaikan |
 | 💾 **Cadangan dan pulihkan** | Ekspor semua data lokal sebagai teks, impor kembali untuk pulihkan (pindah HP jadi mudah, tanpa akun) |
-| 📊 **Statistik** | Grafik 7 hari terakhir tanpa dependency, distribusi per kategori, total reroll dan chaos |
+| 📊 **Statistik** | Grafik 7 dan 30 hari terakhir tanpa dependency, rata-rata XP per hari aktif, hari tersibuk, distribusi per kategori, total reroll dan chaos |
+| 👎 **Dislike** | Downvote misi supaya generator berhenti mengeluarkannya |
 | 📤 **Bagikan** | Salin misi apa pun sebagai teks dan tempel di mana saja |
 | 🌍 **UI Inggris dan Indonesia** | Inggris sebagai default, ganti ke Bahasa Indonesia di Profil |
+| 🎨 **Tema terang dan gelap** | Gelap sebagai default, mode terang plus 5 warna aksen di Profil |
+| 📳 **Haptic feedback** | Getaran kecil saat ketuk dan selesai, bisa dimatikan |
 | 🔒 **Sepenuhnya offline** | Semua tersimpan lokal di HP, tanpa akun, tanpa server, tanpa izin baru |
 
 ## 📦 Kebutuhan
@@ -149,6 +152,7 @@ boredom/
 │   ├── models/                   # Mission, UserProgress, Achievement, DailyChallenge,
 │   │                             # QuestChain, CustomMission
 │   ├── providers/                # BoredomProvider (state game), LanguageProvider
+│   │                             # ThemeProvider (gelap/terang, aksen)
 │   ├── screens/                  # Beranda, Misi, Statistik, Pencapaian, Profil, shell
 │   │                             # onboarding (tur perkenalan pertama buka)
 │   ├── services/                 # katalog, generator, penyimpanan lokal

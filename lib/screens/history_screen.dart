@@ -5,9 +5,10 @@ import '../models/custom_mission.dart';
 import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
+import '../providers/theme_provider.dart';
 import '../services/mission_catalog.dart';
-import '../utils/app_theme.dart';
 import '../utils/date_format.dart';
+import '../utils/feedback.dart';
 import '../widgets/quest_chain_section.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final code = s.code;
     final history = context.select<BoredomProvider, List<CompletedMission>>(
       (p) => p.history,
@@ -56,8 +58,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               children: [
                 Text(
                   s.missionsTitle,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: pal.textPrimary,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -67,8 +69,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(height: 24),
                 Text(
                   s.customTitle,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: pal.textSecondary,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -76,8 +78,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(height: 8),
                 Text(
                   s.customDesc,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: pal.textSecondary,
                     fontSize: 12,
                   ),
                 ),
@@ -87,8 +89,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(s.customAdd),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.accent,
-                    side: const BorderSide(color: AppColors.accent),
+                    foregroundColor: pal.accent,
+                    side: BorderSide(color: pal.accent),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -98,8 +100,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 if (customMissions.isEmpty)
                   Text(
                     s.customEmpty,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: pal.textSecondary,
                       fontSize: 12,
                     ),
                   )
@@ -110,8 +112,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(height: 24),
                 Text(
                   s.favoritesTitle,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: pal.textSecondary,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -120,8 +122,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 if (favoriteMissions.isEmpty)
                   Text(
                     s.favoritesEmpty,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: pal.textSecondary,
                       fontSize: 12,
                     ),
                   )
@@ -136,8 +138,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(height: 24),
                 Text(
                   s.historyTitle,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: pal.textSecondary,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -147,17 +149,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onChanged: (v) => setState(() => _query = v),
                   decoration: InputDecoration(
                     hintText: s.searchHint,
-                    hintStyle: const TextStyle(
-                      color: AppColors.textSecondary,
+                    hintStyle: TextStyle(
+                      color: pal.textSecondary,
                       fontSize: 13,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
-                      color: AppColors.textSecondary,
+                      color: pal.textSecondary,
                       size: 20,
                     ),
                     filled: true,
-                    fillColor: AppColors.surface,
+                    fillColor: pal.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -167,8 +169,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       vertical: 12,
                     ),
                   ),
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: pal.textPrimary,
                     fontSize: 14,
                   ),
                 ),
@@ -185,7 +187,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Text(
                     q.isEmpty ? s.historyEmpty : s.searchEmpty,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: pal.textSecondary),
                   ),
                 ),
               ),
@@ -213,79 +215,82 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return showDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppColors.surfaceElevated,
-          title: Text(
-            s.customAdd,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 17),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(
-                    hintText: s.customNameHint,
-                    hintStyle: const TextStyle(color: AppColors.textSecondary),
-                  ),
-                  style: const TextStyle(color: AppColors.textPrimary),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descCtrl,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintText: s.customDescHint,
-                    hintStyle: const TextStyle(color: AppColors.textSecondary),
-                  ),
-                  style: const TextStyle(color: AppColors.textPrimary),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '${s.customXp}: ${xp.toInt()}',
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
-                  ),
-                ),
-                Slider(
-                  value: xp,
-                  min: 5,
-                  max: 200,
-                  divisions: 39,
-                  label: '${xp.toInt()} XP',
-                  onChanged: (v) => setDialogState(() => xp = v),
-                ),
-              ],
+        builder: (context, setDialogState) {
+          final pal = context.palette;
+          return AlertDialog(
+            backgroundColor: pal.surfaceElevated,
+            title: Text(
+              s.customAdd,
+              style: TextStyle(color: pal.textPrimary, fontSize: 17),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(s.dialogCancel),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: titleCtrl,
+                    decoration: InputDecoration(
+                      hintText: s.customNameHint,
+                      hintStyle: TextStyle(color: pal.textSecondary),
+                    ),
+                    style: TextStyle(color: pal.textPrimary),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: descCtrl,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: s.customDescHint,
+                      hintStyle: TextStyle(color: pal.textSecondary),
+                    ),
+                    style: TextStyle(color: pal.textPrimary),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${s.customXp}: ${xp.toInt()}',
+                    style: TextStyle(
+                      color: pal.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Slider(
+                    value: xp,
+                    min: 5,
+                    max: 200,
+                    divisions: 39,
+                    label: '${xp.toInt()} XP',
+                    onChanged: (v) => setDialogState(() => xp = v),
+                  ),
+                ],
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                if (titleCtrl.text.trim().isEmpty ||
-                    descCtrl.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(s.customInvalid)),
-                  );
-                  return;
-                }
-                context.read<BoredomProvider>().addCustomMission(
-                      titleCtrl.text,
-                      descCtrl.text,
-                      xp.toInt(),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(s.dialogCancel),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (titleCtrl.text.trim().isEmpty ||
+                      descCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(s.customInvalid)),
                     );
-                Navigator.of(context).pop();
-              },
-              child: Text(s.customSave),
-            ),
-          ],
-        ),
+                    return;
+                  }
+                  context.read<BoredomProvider>().addCustomMission(
+                        titleCtrl.text,
+                        descCtrl.text,
+                        xp.toInt(),
+                      );
+                  Navigator.of(context).pop();
+                },
+                child: Text(s.customSave),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -298,12 +303,13 @@ class _HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: pal.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -316,8 +322,8 @@ class _HistoryTile extends StatelessWidget {
                 children: [
                   Text(
                     entry.title,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: pal.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -325,8 +331,8 @@ class _HistoryTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${entry.categoryLabel} · ${formatHistoryDate(entry.completedAt, code: code)}',
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: pal.textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -335,8 +341,8 @@ class _HistoryTile extends StatelessWidget {
             ),
             Text(
               '+${entry.xpEarned} XP',
-              style: const TextStyle(
-                color: AppColors.success,
+              style: TextStyle(
+                color: pal.success,
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
               ),
@@ -360,12 +366,13 @@ class _FavoriteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: pal.surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -378,16 +385,16 @@ class _FavoriteTile extends StatelessWidget {
                 children: [
                   Text(
                     localizedTitle(en: mission.title, id: mission.titleId, code: code),
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: pal.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
                   ),
                   Text(
                     '+${mission.baseXp} XP',
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: pal.textSecondary,
                       fontSize: 11,
                     ),
                   ),
@@ -396,7 +403,7 @@ class _FavoriteTile extends StatelessWidget {
             ),
             IconButton(
               onPressed: onUnfavorite,
-              icon: const Icon(Icons.favorite, color: AppColors.danger, size: 20),
+              icon: Icon(Icons.favorite, color: pal.danger, size: 20),
             ),
           ],
         ),
@@ -412,15 +419,16 @@ class _CustomMissionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final actions = context.read<BoredomProvider>();
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: pal.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.accent.withValues(alpha: 0.3)),
+          border: Border.all(color: pal.accent.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -432,8 +440,8 @@ class _CustomMissionTile extends StatelessWidget {
                 children: [
                   Text(
                     mission.title,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: pal.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -442,8 +450,8 @@ class _CustomMissionTile extends StatelessWidget {
                     mission.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: pal.textSecondary,
                       fontSize: 11,
                     ),
                   ),
@@ -452,6 +460,7 @@ class _CustomMissionTile extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
+                buzzIfEnabled(context);
                 final unlocked = await actions.completeCustomMission(mission);
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -459,7 +468,7 @@ class _CustomMissionTile extends StatelessWidget {
                     content: Text(
                       s.customDone(mission.title, mission.baseXp),
                     ),
-                    backgroundColor: AppColors.success,
+                    backgroundColor: pal.success,
                   ),
                 );
                 for (final a in unlocked) {
@@ -469,7 +478,7 @@ class _CustomMissionTile extends StatelessWidget {
                       content: Text(
                         '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: s.code)}',
                       ),
-                      backgroundColor: AppColors.accent,
+                      backgroundColor: pal.accent,
                     ),
                   );
                 }
@@ -479,9 +488,9 @@ class _CustomMissionTile extends StatelessWidget {
             ),
             IconButton(
               onPressed: () => _confirmDelete(context, s, actions),
-              icon: const Icon(
+              icon: Icon(
                 Icons.delete_outline,
-                color: AppColors.textSecondary,
+                color: pal.textSecondary,
                 size: 20,
               ),
             ),
@@ -496,13 +505,14 @@ class _CustomMissionTile extends StatelessWidget {
     AppStrings s,
     BoredomProvider actions,
   ) {
+    final pal = context.palette;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
+        backgroundColor: pal.surfaceElevated,
         title: Text(
           s.deleteTitle,
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+          style: TextStyle(color: pal.textPrimary, fontSize: 16),
         ),
         actions: [
           TextButton(
@@ -516,7 +526,7 @@ class _CustomMissionTile extends StatelessWidget {
             },
             child: Text(
               s.deleteConfirm,
-              style: const TextStyle(color: AppColors.danger),
+              style: TextStyle(color: pal.danger),
             ),
           ),
         ],

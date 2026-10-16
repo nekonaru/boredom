@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
 import '../providers/boredom_provider.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
+import '../utils/feedback.dart';
 
 /// Shows the mission card as a bottom sheet that cannot be casually
 /// dismissed (so the user thinks ACCEPT vs REROLL instead of swiping away).
@@ -36,6 +37,7 @@ class _MissionSheetState extends State<MissionSheet> {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final instance = context.select<BoredomProvider, MissionInstance?>(
       (p) => p.currentMission,
     );
@@ -60,6 +62,9 @@ class _MissionSheetState extends State<MissionSheet> {
     final isFav = context.select<BoredomProvider, bool>(
       (p) => p.isFavorite(mission.id),
     );
+    final isDisliked = context.select<BoredomProvider, bool>(
+      (p) => p.isDisliked(mission.id),
+    );
     final rerollsLeft = context.select<BoredomProvider, int>(
       (p) => p.rerollsLeft,
     );
@@ -68,9 +73,9 @@ class _MissionSheetState extends State<MissionSheet> {
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        decoration: BoxDecoration(
+          color: pal.surfaceElevated,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -81,8 +86,8 @@ class _MissionSheetState extends State<MissionSheet> {
                 Expanded(
                   child: Text(
                     s.missionNo(instance.missionNumber),
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: pal.textSecondary,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -93,7 +98,14 @@ class _MissionSheetState extends State<MissionSheet> {
                   onPressed: () => provider.toggleFavorite(mission.id),
                   icon: Icon(
                     isFav ? Icons.favorite : Icons.favorite_border,
-                    color: isFav ? AppColors.danger : AppColors.textSecondary,
+                    color: isFav ? pal.danger : pal.textSecondary,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => provider.toggleDislike(mission.id),
+                  icon: Icon(
+                    isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
+                    color: isDisliked ? pal.warning : pal.textSecondary,
                   ),
                 ),
                 IconButton(
@@ -105,7 +117,7 @@ class _MissionSheetState extends State<MissionSheet> {
                       SnackBar(content: Text(s.sharedCopied)),
                     );
                   },
-                  icon: const Icon(Icons.share_outlined, color: AppColors.textSecondary),
+                  icon: Icon(Icons.share_outlined, color: pal.textSecondary),
                 ),
               ],
             ),
@@ -114,8 +126,8 @@ class _MissionSheetState extends State<MissionSheet> {
             const SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: pal.textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -123,8 +135,8 @@ class _MissionSheetState extends State<MissionSheet> {
             const SizedBox(height: 10),
             Text(
               description,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: pal.textSecondary,
                 fontSize: 15,
                 height: 1.4,
               ),
@@ -148,6 +160,7 @@ class _MissionSheetState extends State<MissionSheet> {
                     onPressed: _isSubmitting
                         ? null
                         : () {
+                            buzzIfEnabled(context);
                             final ok = provider.rerollMission();
                             if (!ok && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -158,8 +171,10 @@ class _MissionSheetState extends State<MissionSheet> {
                             }
                           },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: Colors.white24),
+                      foregroundColor: pal.textPrimary,
+                      side: BorderSide(
+                        color: pal.textSecondary.withValues(alpha: 0.3),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -176,6 +191,7 @@ class _MissionSheetState extends State<MissionSheet> {
                         ? null
                         : () async {
                             setState(() => _isSubmitting = true);
+                            buzzIfEnabled(context);
                             await provider.completeMission();
                             // No need to reset _isSubmitting: this widget is
                             // popped/disposed once currentMission becomes
@@ -208,7 +224,7 @@ class _MissionSheetState extends State<MissionSheet> {
                       },
                 child: Text(
                   s.skipBtn,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: pal.textSecondary),
                 ),
               ),
             ),
@@ -226,16 +242,17 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.palette;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: highlight ? AppColors.success.withValues(alpha: 0.18) : Colors.white10,
+        color: highlight ? pal.success.withValues(alpha: 0.18) : pal.emptyBar,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: highlight ? AppColors.success : AppColors.textSecondary,
+          color: highlight ? pal.success : pal.textSecondary,
           fontWeight: FontWeight.w600,
           fontSize: 12,
         ),

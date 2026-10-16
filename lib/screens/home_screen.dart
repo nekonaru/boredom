@@ -4,7 +4,8 @@ import '../l10n/app_strings.dart';
 import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
+import '../utils/feedback.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     // Selective rebuilds: each piece only listens to the field it renders,
     // so tapping a chip does not rebuild the whole page.
     final progress = context.select<BoredomProvider, UserProgress>((p) => p.progress);
@@ -41,8 +43,8 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Text(
                   s.brand,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: pal.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
@@ -52,13 +54,13 @@ class HomeScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppColors.warning.withValues(alpha: 0.15),
+                      color: pal.warning.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '🔥 ${s.streak(progress.streakDays)}',
-                      style: const TextStyle(
-                        color: AppColors.warning,
+                      style: TextStyle(
+                        color: pal.warning,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -69,8 +71,8 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               s.headline,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: pal.textPrimary,
                 fontSize: 30,
                 fontWeight: FontWeight.w900,
                 height: 1.1,
@@ -79,7 +81,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               s.subhead,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
+              style: TextStyle(color: pal.textSecondary, fontSize: 16),
             ),
             const SizedBox(height: 24),
             XpBar(progress: progress),
@@ -88,10 +90,10 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.12),
+                  color: pal.warning.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.warning.withValues(alpha: 0.4),
+                    color: pal.warning.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Row(
@@ -101,8 +103,8 @@ class HomeScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         s.streakRisk,
-                        style: const TextStyle(
-                          color: AppColors.warning,
+                        style: TextStyle(
+                          color: pal.warning,
                           fontSize: 12,
                           height: 1.4,
                         ),
@@ -162,11 +164,13 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: chaosMode
-                      ? AppColors.danger.withValues(alpha: 0.15)
-                      : AppColors.surface,
+                      ? pal.danger.withValues(alpha: 0.15)
+                      : pal.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: chaosMode ? AppColors.danger : Colors.white12,
+                    color: chaosMode
+                        ? pal.danger
+                        : pal.textSecondary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -179,8 +183,8 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Text(
                             s.chaosTitle,
-                            style: const TextStyle(
-                              color: AppColors.textPrimary,
+                            style: TextStyle(
+                              color: pal.textPrimary,
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                             ),
@@ -188,7 +192,7 @@ class HomeScreen extends StatelessWidget {
                           Text(
                             s.chaosDesc,
                             style: TextStyle(
-                              color: AppColors.textSecondary.withValues(alpha: 0.9),
+                              color: pal.textSecondary.withValues(alpha: 0.9),
                               fontSize: 11,
                             ),
                           ),
@@ -198,7 +202,7 @@ class HomeScreen extends StatelessWidget {
                     Switch(
                       value: chaosMode,
                       onChanged: actions.setChaosMode,
-                      activeThumbColor: AppColors.danger,
+                      activeThumbColor: pal.danger,
                     ),
                   ],
                 ),
@@ -212,6 +216,7 @@ class HomeScreen extends StatelessWidget {
               height: 64,
               child: ElevatedButton(
                 onPressed: () async {
+                  buzzIfEnabled(context);
                   actions.rollMission();
                   if (!context.mounted) return;
                   await showMissionSheet(context);
@@ -221,7 +226,7 @@ class HomeScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(s.xpSnack(provider.lastXpGained!)),
-                        backgroundColor: AppColors.success,
+                        backgroundColor: pal.success,
                         action: provider.canUndo
                             ? SnackBarAction(
                                 label: s.undoAction,
@@ -248,7 +253,7 @@ class HomeScreen extends StatelessWidget {
                         content: Text(
                           '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: code)}',
                         ),
-                        backgroundColor: AppColors.accent,
+                        backgroundColor: pal.accent,
                       ),
                     );
                   }
@@ -256,7 +261,7 @@ class HomeScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      chaosMode ? AppColors.danger : AppColors.accent,
+                      chaosMode ? pal.danger : pal.accent,
                   textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                 ),
                 child: Text(chaosMode ? '☢️ ${s.chaosButton}' : '🎲 ${s.boredButton}'),
@@ -266,7 +271,7 @@ class HomeScreen extends StatelessWidget {
             Center(
               child: Text(
                 s.rerollsLeft(rerollsLeft),
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                style: TextStyle(color: pal.textSecondary, fontSize: 12),
               ),
             ),
           ],

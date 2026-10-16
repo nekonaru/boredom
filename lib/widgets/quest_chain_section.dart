@@ -4,7 +4,8 @@ import '../l10n/app_strings.dart';
 import '../models/achievement.dart';
 import '../models/quest_chain.dart';
 import '../providers/boredom_provider.dart';
-import '../utils/app_theme.dart';
+import '../providers/theme_provider.dart';
+import '../utils/feedback.dart';
 
 class QuestChainSection extends StatelessWidget {
   const QuestChainSection({super.key});
@@ -20,6 +21,7 @@ class QuestChainSection extends StatelessWidget {
     }
 
     final s = context.str;
+    final pal = context.palette;
     final code = s.code;
     final stepIndex = context.select<BoredomProvider, int>(
       (p) => p.currentChainStepIndex,
@@ -30,9 +32,9 @@ class QuestChainSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: pal.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.3)),
+        border: Border.all(color: pal.accent.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,8 +46,8 @@ class QuestChainSection extends StatelessWidget {
               Expanded(
                 child: Text(
                   localizedTitle(en: chain.title, id: chain.titleId, code: code),
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: pal.textPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
@@ -53,7 +55,7 @@ class QuestChainSection extends StatelessWidget {
               ),
               Text(
                 s.stepOf(stepIndex + 1, chain.steps.length),
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                style: TextStyle(color: pal.textSecondary, fontSize: 11),
               ),
             ],
           ),
@@ -63,19 +65,19 @@ class QuestChainSection extends StatelessWidget {
             child: LinearProgressIndicator(
               value: (stepIndex) / chain.steps.length,
               minHeight: 6,
-              backgroundColor: Colors.white12,
-              valueColor: const AlwaysStoppedAnimation(AppColors.accent),
+              backgroundColor: pal.emptyBar,
+              valueColor: AlwaysStoppedAnimation(pal.accent),
             ),
           ),
           const SizedBox(height: 14),
           Text(
             localizedTitle(en: step.title, id: step.titleId, code: code),
-            style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 14),
+            style: TextStyle(color: pal.textPrimary, fontWeight: FontWeight.w600, fontSize: 14),
           ),
           const SizedBox(height: 4),
           Text(
             localizedTitle(en: step.description, id: step.descriptionId, code: code),
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
+            style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.4),
           ),
           const SizedBox(height: 14),
           Row(
@@ -84,8 +86,8 @@ class QuestChainSection extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: () => _confirmAbandon(context, s),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.danger,
-                    side: const BorderSide(color: AppColors.danger),
+                    foregroundColor: pal.danger,
+                    side: BorderSide(color: pal.danger),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Text(s.chainCancel),
@@ -96,6 +98,7 @@ class QuestChainSection extends StatelessWidget {
                 flex: 2,
                 child: ElevatedButton(
                   onPressed: () async {
+                    buzzIfEnabled(context);
                     final provider = context.read<BoredomProvider>();
                     final unlocked = await provider.completeCurrentChainStep();
                     if (!context.mounted) return;
@@ -108,7 +111,7 @@ class QuestChainSection extends StatelessWidget {
                               chain.rewardXp,
                             ),
                           ),
-                          backgroundColor: AppColors.success,
+                          backgroundColor: pal.success,
                         ),
                       );
                     } else {
@@ -129,12 +132,13 @@ class QuestChainSection extends StatelessWidget {
   }
 
   void _confirmAbandon(BuildContext context, AppStrings s) {
+    final pal = context.palette;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
-        title: Text(s.abandonTitle, style: const TextStyle(color: AppColors.textPrimary)),
-        content: Text(s.abandonBody, style: const TextStyle(color: AppColors.textSecondary)),
+        backgroundColor: pal.surfaceElevated,
+        title: Text(s.abandonTitle, style: TextStyle(color: pal.textPrimary)),
+        content: Text(s.abandonBody, style: TextStyle(color: pal.textSecondary)),
         actions: [
           TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(s.abandonKeep)),
           TextButton(
@@ -142,7 +146,7 @@ class QuestChainSection extends StatelessWidget {
               context.read<BoredomProvider>().abandonChain();
               Navigator.of(context).pop();
             },
-            child: Text(s.abandonConfirm, style: const TextStyle(color: AppColors.danger)),
+            child: Text(s.abandonConfirm, style: TextStyle(color: pal.danger)),
           ),
         ],
       ),
@@ -154,13 +158,14 @@ class QuestChainSection extends StatelessWidget {
     AppStrings s,
     List<Achievement> unlocked,
   ) {
+    final pal = context.palette;
     for (final a in unlocked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: s.code)}',
           ),
-          backgroundColor: AppColors.accent,
+          backgroundColor: pal.accent,
         ),
       );
     }
@@ -173,6 +178,7 @@ class _NoActiveChain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final code = s.code;
     final chains = context.select<BoredomProvider, List<QuestChain>>(
       (p) => p.availableChains,
@@ -182,7 +188,7 @@ class _NoActiveChain extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: pal.surface,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -190,12 +196,12 @@ class _NoActiveChain extends StatelessWidget {
         children: [
           Text(
             '🧩 ${s.chainsTitle}',
-            style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+            style: TextStyle(color: pal.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
           ),
           const SizedBox(height: 4),
           Text(
             s.chainsDesc,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            style: TextStyle(color: pal.textSecondary, fontSize: 12),
           ),
           const SizedBox(height: 12),
           ...chains.map(
@@ -207,7 +213,7 @@ class _NoActiveChain extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
+                    color: pal.surfaceElevated,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -220,15 +226,15 @@ class _NoActiveChain extends StatelessWidget {
                           children: [
                             Text(
                               localizedTitle(en: chain.title, id: chain.titleId, code: code),
-                              style: const TextStyle(
-                                color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 13),
+                              style: TextStyle(
+                                color: pal.textPrimary, fontWeight: FontWeight.w600, fontSize: 13),
                             ),
                             Text('${chain.steps.length} step · +${chain.rewardXp} XP',
-                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                                style: TextStyle(color: pal.textSecondary, fontSize: 11)),
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                      Icon(Icons.chevron_right, color: pal.textSecondary),
                     ],
                   ),
                 ),

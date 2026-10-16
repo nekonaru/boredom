@@ -159,6 +159,17 @@ class AppStrings {
   String get languageTitle => _pick('Language', 'Bahasa');
   String get languageEnglish => 'English';
   String get languageIndonesian => 'Bahasa Indonesia';
+
+  // Appearance (v2.2)
+  String get appearanceTitle => _pick('Appearance', 'Tampilan');
+  String get themeDark => _pick('Dark', 'Gelap');
+  String get themeLight => _pick('Light', 'Terang');
+  String get accentTitle => _pick('Accent color', 'Warna aksen');
+  String get hapticsTitle => _pick('Haptic feedback', 'Getaran haptic');
+  String get hapticsDesc => _pick(
+        'Tiny vibration on taps and completions.',
+        'Getaran kecil saat ketuk dan selesai.',
+      );
   String get resetBtn => _pick('Reset Progress', 'Hapus Progres');
   String get resetTitle => _pick(
         'Reset all progress?',
@@ -273,6 +284,23 @@ class AppStrings {
         'Streak at risk: complete a mission today to keep it alive.',
         'Streak terancam: selesaikan satu misi hari ini agar tidak putus.',
       );
+
+  // Monthly stats (v2.2)
+  String get monthTitle => _pick('Last 30 Days', '30 Hari Terakhir');
+  String get mAvgXp => _pick('Avg XP / Day', 'Rata-rata XP / Hari');
+  String get mBestDay => _pick('Busiest Day', 'Hari Tersibuk');
+
+  List<String> get weekdaysShort => isId
+      ? const ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
+      : const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  String weekdayName(int weekday) {
+    // 1=Monday .. 7=Sunday.
+    const en = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const id = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    final list = isId ? id : en;
+    return list[(weekday - 1).clamp(0, 6)];
+  }
   String get shareBtn => _pick('Share', 'Bagikan');
   String shareText(String title, int xp, int level) => isId
       ? 'Aku baru saja menyelesaikan "$title" (+$xp XP) dan mencapai level $level di Boredom!'

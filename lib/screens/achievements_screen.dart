@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../providers/boredom_provider.dart';
+import '../providers/theme_provider.dart';
 import '../services/achievement_catalog.dart';
-import '../utils/app_theme.dart';
 import '../widgets/achievement_badge.dart';
 
 class AchievementsScreen extends StatelessWidget {
@@ -12,6 +12,7 @@ class AchievementsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.str;
+    final pal = context.palette;
     final unlockedIds = context.select<BoredomProvider, Set<String>>(
       (p) => p.achievements.map((a) => a.achievementId).toSet(),
     );
@@ -29,17 +30,17 @@ class AchievementsScreen extends StatelessWidget {
               children: [
                 Text(
                   s.achievementsTitle,
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: pal.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.18),
+                    color: pal.accent.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     '$unlockedCount/${all.length}',
-                    style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: TextStyle(color: pal.accent, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
               ],
