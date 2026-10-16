@@ -190,6 +190,20 @@ class HomeScreen extends StatelessWidget {
                       SnackBar(
                         content: Text(s.xpSnack(provider.lastXpGained!)),
                         backgroundColor: AppColors.success,
+                        action: provider.canUndo
+                            ? SnackBarAction(
+                                label: s.undoAction,
+                                textColor: Colors.white,
+                                onPressed: () async {
+                                  final ok = await provider.undoLastComplete();
+                                  if (context.mounted && ok) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(s.undoDone)),
+                                    );
+                                  }
+                                },
+                              )
+                            : null,
                       ),
                     );
                     provider.clearLastXpGained();

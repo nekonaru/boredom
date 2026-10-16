@@ -56,6 +56,9 @@ class _MissionSheetState extends State<MissionSheet> {
       id: mission.descriptionId,
       code: code,
     );
+    final isFav = context.select<BoredomProvider, bool>(
+      (p) => p.isFavorite(mission.id),
+    );
     final rerollsLeft = context.select<BoredomProvider, int>(
       (p) => p.rerollsLeft,
     );
@@ -72,14 +75,27 @@ class _MissionSheetState extends State<MissionSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              s.missionNo(instance.missionNumber),
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                letterSpacing: 1.2,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    s.missionNo(instance.missionNumber),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => provider.toggleFavorite(mission.id),
+                  icon: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? AppColors.danger : AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Text(mission.emoji, style: const TextStyle(fontSize: 44)),

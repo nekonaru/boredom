@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.3.0
+
+Feature release, built on the v1.2.0 foundation. No native plugins were
+added, so the APK stays light and no new permissions are needed.
+
+### Added
+- Custom missions: create your own missions with title, description, and
+  XP reward (5 to 200), complete them for XP like catalog missions, delete
+  them anytime. Stored locally, included in backups.
+- Favorites: tap the heart on any mission sheet to pin catalog missions
+  to a Favorites section on the Missions tab.
+- History search: filter completed missions by title or category.
+- Undo: completing a mission now offers a 5-minute Undo action that
+  restores XP, streak, and history.
+- Backup: export all local data as text (copied to clipboard) and import
+  it back to restore, useful before switching phones. Still fully local,
+  no account or server.
+
+### Improved
+- Mission rolls skip missions completed in the last 7 days when
+  alternatives exist, so repeats feel fresh. Falls back gracefully when
+  everything was recently completed.
+
 ## v1.2.0
 
 Foundation release: English by default with an Indonesian option, plus

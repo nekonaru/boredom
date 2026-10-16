@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/user_progress.dart';
@@ -117,6 +118,60 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
+              s.backupTitle,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              s.backupDesc,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final text = await provider.exportBackup();
+                      await Clipboard.setData(ClipboardData(text: text));
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(s.backupCopied)),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.upload_outlined, size: 18),
+                    label: Text(s.backupExport),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.accent,
+                      side: const BorderSide(color: AppColors.accent),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showImportDialog(context, s, provider),
+                    icon: const Icon(Icons.download_outlined, size: 18),
+                    label: Text(s.backupImport),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.accent,
+                      side: const BorderSide(color: AppColors.accent),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
               s.aboutTitle,
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
@@ -150,6 +205,44 @@ class ProfileScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showImportDialog(
+    BuildContext context,
+    AppStrings s,
+    BoredomProvider provider,
+  ) {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.surfaceElevated,
+        title: Text(s.backupImport, style: const TextStyle(color: AppColors.textPrimary, fontSize: 17)),
+        content: TextField(
+          controller: ctrl,
+          maxLines: 5,
+          decoration: InputDecoration(hintText: s.backupPasteHint),
+          style: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(s.dialogCancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              final ok = await provider.importBackup(ctrl.text);
+              if (!context.mounted) return;
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(ok ? s.backupRestored : s.backupInvalid)),
+              );
+            },
+            child: Text(s.backupImport),
+          ),
+        ],
       ),
     );
   }
