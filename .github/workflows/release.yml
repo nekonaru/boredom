@@ -184,6 +184,8 @@ jobs:
 
           def subsections(block):
               # Split "### Heading" groups, keep bullet lines only.
+              # Wrapped bullets (continuation lines) are joined back so no
+              # point ever renders truncated.
               out = []
               current = None
               bullets = []
@@ -196,6 +198,8 @@ jobs:
                       bullets = []
                   elif line.strip().startswith('-') and current:
                       bullets.append(line.strip())
+                  elif current and bullets and line.strip():
+                      bullets[-1] += ' ' + line.strip()
               if current and bullets:
                   out.append((current, bullets))
               return out
