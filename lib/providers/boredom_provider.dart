@@ -435,7 +435,6 @@ class BoredomProvider extends ChangeNotifier {
 
   /// Serializes everything needed to restore this device state.
   Future<String> exportBackup() async {
-    final storage = StorageService.instance;
     final data = {
       'app': 'boredom',
       'version': 1,
@@ -799,7 +798,7 @@ class _JsonReader {
   String _peek() => pos < text.length ? text[pos] : '';
 
   void _expect(String c) {
-    if (_peek() != c) throw const FormatException('Expected $c');
+    if (_peek() != c) throw FormatException('Expected $c');
     pos++;
   }
 }

@@ -25,8 +25,8 @@ void main() {
     });
 
     test('English is the default and Indonesian differs somewhere', () {
-      final en = AppStrings('en');
-      final id = AppStrings('id');
+      final en = const AppStrings('en');
+      final id = const AppStrings('id');
       expect(en.headline, isNot(id.headline));
       expect(en.rerollsLeft(2), isNot(id.rerollsLeft(2)));
     });

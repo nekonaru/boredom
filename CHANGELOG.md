@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.1
+
+Hotfix for issues caught by CI (`flutter analyze`): a wrong import path
+in `lib/l10n/app_strings.dart`, a non-constant `FormatException` throw,
+an unused local in `exportBackup`, and two missing `const` in tests.
+No behavior changes.
+
 ## v2.0.0
 
 Polish release: progress visibility and streak safety, still with zero

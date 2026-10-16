@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/mission.dart';
-import 'language_provider.dart';
+import '../providers/language_provider.dart';
 
 /// Hand-written EN/ID string table (English is the source of truth).
 ///
