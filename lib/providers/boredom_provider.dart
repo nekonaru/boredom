@@ -49,6 +49,7 @@ class BoredomProvider extends ChangeNotifier {
 
   int? lastXpGained;
   List<Achievement> lastUnlockedAchievements = [];
+  bool lastFreezeUsed = false;
 
   Future<void> init() async {
     final storage = StorageService.instance;
@@ -131,6 +132,52 @@ class BoredomProvider extends ChangeNotifier {
     return _isSameDay(last, twoAgo);
   }
 
+  bool _isThreeDaysAgo(DateTime last, DateTime now) {
+    final threeAgo = now.subtract(const Duration(days: 3));
+    return _isSameDay(last, threeAgo);
+  }
+
+  /// Shared streak math for every completion path. A freeze token covers a
+  /// 3-day gap; every 7th streak day earns one token (max 3 held).
+  _StreakResolution _resolveStreak({
+    required DateTime? last,
+    required DateTime now,
+    required int streakDays,
+    required int tokens,
+  }) {
+    var streak = streakDays;
+    var remaining = tokens;
+    var usedFreeze = false;
+    if (last == null) {
+      streak = 1;
+    } else if (_isSameDay(last, now)) {
+      streak = streakDays == 0 ? 1 : streakDays;
+    } else if (_isYesterday(last, now) || _isTwoDaysAgo(last, now)) {
+      streak = streakDays + 1;
+    } else if (_isThreeDaysAgo(last, now) && tokens > 0) {
+      streak = streakDays + 1;
+      remaining = tokens - 1;
+      usedFreeze = true;
+    } else {
+      streak = 1;
+    }
+    if (streak > streakDays && streak % 7 == 0 && remaining < 3) {
+      remaining += 1;
+    }
+    return _StreakResolution(
+      streak: streak,
+      tokens: remaining,
+      usedFreeze: usedFreeze,
+    );
+  }
+
+  /// Weekend double XP. Pure and unit-testable.
+  static bool isWeekend(DateTime date) =>
+      date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+
+  static int xpForDate(int baseXp, DateTime date) =>
+      isWeekend(date) ? baseXp * 2 : baseXp;
+
   /// True when the user completed something yesterday or the day before
   /// but nothing today: the streak is alive yet at risk.
   bool get streakAtRisk {
@@ -201,6 +248,7 @@ class BoredomProvider extends ChangeNotifier {
       // Disliked missions are excluded alongside recent ones, so the
       // generator learns what the user does not want to see again.
       excludeIds: chaosMode ? const {} : {...recentMissionIds, ...dislikedIds},
+      categoryCounts: progress.categoryCounts,
     );
     _missionCounter++;
     currentMission = MissionInstance(
@@ -241,18 +289,16 @@ class BoredomProvider extends ChangeNotifier {
 
     final mission = instance.mission;
     final now = DateTime.now();
+    final gainedXp = xpForDate(mission.baseXp, now);
 
-    int newStreak = progress.streakDays;
-    final last = progress.lastCompletedDate;
-    if (last == null) {
-      newStreak = 1;
-    } else if (_isSameDay(last, now)) {
-      newStreak = progress.streakDays == 0 ? 1 : progress.streakDays;
-    } else if (_isYesterday(last, now) || _isTwoDaysAgo(last, now)) {
-      newStreak = progress.streakDays + 1;
-    } else {
-      newStreak = 1;
-    }
+    final resolved = _resolveStreak(
+      last: progress.lastCompletedDate,
+      now: now,
+      streakDays: progress.streakDays,
+      tokens: progress.freezeTokens,
+    );
+    final newStreak = resolved.streak;
+    lastFreezeUsed = resolved.usedFreeze;
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
     final catKey = mission.category.name;
@@ -260,7 +306,7 @@ class BoredomProvider extends ChangeNotifier {
 
     _undoProgress = progress;
     progress = progress.copyWith(
-      totalXp: progress.totalXp + mission.baseXp,
+      totalXp: progress.totalXp + gainedXp,
       streakDays: newStreak,
       longestStreak: newStreak > progress.longestStreak ? newStreak : progress.longestStreak,
       lastCompletedDate: now,
@@ -268,15 +314,16 @@ class BoredomProvider extends ChangeNotifier {
       chaosMissionsCompleted:
           progress.chaosMissionsCompleted + (instance.isChaos ? 1 : 0),
       categoryCounts: newCategoryCounts,
+      freezeTokens: resolved.tokens,
     );
-    lastXpGained = mission.baseXp;
+    lastXpGained = gainedXp;
 
     final entry = CompletedMission(
       missionId: mission.id,
       title: mission.title,
       emoji: mission.emoji,
       categoryLabel: mission.category.label,
-      xpEarned: mission.baseXp,
+      xpEarned: gainedXp,
       completedAt: now,
     );
     _undoEntry = entry;
@@ -319,6 +366,7 @@ class BoredomProvider extends ChangeNotifier {
     _undoEntry = null;
     _undoAt = null;
     lastXpGained = null;
+    lastFreezeUsed = false;
     lastUnlockedAchievements = [];
     notifyListeners();
     return true;
@@ -363,6 +411,7 @@ class BoredomProvider extends ChangeNotifier {
 
   void clearLastXpGained() {
     lastXpGained = null;
+    lastFreezeUsed = false;
   }
 
   void clearLastUnlockedAchievements() {
@@ -428,17 +477,15 @@ class BoredomProvider extends ChangeNotifier {
   /// achievement handling as catalog missions.
   Future<List<Achievement>> completeCustomMission(CustomMission mission) async {
     final now = DateTime.now();
-    int newStreak = progress.streakDays;
-    final last = progress.lastCompletedDate;
-    if (last == null) {
-      newStreak = 1;
-    } else if (_isSameDay(last, now)) {
-      newStreak = progress.streakDays == 0 ? 1 : progress.streakDays;
-    } else if (_isYesterday(last, now) || _isTwoDaysAgo(last, now)) {
-      newStreak = progress.streakDays + 1;
-    } else {
-      newStreak = 1;
-    }
+    final gainedXp = xpForDate(mission.baseXp, now);
+    final resolved = _resolveStreak(
+      last: progress.lastCompletedDate,
+      now: now,
+      streakDays: progress.streakDays,
+      tokens: progress.freezeTokens,
+    );
+    final newStreak = resolved.streak;
+    lastFreezeUsed = resolved.usedFreeze;
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
     newCategoryCounts[mission.category.name] =
@@ -446,21 +493,22 @@ class BoredomProvider extends ChangeNotifier {
 
     _undoProgress = progress;
     progress = progress.copyWith(
-      totalXp: progress.totalXp + mission.baseXp,
+      totalXp: progress.totalXp + gainedXp,
       streakDays: newStreak,
       longestStreak: newStreak > progress.longestStreak ? newStreak : progress.longestStreak,
       lastCompletedDate: now,
       totalMissionsCompleted: progress.totalMissionsCompleted + 1,
       categoryCounts: newCategoryCounts,
+      freezeTokens: resolved.tokens,
     );
-    lastXpGained = mission.baseXp;
+    lastXpGained = gainedXp;
 
     final entry = CompletedMission(
       missionId: mission.id,
       title: mission.title,
       emoji: '⭐',
       categoryLabel: mission.category.label,
-      xpEarned: mission.baseXp,
+      xpEarned: gainedXp,
       completedAt: now,
     );
     _undoEntry = entry;
@@ -578,9 +626,10 @@ class BoredomProvider extends ChangeNotifier {
     dailyChallengeState = dailyChallengeState!.copyWith(completed: true);
     await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
 
-    progress = progress.copyWith(totalXp: progress.totalXp + challenge.rewardXp);
+    final gainedXp = xpForDate(challenge.rewardXp, DateTime.now());
+    progress = progress.copyWith(totalXp: progress.totalXp + gainedXp);
     await StorageService.instance.saveProgress(progress);
-    lastXpGained = challenge.rewardXp;
+    lastXpGained = gainedXp;
 
     notifyListeners();
   }
@@ -614,11 +663,12 @@ class BoredomProvider extends ChangeNotifier {
     final nextIndex = qp.currentStepIndex + 1;
 
     if (nextIndex >= chain.steps.length) {
+      final gainedXp = xpForDate(chain.rewardXp, DateTime.now());
       progress = progress.copyWith(
-        totalXp: progress.totalXp + chain.rewardXp,
+        totalXp: progress.totalXp + gainedXp,
         questChainsCompleted: progress.questChainsCompleted + 1,
       );
-      lastXpGained = chain.rewardXp;
+      lastXpGained = gainedXp;
       await StorageService.instance.saveProgress(progress);
 
       questChainProgress = null;
@@ -723,8 +773,18 @@ class BoredomProvider extends ChangeNotifier {
   }
 }
 
-String _encodeJson(Map<String, dynamic> data) {
-  final buffer = StringBuffer('{');
+class _StreakResolution {
+  final int streak;
+  final int tokens;
+  final bool usedFreeze;
+  const _StreakResolution({
+    required this.streak,
+    required this.tokens,
+    required this.usedFreeze,
+  });
+}
+
+String _encodeJson(Map<String, dynamic> data) {  final buffer = StringBuffer('{');
   var first = true;
   void writePair(String key, String valueJson) {
     if (!first) buffer.write(',');

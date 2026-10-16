@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.3.0
+
+Rilis kedalaman game tanpa breaking change: simpanan dan cadangan lama
+tetap terbaca, karena semua tambahan bersifat aditif.
+
+### Ditambahkan
+- Token beku streak: satu token menutup gap 2 hari, dan setiap streak
+  7 hari dapat satu (maks 3 disimpan). Token tampil di Profil.
+- XP ganda akhir pekan untuk semua perolehan XP, dengan tag 2x di
+  mission sheet.
+- 4 misi musiman yang hanya keluar di bulannya, plus 12 misi reguler
+  dan quest chain Deep Work Arc yang baru.
+- Generator v2: pilihan dibobot ke kategori yang paling jarang
+  dimainkan, sehingga variasi tumbuh seiring main.
+
 ## v2.2.0
 
 Rilis personalisasi dan insight. Murni Dart, tanpa plugin atau izin

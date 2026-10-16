@@ -285,6 +285,17 @@ class AppStrings {
         'Streak terancam: selesaikan satu misi hari ini agar tidak putus.',
       );
 
+  // Freeze + weekend (v2.3)
+  String get freezeTitle => _pick('Streak Freeze', 'Beku Streak');
+  String freezeDesc(int n) => isId
+      ? '$n token. Satu token menyelamatkan streak yang terputus 2 hari. Dapat 1 token tiap streak kelipatan 7.'
+      : '$n token${n == 1 ? '' : 's'}. One token saves a streak broken for 2 days. Earn 1 token every 7-day streak.';
+  String get freezeUsed => _pick(
+        'Freeze token used: streak saved!',
+        'Token beku dipakai: streak selamat!',
+      );
+  String get weekendTag => _pick('2x WEEKEND', '2x AKHIR PEKAN');
+
   // Monthly stats (v2.2)
   String get monthTitle => _pick('Last 30 Days', '30 Hari Terakhir');
   String get mAvgXp => _pick('Avg XP / Day', 'Rata-rata XP / Hari');

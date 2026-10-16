@@ -37,6 +37,7 @@ class UserProgress {
   final int appOpensToday;
   final DateTime? appOpensResetDate;
   final int longestStreak;
+  final int freezeTokens;
 
   const UserProgress({
     this.totalXp = 0,
@@ -52,6 +53,7 @@ class UserProgress {
     this.appOpensToday = 0,
     this.appOpensResetDate,
     this.longestStreak = 0,
+    this.freezeTokens = 0,
   });
 
   // Level curve: higher levels need progressively more XP.
@@ -98,6 +100,7 @@ class UserProgress {
     int? appOpensToday,
     DateTime? appOpensResetDate,
     int? longestStreak,
+    int? freezeTokens,
   }) {
     return UserProgress(
       totalXp: totalXp ?? this.totalXp,
@@ -116,6 +119,7 @@ class UserProgress {
       appOpensToday: appOpensToday ?? this.appOpensToday,
       appOpensResetDate: appOpensResetDate ?? this.appOpensResetDate,
       longestStreak: longestStreak ?? this.longestStreak,
+      freezeTokens: freezeTokens ?? this.freezeTokens,
     );
   }
 
@@ -133,6 +137,7 @@ class UserProgress {
         'appOpensToday': appOpensToday,
         'appOpensResetDate': appOpensResetDate?.toIso8601String(),
         'longestStreak': longestStreak,
+        'freezeTokens': freezeTokens,
       };
 
   factory UserProgress.fromJson(Map<String, dynamic> json) => UserProgress(
@@ -157,6 +162,7 @@ class UserProgress {
             ? DateTime.parse(json['appOpensResetDate'])
             : null,
         longestStreak: json['longestStreak'] ?? 0,
+        freezeTokens: json['freezeTokens'] ?? 0,
       );
 }
 

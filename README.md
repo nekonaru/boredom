@@ -27,12 +27,12 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 | Feature | Description |
 |---------|-------------|
-| 🎲 **Mission generator** | Random mission from a 40+ catalog, matched to mood, time, location, and energy, with smart fallback so you always get one |
+| 🎲 **Mission generator** | Random mission from a 60+ catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
-| ⭐ **XP and levels** | Progressive curve with absurd level titles |
-| 🔥 **Streaks** | Daily streak plus longest streak, with a 1-day grace period and an at-risk warning |
-| 📜 **Quest chains** | 3 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc") with a big final reward |
+| ⭐ **XP and levels** | Progressive curve with absurd level titles, double XP every weekend |
+| 🔥 **Streaks** | Daily streak plus longest streak, with a 1-day grace period, freeze tokens, and an at-risk warning |
+| 📜 **Quest chains** | 4 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") with a big final reward |
 | 🏆 **Achievements** | 21 achievements, progress-based and event-based (like "Night Owl") |
 | 📅 **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
 | ⭐ **Custom missions** | Create your own missions with your own XP rewards |
@@ -163,7 +163,9 @@ boredom/
 │   ├── user_progress_test.dart   # level curve
 │   ├── mission_service_test.dart # generator fallback, filters, exclusions
 │   ├── localization_test.dart    # string coverage, catalog sanity
-│   └── onboarding_test.dart      # onboarding flag persists
+│   ├── onboarding_test.dart      # onboarding flag persists
+│   ├── stats_theme_test.dart     # monthly stats, palettes, weekday names
+│   └── events_test.dart          # weekend XP, seasonal rolls, weighting
 ├── android_res_extra/            # launcher icon + splash drawn into the APK by CI
 ├── .github/
 │   └── workflows/

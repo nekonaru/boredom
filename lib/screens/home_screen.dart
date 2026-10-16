@@ -223,9 +223,11 @@ class HomeScreen extends StatelessWidget {
                   if (!context.mounted) return;
                   final provider = context.read<BoredomProvider>();
                   if (provider.lastXpGained != null) {
+                    final gained = provider.lastXpGained!;
+                    final usedFreeze = provider.lastFreezeUsed;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(s.xpSnack(provider.lastXpGained!)),
+                        content: Text(s.xpSnack(gained)),
                         backgroundColor: pal.success,
                         action: provider.canUndo
                             ? SnackBarAction(
@@ -243,6 +245,14 @@ class HomeScreen extends StatelessWidget {
                             : null,
                       ),
                     );
+                    if (usedFreeze) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('❄️ ${s.freezeUsed}'),
+                          backgroundColor: pal.accent,
+                        ),
+                      );
+                    }
                     provider.clearLastXpGained();
                   }
                   final code = s.code;

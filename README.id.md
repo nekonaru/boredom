@@ -27,12 +27,12 @@ Ada juga **Chaos Mode** yang mengabaikan semua filter, jadi misi apa pun bisa ke
 
 | Fitur | Deskripsi |
 |---------|-------------|
-| 🎲 **Generator misi** | Misi acak dari 40+ katalog, disesuaikan dengan mood, waktu, lokasi, dan energi, plus fallback pintar supaya selalu dapat misi |
+| 🎲 **Generator misi** | Misi acak dari 60+ katalog, disesuaikan dengan mood, waktu, lokasi, dan energi, dibobot ke kategori yang paling jarang dimainkan, plus misi musiman dan fallback pintar supaya selalu dapat misi |
 | ☢️ **Chaos Mode** | Mengabaikan semua filter, membuka misi khusus chaos |
 | ✅ **Terima / reroll** | Terima misi untuk XP, reroll sampai 3x sehari |
-| ⭐ **XP dan level** | Kurva progresif dengan judul level yang absurd |
-| 🔥 **Streak** | Streak harian plus streak terpanjang, dengan toleransi 1 hari libur dan peringatan saat terancam putus |
-| 📜 **Quest chain** | 3 arc bertahap ("Touch Grass Arc", "Creator Arc", "Reset Arc") dengan hadiah besar di akhir |
+| ⭐ **XP dan level** | Kurva progresif dengan judul level yang absurd, XP ganda setiap akhir pekan |
+| 🔥 **Streak** | Streak harian plus streak terpanjang, dengan toleransi 1 hari libur, token beku, dan peringatan saat terancam putus |
+| 📜 **Quest chain** | 4 arc bertahap ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") dengan hadiah besar di akhir |
 | 🏆 **Pencapaian** | 21 pencapaian, berbasis progres dan event (seperti "Night Owl") |
 | 📅 **Tantangan harian** | Satu tantangan spesial per hari, sama untuk semua orang di tanggal yang sama, hadiah XP besar |
 | ⭐ **Misi buatanmu** | Buat misi sendiri dengan hadiah XP pilihanmu |
@@ -163,6 +163,8 @@ boredom/
 │   ├── user_progress_test.dart   # kurva level
 │   ├── mission_service_test.dart # fallback generator, filter, pengecualian
 │   └── localization_test.dart    # cakupan string, kewarasan katalog
+│   ├── stats_theme_test.dart     # statistik bulanan, palet, nama hari
+│   └── events_test.dart          # XP akhir pekan, roll musiman, bobot
 │   └── onboarding_test.dart      # flag onboarding tersimpan
 ├── android_res_extra/            # icon launcher + splash yang dipasang CI ke APK
 ├── .github/

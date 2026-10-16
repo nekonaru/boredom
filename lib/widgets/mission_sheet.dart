@@ -150,6 +150,8 @@ class _MissionSheetState extends State<MissionSheet> {
                 _InfoPill(label: mission.difficultyStars),
                 _InfoPill(label: s.minutesShort(mission.maxTime.minutes)),
                 _InfoPill(label: '+${mission.baseXp} XP', highlight: true),
+                if (BoredomProvider.isWeekend(DateTime.now()))
+                  _InfoPill(label: s.weekendTag, highlight: true),
               ],
             ),
             const SizedBox(height: 24),

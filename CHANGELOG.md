@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.3.0
+
+Game-depth release without breaking changes: old saves and backups
+keep loading, since every addition is additive.
+
+### Added
+- Streak freeze tokens: a token covers a 2-day gap, and every 7-day
+  streak earns one (max 3 held). Tokens show in Profile.
+- Weekend double XP on every XP gain, with a 2x tag on the mission
+  sheet.
+- 4 seasonal missions that only roll in their months, plus 12 regular
+  missions and a new Deep Work Arc quest chain.
+- Generator v2: picks are weighted toward least-played categories, so
+  variety grows the more you play.
+
 ## v2.2.0
 
 Personalization and insight release. Pure Dart, no new plugins or

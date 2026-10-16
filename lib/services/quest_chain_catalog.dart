@@ -119,6 +119,41 @@ class QuestChainCatalog {
         ),
       ],
     ),
+    QuestChain(
+      id: 'qc_deep_work',
+      title: 'Deep Work Arc',
+      titleId: 'Arc Kerja Fokus',
+      emoji: '🎯',
+      description: 'From scattered attention to one finished piece of work.',
+      descriptionId: 'Dari perhatian yang buyar sampai satu pekerjaan yang selesai.',
+      rewardXp: 450,
+      steps: [
+        QuestStep(
+          title: 'Pick the One Thing',
+          titleId: 'Pilih Satu Hal',
+          description: 'Write the single task that matters most today.',
+          descriptionId: 'Tulis satu tugas yang paling penting hari ini.',
+        ),
+        QuestStep(
+          title: 'Clear the Deck',
+          titleId: 'Bersihkan Arena',
+          description: 'Silence notifications and close every unrelated tab.',
+          descriptionId: 'Matikan notifikasi dan tutup semua tab yang tidak berkaitan.',
+        ),
+        QuestStep(
+          title: 'One Pomodoro',
+          titleId: 'Satu Pomodoro',
+          description: 'Work on it for 25 minutes with a timer running.',
+          descriptionId: 'Kerjakan selama 25 menit dengan timer menyala.',
+        ),
+        QuestStep(
+          title: 'Ship It',
+          titleId: 'Kirim',
+          description: 'Finish or hand off the smallest shippable version.',
+          descriptionId: 'Selesaikan atau serahkan versi terkecil yang bisa dikirim.',
+        ),
+      ],
+    ),
   ];
 
   /// orElse falls back to the first entry, so an old stored chain id

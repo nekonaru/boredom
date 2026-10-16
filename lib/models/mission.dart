@@ -198,6 +198,7 @@ class Mission {
   final Set<LocationType> locations;
   final Set<EnergyLevel> energyLevels;
   final bool chaosOnly; // only shows up in Chaos Mode
+  final Set<int> months; // 1-12, empty means available all year
 
   const Mission({
     required this.id,
@@ -214,6 +215,7 @@ class Mission {
     required this.locations,
     required this.energyLevels,
     this.chaosOnly = false,
+    this.months = const {},
   });
 
   String get difficultyStars => '⭐' * difficulty + '☆' * (5 - difficulty);
