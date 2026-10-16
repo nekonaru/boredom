@@ -163,6 +163,8 @@ boredom/
 │       ├── build-apk.yml         # CI: analyze + build APK on push to main/master
 │       └── release.yml           # release: test + split APKs attached to each v* tag
 ├── pubspec.yaml
+├── CHANGELOG.md                  # changelog (English)
+├── CHANGELOG.id.md               # changelog (Bahasa Indonesia)
 ├── LICENSE
 ├── README.md                     # main documentation (English)
 └── README.id.md                  # documentation (Bahasa Indonesia)

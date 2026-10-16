@@ -163,6 +163,8 @@ boredom/
 │       ├── build-apk.yml         # CI: analyze + build APK tiap push ke main/master
 │       └── release.yml           # rilis: test + APK per-ABI di setiap tag v*
 ├── pubspec.yaml
+├── CHANGELOG.md                  # changelog (English)
+├── CHANGELOG.id.md               # changelog (Bahasa Indonesia)
 ├── LICENSE
 ├── README.md                     # dokumentasi utama (English)
 └── README.id.md                  # dokumentasi (Bahasa Indonesia)

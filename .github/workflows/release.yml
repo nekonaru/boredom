@@ -152,35 +152,95 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
+      - name: Build bilingual release notes from changelogs
+        run: |
+          python3 - << 'PYEOF'
+          import pathlib
+          import re
+
+          version = '${{ steps.version.outputs.version }}'
+          en_log = pathlib.Path('CHANGELOG.md').read_text(encoding='utf-8')
+          id_log = pathlib.Path('CHANGELOG.id.md').read_text(encoding='utf-8')
+
+          def section(text):
+              # Grab the "## [v]{version}" block (up to the next "## " header).
+              m = re.search(
+                  r'^## v?' + re.escape(version) + r'\s*\n(.*?)(?=^## |\Z)',
+                  text,
+                  re.M | re.S,
+              )
+              return m.group(1).strip() if m else ''
+
+          def subsections(block):
+              # Split "### Heading" groups, keep bullet lines only.
+              out = []
+              current = None
+              bullets = []
+              for line in block.splitlines():
+                  h = re.match(r'^###\s+(.*)\s*$', line)
+                  if h:
+                      if current and bullets:
+                          out.append((current, bullets))
+                      current = h.group(1).strip()
+                      bullets = []
+                  elif line.strip().startswith('-') and current:
+                      bullets.append(line.strip())
+              if current and bullets:
+                  out.append((current, bullets))
+              return out
+
+          en_map = {'Added': '✨ New features',
+                    'Improved': '⚡ Optimizations',
+                    'Fixed': '🐛 Bug fixes'}
+          id_map = {'Ditambahkan': '✨ Fitur baru',
+                    'Ditingkatkan': '⚡ Optimisasi',
+                    'Diperbaiki': '🐛 Perbaikan bug'}
+
+          def render(block, mapping):
+              parts = []
+              for heading, bullets in subsections(block):
+                  title = mapping.get(heading)
+                  if not title:
+                      continue
+                  parts.append('## ' + title + '\n\n' + '\n'.join(bullets))
+              if not parts and block:
+                  # No "###" groups (e.g. hotfix notes): keep the raw text.
+                  return block
+              return '\n\n'.join(parts)
+
+          en_body = render(section(en_log), en_map)
+          id_body = render(section(id_log), id_map)
+
+          install_en = (
+              '## 📦 Install / Update\n\n'
+              'Download the APK matching your device below '
+              '(`app-arm64-v8a-release.apk` for most modern phones, '
+              '`app-armeabi-v7a-release.apk` for older 32-bit ones). '
+              'Open it on your phone and allow installs from unknown sources '
+              'if asked. Minimum Android 8.0 (API 26).'
+          )
+          install_id = (
+              '## 📦 Instalasi / Update\n\n'
+              'Download APK sesuai HP di bawah '
+              '(`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, '
+              '`app-armeabi-v7a-release.apk` untuk yang 32-bit lama). '
+              'Buka di HP dan izinkan instalasi dari sumber tidak dikenal '
+              'bila diminta. Minimum Android 8.0 (API 26).'
+          )
+
+          body = ('# English\n\n**Boredom ' + version + '**\n\n' + en_body +
+                  '\n\n' + install_en +
+                  '\n\n<br>\n\n---\n\n<br>\n\n' +
+                  '# Bahasa Indonesia\n\n**Boredom ' + version + '**\n\n' +
+                  id_body + '\n\n' + install_id + '\n')
+          pathlib.Path('RELEASE_BODY.md').write_text(body, encoding='utf-8')
+          print(body)
+          PYEOF
+
       - name: Create GitHub Release with APKs
         uses: softprops/action-gh-release@v2
         with:
           name: Boredom ${{ steps.version.outputs.version }}
-          generate_release_notes: true
-          body: |
-            # English
-
-            **Boredom ${{ steps.version.outputs.version }}**
-
-            See [CHANGELOG.md](https://github.com/nekonaru/boredom/blob/master/CHANGELOG.md) for what changed in this version.
-
-            ## 📦 Install / Update
-
-            Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
-
-            <br>
-
-            ---
-
-            <br>
-
-            # Bahasa Indonesia
-
-            **Boredom ${{ steps.version.outputs.version }}**
-
-            Lihat [CHANGELOG.md](https://github.com/nekonaru/boredom/blob/master/CHANGELOG.md) untuk isi perubahan di versi ini.
-
-            ## 📦 Instalasi / Update
-
-            Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+          generate_release_notes: false
+          body_path: RELEASE_BODY.md
           files: build/app/outputs/flutter-apk/app-*-release.apk
