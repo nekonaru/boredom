@@ -181,6 +181,7 @@ jobs:
             exit 1
           fi
           echo "APK ditemukan di: $FOUND"
+          FOUND="${FOUND#./}"
           if [ "$FOUND" != "build/app/outputs/flutter-apk/app-release.apk" ]; then
             cp "$FOUND" build/app/outputs/flutter-apk/app-release.apk
           fi
