@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// App version shown in the Profile footer. Keep in sync with `version:`
 /// in pubspec.yaml on every release.
-const String kAppVersion = '2.0.1';
+const String kAppVersion = '2.0.2';
 
 /// Dark-minimal palette for Boredom.
 /// Deliberately not neon or cyberpunk: closer to a premium dark app vibe.

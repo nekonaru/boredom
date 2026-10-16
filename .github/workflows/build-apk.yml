@@ -181,7 +181,9 @@ jobs:
             exit 1
           fi
           echo "APK ditemukan di: $FOUND"
-          cp "$FOUND" build/app/outputs/flutter-apk/app-release.apk
+          if [ "$FOUND" != "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            cp "$FOUND" build/app/outputs/flutter-apk/app-release.apk
+          fi
 
       - name: Upload APK sebagai artifact
         uses: actions/upload-artifact@v4

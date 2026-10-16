@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.2
+
+Fixes a pre-existing CI bug where the APK finder step copied
+`app-release.apk` onto itself and failed the build even though
+`flutter analyze`, `flutter test`, and the APK build itself all passed.
+No app changes.
+
 ## v2.0.1
 
 Hotfix for issues caught by CI (`flutter analyze`): a wrong import path
