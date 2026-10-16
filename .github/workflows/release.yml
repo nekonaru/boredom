@@ -26,6 +26,16 @@ jobs:
           flutter-version: '3.35.0'
           channel: 'stable'
 
+      - name: Cache pub and Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            ~/.gradle
+          key: ${{ runner.os }}-flutter-3.35.0-${{ hashFiles('pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-3.35.0-
+
       - name: Regenerate android folder from the official Flutter template
         run: |
           rm -rf android
@@ -135,8 +145,42 @@ jobs:
       - name: Build split APKs
         run: flutter build apk --release --split-per-abi
 
+      - name: Read version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
       - name: Create GitHub Release with APKs
         uses: softprops/action-gh-release@v2
         with:
-          files: build/app/outputs/flutter-apk/app-*-release.apk
+          name: Boredom ${{ steps.version.outputs.version }}
           generate_release_notes: true
+          body: |
+            # English
+
+            **Boredom ${{ steps.version.outputs.version }}**
+
+            See [CHANGELOG.md](https://github.com/nekonaru/boredom/blob/master/CHANGELOG.md) for what changed in this version.
+
+            ## 📦 Install / Update
+
+            Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+            <br>
+
+            ---
+
+            <br>
+
+            # Bahasa Indonesia
+
+            **Boredom ${{ steps.version.outputs.version }}**
+
+            Lihat [CHANGELOG.md](https://github.com/nekonaru/boredom/blob/master/CHANGELOG.md) untuk isi perubahan di versi ini.
+
+            ## 📦 Instalasi / Update
+
+            Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+          files: build/app/outputs/flutter-apk/app-*-release.apk
