@@ -5,6 +5,7 @@ import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
+import '../widgets/weekly_chart.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -14,6 +15,9 @@ class StatsScreen extends StatelessWidget {
     final s = context.str;
     final progress = context.select<BoredomProvider, UserProgress>(
       (p) => p.progress,
+    );
+    final weekCounts = context.select<BoredomProvider, List<int>>(
+      (p) => p.last7DaysCounts,
     );
 
     final categoryCounts = progress.categoryCounts;
@@ -61,6 +65,15 @@ class StatsScreen extends StatelessWidget {
                   child: _MetricCard(label: s.mChaos, value: '${progress.chaosMissionsCompleted}', emoji: '☢️'),
                 ),
               ],
+            ),
+            const SizedBox(height: 28),
+            Text(
+              s.weekTitle,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            RepaintBoundary(
+              child: WeeklyChart(counts: weekCounts),
             ),
             const SizedBox(height: 28),
             Text(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
@@ -94,6 +95,17 @@ class _MissionSheetState extends State<MissionSheet> {
                     isFav ? Icons.favorite : Icons.favorite_border,
                     color: isFav ? AppColors.danger : AppColors.textSecondary,
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(
+                      text: s.shareText(title, mission.baseXp, provider.progress.level),
+                    ));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(s.sharedCopied)),
+                    );
+                  },
+                  icon: const Icon(Icons.share_outlined, color: AppColors.textSecondary),
                 ),
               ],
             ),

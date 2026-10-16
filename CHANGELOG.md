@@ -1,5 +1,26 @@
 # Changelog
 
+## v2.0.0
+
+Polish release: progress visibility and streak safety, still with zero
+native plugins and zero new permissions.
+
+### Added
+- Weekly activity chart on the Stats tab, drawn with a dependency-free
+  CustomPainter (no chart package, no extra APK weight).
+- Streak grace day: a streak now survives one missed day and only resets
+  after two. A warning banner on Home appears while the streak is at
+  risk.
+- Share: copy any mission as text from the mission sheet and paste it
+  anywhere.
+- Per-tag GitHub Releases with split-per-ABI APKs
+  (`.github/workflows/release.yml`), so each version ships installable
+  artifacts automatically.
+
+### Improved
+- README rewritten in the Swara template, in English (`README.md`) and
+  Bahasa Indonesia (`README.id.md`).
+
 ## v1.3.0
 
 Feature release, built on the v1.2.0 foundation. No native plugins were

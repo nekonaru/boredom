@@ -1,89 +1,244 @@
 <div align="center">
 
-# 🎲 Boredom
+# 🎲 Boredom: Turn Boredom Into Missions
 
-Game kecil buat kehidupan sehari-hari. Klik satu tombol, dapet satu misi nyata, dapet XP, naik level.
+**Tap one button, get one real-world mission, earn XP, level up. A tiny game for everyday life, fully offline.**
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.35-02569B?logo=flutter)](https://flutter.dev)
-[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Flutter](https://img.shields.io/badge/Flutter-3.35-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Release](https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
+![CI](https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg)
 
 </div>
 
----
+**English** | [Bahasa Indonesia](README.id.md)
 
-## Konsep
+## ✨ About
 
-Boredom bukan aplikasi produktivitas. Ini game kecil buat kehidupan sehari-hari:
+**Boredom** is a tiny Flutter game for everyday life, not a productivity app. Pick your **mood**, **free time**, **location**, and **energy**, tap **I'M BORED**, and get one concrete mission you can do right now (never generic advice). **Accept** it for XP, or **reroll** (3x per day) when it does not fit. XP levels you up through absurd titles, from "Bored" to "The Final Boss of Boredom".
 
-1. Pilih **mood**, **waktu luang**, **lokasi**, dan **energi** kamu sekarang.
-2. Klik **🎲 I'M BORED**.
-3. Dapet satu misi nyata yang bisa langsung dikerjain (bukan saran generik).
-4. **ACCEPT** buat dapat XP, atau **REROLL** (maks 3x/hari) kalau nggak cocok.
-5. XP naikin level. Level punya nama absurd, dari "Bored" sampai "The Final Boss of Boredom".
+There is also **Chaos Mode**, which ignores every filter so anything can come out.
 
-Ada juga **☢️ Chaos Mode** — matiin semua filter, misi apapun bisa keluar.
+> _"You are bored. So... what now?"_
 
-## Fitur
+## 🎯 Features
 
-- Mood / waktu / lokasi / energi selector
-- Random mission generator dengan fallback pintar (kalau kombinasi filter kosong, filter dilonggarkan otomatis biar tetap dapat misi)
-- Accept / Reroll dengan limit harian
-- XP & level system dengan kurva progresif + judul level
-- Streak harian + longest streak
-- Riwayat misi yang sudah diselesaikan
-- **Daily Challenge** — satu tantangan spesial per hari (sama untuk semua orang di tanggal yang sama), reward XP besar
-- **Achievement system** — 21 achievement tersembunyi (progress-based & event-based seperti "Night Owl")
-- **Quest Chains** — 3 rantai misi bertahap ("Touch Grass Arc", "Creator Arc", "Reset Arc"), reward besar di step terakhir
-- **Statistics** — distribusi misi per kategori, total reroll, total misi Chaos Mode
-- Chaos Mode — abaikan semua filter
-- Semua data tersimpan lokal di HP (tidak ada server/API eksternal)
+| Feature | Description |
+|---------|-------------|
+| 🎲 **Mission generator** | Random mission from a 40+ catalog, matched to mood, time, location, and energy, with smart fallback so you always get one |
+| ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
+| ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
+| ⭐ **XP and levels** | Progressive curve with absurd level titles |
+| 🔥 **Streaks** | Daily streak plus longest streak, with a 1-day grace period and an at-risk warning |
+| 📜 **Quest chains** | 3 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc") with a big final reward |
+| 🏆 **Achievements** | 21 achievements, progress-based and event-based (like "Night Owl") |
+| 📅 **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
+| ⭐ **Custom missions** | Create your own missions with your own XP rewards |
+| ❤️ **Favorites** | Pin catalog missions to find them again fast |
+| 🔍 **History search** | Filter completed missions by title or category |
+| ↩️ **Undo** | 5-minute window to restore the last completion |
+| 💾 **Backup and restore** | Export all local data as text, import it back (phone-switch friendly, no account needed) |
+| 📊 **Statistics** | Last-7-days chart drawn dependency-free, per-category distribution, reroll and chaos totals |
+| 📤 **Share** | Copy any mission as text and paste it anywhere |
+| 🌍 **English and Indonesian UI** | English by default, switch to Bahasa Indonesia in Profile |
+| 🔒 **Fully offline** | Everything is stored locally on the phone, no account, no server, no new permissions |
 
-## Tech Stack
+## 📦 Requirements
 
-| Kategori | Package |
-|---|---|
-| State management | provider |
-| Penyimpanan lokal | shared_preferences |
-| Format tanggal | intl |
+- **Flutter** 3.35 or newer (stable channel)
+- **JDK** 17
+- **Android SDK** (API 34+)
+- An Android phone or emulator (minimum Android 8.0 / API 26)
 
-Nggak ada dependency ke API eksternal — seluruh katalog misi/achievement/challenge/chain ada di `lib/services/`, tinggal edit/tambah di situ.
+### Never used a terminal? Start here
 
-## Build APK
+<details>
+<summary><b>How to open a terminal on Windows</b></summary>
 
-Push ke branch `main` (atau jalankan workflow secara manual dari tab **Actions**) — GitHub Actions otomatis build APK release dan upload sebagai artifact, sama seperti workflow di project Swara.
+1. Press the **Windows** key, type `PowerShell`, then press **Enter**
+2. A blue window opens. That is where you type commands
+3. Every `flutter ...` or `git ...` command in this guide is typed in that window, followed by **Enter**
 
-## Struktur Project
+</details>
+
+## 🚀 Installation
+
+### Option A: Download the APK (easiest)
+
+1. Open the [Releases](https://github.com/nekonaru/boredom/releases) page
+2. Download the APK matching your device (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones)
+3. Open it on your phone, allow installs from unknown sources if asked
+
+### Option B: Build from source (for development / to read or change the code)
+
+**1. Get the project code**
+
+<details>
+<summary><b>I have Git installed</b></summary>
+
+```bash
+git clone https://github.com/nekonaru/boredom.git
+cd boredom
+```
+
+</details>
+
+<details>
+<summary><b>I don't have Git</b></summary>
+
+1. Open the repository page on GitHub
+2. Click the green **`Code`** button, choose **`Download ZIP`**
+3. Extract the ZIP to a folder of your choice
+4. In the terminal, go into the extracted folder, for example:
+
+```bash
+cd Downloads/boredom-main
+```
+
+</details>
+
+**2. Install dependencies and verify**
+
+```bash
+flutter pub get
+flutter analyze
+flutter test
+```
+
+`flutter analyze` must report **No issues found** and all tests must pass.
+
+**3. Build the APK**
+
+```bash
+flutter build apk --release --split-per-abi
+```
+
+The results are at `build/app/outputs/flutter-apk/` (`app-arm64-v8a-release.apk` and friends).
+
+## 🖥️ Usage
+
+**First launch:**
+1. Pick your mood, free time, location, and energy
+2. Tap **I'M BORED**
+3. Accept the mission and do it, or reroll (3x per day)
+
+**Everyday use:**
+- Open **Missions** for quest chains, your custom missions, favorites, and searchable history
+- Check the **Daily Challenge** on Home for bonus XP
+- Watch your **Stats** for the weekly chart and category breakdown
+- Switch language or back up your data from **Profile**
+
+## 🌍 Display Language
+
+The app UI (menus, buttons, messages, and settings) is available in **English** (default) and **Bahasa Indonesia**.
+
+1. Open **Profile**
+2. Under **Language**, pick **English** or **Bahasa Indonesia**
+3. The choice is remembered between sessions
+
+## 🗂️ Project Structure
 
 ```
-lib/
-  models/       # Mission, UserProgress, Achievement, DailyChallenge, QuestChain
-  services/     # Katalog misi/achievement/challenge/chain + generator + local storage
-  providers/    # BoredomProvider (state management)
-  screens/      # Home, Missions, Stats, Achievements, Profile
-  widgets/      # Selector chips, mission sheet, XP bar, daily challenge card, quest chain section, achievement badge
-  utils/        # Tema warna
+boredom/
+├── lib/
+│   ├── main.dart                 # entry point, providers, MaterialApp + locale
+│   ├── l10n/
+│   │   └── app_strings.dart      # English (source of truth) + Indonesian tables
+│   ├── models/                   # Mission, UserProgress, Achievement, DailyChallenge,
+│   │                             # QuestChain, CustomMission
+│   ├── providers/                # BoredomProvider (game state), LanguageProvider
+│   ├── screens/                  # Home, Missions, Stats, Achievements, Profile, shell
+│   ├── services/                 # catalogs, generator, local storage
+│   ├── utils/                    # theme, lightweight date formatting
+│   └── widgets/                  # selector chips, mission sheet, XP bar, charts, ...
+├── test/
+│   ├── widget_test.dart          # app boots without crashing
+│   ├── user_progress_test.dart   # level curve
+│   ├── mission_service_test.dart # generator fallback, filters, exclusions
+│   └── localization_test.dart    # string coverage, catalog sanity
+├── .github/
+│   └── workflows/
+│       ├── build-apk.yml         # CI: analyze + build APK on push to main/master
+│       └── release.yml           # release: test + split APKs attached to each v* tag
+├── pubspec.yaml
+├── LICENSE
+├── README.md                     # main documentation (English)
+└── README.id.md                  # documentation (Bahasa Indonesia)
 ```
 
-## Yang belum dibuat
+**Adding a new user-facing string:**
+1. Add the EN/ID pair to `lib/l10n/app_strings.dart` (English first)
+2. If it is catalog content (mission, achievement, challenge, chain step), add the `titleId`/`descriptionId` fields next to the English ones
+3. Use it via `context.str.yourKey` or `localizedTitle(en: ..., id: ..., code: ...)`
+4. No codegen step needed (`flutter gen-l10n` is intentionally not used, to keep the build light)
 
-Sound effect & animasi tambahan (polish murni, nggak mempengaruhi fungsi) — satu-satunya item di roadmap awal yang sengaja dilewatin karena butuh aset audio/animasi custom yang di luar scope kode. App icon juga masih default Flutter — perlu aset gambar custom buat diganti.
+## 🧪 Testing
 
-## Roadmap lanjutan (belum dikerjain)
+Unit and widget tests cover the level curve, the mission generator, and localization:
 
-- Sound effect & haptic pattern yang lebih variatif (baru ditambah haptic dasar di v1.1.0)
-- Custom app icon & splash screen
-- Widget test untuk `MissionService.generate` (fallback filter) dan `UserProgress` (kurva level/XP)
-- Export/import data (backup manual sebelum ganti HP, mengingat semua data cuma lokal)
-- Sinkronisasi opsional (tetap privacy-first, misalnya lewat file backup, bukan akun/server)
-- Custom mission submission (misi buatan sendiri, di luar katalog bawaan)
+```bash
+flutter test
+```
 
-## License
+Static verification before every push:
 
-[MIT](LICENSE) © 2026 Nicolas Dwi Dharma — bebas dipakai, dimodifikasi, dan disebarluaskan asal kredit tetap dicantumkan.
+```bash
+flutter analyze
+```
 
----
+It must report **No issues found** (zero errors, zero warnings).
+
+## ❓ FAQ
+
+<details>
+<summary><b>Is my data sent anywhere?</b></summary>
+
+No. Everything (XP, level, streak, history, achievements, custom missions, favorites) is stored locally with SharedPreferences. Backup works by copying text, never by uploading.
+
+</details>
+
+<details>
+<summary><b>I switched phones. How do I move my progress?</b></summary>
+
+Open **Profile**, tap **Export data**, save the copied text somewhere safe. On the new phone, open **Profile**, tap **Import data**, paste the text.
+
+</details>
+
+<details>
+<summary><b>The same missions keep coming out?</b></summary>
+
+Rolls skip missions completed in the last 7 days when alternatives exist. If everything was recently completed, the generator falls back gracefully instead of showing nothing.
+
+</details>
+
+<details>
+<summary><b>How do I change the language?</b></summary>
+
+Profile, section **Language**, pick English or Bahasa Indonesia. English is the default.
+
+</details>
+
+## 👤 Author
 
 <div align="center">
-Dibuat oleh Nicolas Dwi Dharma
+
+| [![Nicolas Dwi Dharma](https://github.com/github.png?size=100)](https://github.com/nekonaru) |
+|:---:|
+| **Nicolas Dwi Dharma** |
+| [github.com/nekonaru](https://github.com/nekonaru) |
+
+</div>
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+
+<div align="center">
+
+Made by **Nicolas Dwi Dharma**
+
+*Star this repo if this project helps you!*
+
 </div>

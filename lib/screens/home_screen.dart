@@ -25,6 +25,9 @@ class HomeScreen extends StatelessWidget {
     final selectedEnergy = context.select<BoredomProvider, EnergyLevel>((p) => p.selectedEnergy);
     final chaosMode = context.select<BoredomProvider, bool>((p) => p.chaosMode);
     final rerollsLeft = context.select<BoredomProvider, int>((p) => p.rerollsLeft);
+    final streakAtRisk = context.select<BoredomProvider, bool>(
+      (p) => p.streakAtRisk,
+    );
     final actions = context.read<BoredomProvider>();
 
     return SafeArea(
@@ -80,6 +83,35 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             XpBar(progress: progress),
+            if (streakAtRisk) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.warning.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Text('⚠️', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        s.streakRisk,
+                        style: const TextStyle(
+                          color: AppColors.warning,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             const DailyChallengeCard(),
             const SizedBox(height: 28),
