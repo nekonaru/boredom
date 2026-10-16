@@ -2,7 +2,7 @@ import 'dart:math';
 import '../models/mission.dart';
 import 'mission_catalog.dart';
 
-/// Filter yang dipilih user sebelum generate misi.
+/// Filter picked by the user before a mission is generated.
 class MissionFilter {
   final Mood mood;
   final TimeBudget timeBudget;
@@ -20,11 +20,16 @@ class MissionFilter {
 class MissionService {
   static final Random _random = Random();
 
-  /// Generate satu misi random sesuai filter.
-  /// Kalau kombinasi filter terlalu ketat dan nggak ada yang cocok,
-  /// filter dilonggarkan bertahap (energy -> mood -> waktu) supaya user
-  /// tetap selalu dapat misi, bukan layar kosong.
-  static Mission generate(MissionFilter filter, {bool chaosMode = false}) {
+  /// Rolls one random mission for the filter.
+  /// When a filter combo is too strict and nothing matches, filters are
+  /// relaxed step by step (energy, then mood, then location) so the user
+  /// always gets a mission instead of an empty screen. Recently completed
+  /// ids in [excludeIds] are skipped when possible so rolls feel fresh.
+  static Mission generate(
+    MissionFilter filter, {
+    bool chaosMode = false,
+    Set<String> excludeIds = const {},
+  }) {
     if (chaosMode) {
       const pool = MissionCatalog.all;
       return pool[_random.nextInt(pool.length)];
@@ -33,7 +38,7 @@ class MissionService {
     final nonChaosPool =
         MissionCatalog.all.where((m) => !m.chaosOnly).toList();
 
-    // Level 0: semua filter ketat.
+    // Level 0: every filter strict.
     var candidates = _filterMissions(
       nonChaosPool,
       mood: filter.mood,
@@ -41,31 +46,47 @@ class MissionService {
       location: filter.location,
       energy: filter.energy,
     );
+    final fresh = _withoutExcluded(candidates, excludeIds);
+    if (fresh.isNotEmpty) return _pick(fresh);
     if (candidates.isNotEmpty) return _pick(candidates);
 
-    // Level 1: abaikan energy.
+    // Level 1: ignore energy.
     candidates = _filterMissions(
       nonChaosPool,
       mood: filter.mood,
       timeBudget: filter.timeBudget,
       location: filter.location,
     );
+    final fresh1 = _withoutExcluded(candidates, excludeIds);
+    if (fresh1.isNotEmpty) return _pick(fresh1);
     if (candidates.isNotEmpty) return _pick(candidates);
 
-    // Level 2: abaikan energy & mood.
+    // Level 2: ignore energy and mood.
     candidates = _filterMissions(
       nonChaosPool,
       timeBudget: filter.timeBudget,
       location: filter.location,
     );
+    final fresh2 = _withoutExcluded(candidates, excludeIds);
+    if (fresh2.isNotEmpty) return _pick(fresh2);
     if (candidates.isNotEmpty) return _pick(candidates);
 
-    // Level 3: abaikan semua kecuali waktu (biar durasinya tetap masuk akal).
+    // Level 3: keep only the time budget so durations stay sane.
     candidates = _filterMissions(nonChaosPool, timeBudget: filter.timeBudget);
+    final fresh3 = _withoutExcluded(candidates, excludeIds);
+    if (fresh3.isNotEmpty) return _pick(fresh3);
     if (candidates.isNotEmpty) return _pick(candidates);
 
-    // Fallback terakhir: full random dari seluruh katalog non-chaos.
+    // Last resort: full random from the non-chaos catalog.
     return _pick(nonChaosPool);
+  }
+
+  static List<Mission> _withoutExcluded(
+    List<Mission> missions,
+    Set<String> excludeIds,
+  ) {
+    if (excludeIds.isEmpty) return missions;
+    return missions.where((m) => !excludeIds.contains(m.id)).toList();
   }
 
   static List<Mission> _filterMissions(

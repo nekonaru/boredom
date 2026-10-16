@@ -1,23 +1,70 @@
 # Changelog
 
-## v1.1.0
+## v1.2.0
 
-Audit menyeluruh terhadap codebase (models, providers, services, screens, widgets). Hasilnya: arsitektur sudah solid, cuma satu bug fungsional nyata + beberapa titik polish.
+Foundation release: English by default with an Indonesian option, plus
+weight and rebuild optimizations. No changes to the stored data format,
+so existing progress on the phone keeps working after the update.
 
-### Fixed
-- **Bug: XP bar nampilin angka negatif buat user baru.** Kurva level (`UserProgress.xpNeededForLevel`) punya off-by-one: level 1 dianggap butuh 50 XP buat "dicapai", padahal user baru langsung start di level 1 dengan 0 XP. Akibatnya, sebelum total XP tembus 50 (yaitu sebelum menyelesaikan misi pertama — XP misi terkecil di katalog cuma 15), XP bar nampilin angka seperti `-50/100 XP`. Ini kelihatan di layar pertama yang dibuka semua user baru. Sudah diperbaiki dengan menggeser basis kurva biar level 1 mulai dari 0 XP.
-- Tombol **REROLL** sekarang benar-benar ter-disable (bukan cuma nongolin snackbar) begitu jatah reroll harian habis.
-- `flutter_lints` sudah ada di `pubspec.yaml` sejak awal tapi belum pernah aktif karena nggak ada `analysis_options.yaml`. Sudah ditambahkan.
+### Added
+- English UI by default with a Bahasa Indonesia switch in Profile
+  (`lib/l10n/app_strings.dart`, `lib/providers/language_provider.dart`).
+  Same pattern as Swara: English source of truth, persisted choice,
+  hand-written tables instead of codegen so the APK stays small.
+- Every catalog (missions, achievements, daily challenges, quest chains)
+  now carries English text plus an Indonesian translation with English
+  fallback, so nothing ever renders blank.
+- Unit tests: level curve (`test/user_progress_test.dart`), mission
+  generator fallback and filters (`test/mission_service_test.dart`),
+  string coverage and catalog sanity (`test/localization_test.dart`).
 
 ### Improved
-- Achievement yang sudah unlock sekarang tampil duluan di grid Achievements (diurut dari yang paling baru di-unlock).
-- Riwayat misi di tab Missions sekarang pakai `ListView.builder` (lazy-build), bukan `ListView` biasa — lebih ringan kalau riwayat sudah ratusan entri.
-- Haptic feedback ringan pas ACCEPT & COMPLETE misi dan pas reroll.
-- Footer versi app + link repo di tab Profile.
+- Removed the `intl` dependency (used exactly once). Date labels now use
+  `lib/utils/date_format.dart`, a 30-line locale-aware formatter.
+- Removed the unused `cupertino_icons` dependency.
+- `StorageService` caches the SharedPreferences instance instead of
+  requesting it on every read and write.
+- Screens now rebuild selectively (`context.select` for reads,
+  `context.read` for actions) so tapping one chip no longer rebuilds the
+  whole page.
+- History list uses a lazy sliver builder, cheap even with 200 entries.
+- All code comments are now English to match the other repos.
+
+### Fixed
+- Time budget labels that were still Indonesian in English mode
+  ("1 jam", "2 jam+").
+
+## v1.1.0
+
+Full audit of the codebase (models, providers, services, screens,
+widgets). Result: the architecture was already solid, with one real
+functional bug plus a few polish items.
+
+### Fixed
+- **Bug: XP bar showed negative numbers for new users.** The level curve
+  (`UserProgress.xpNeededForLevel`) had an off-by-one: level 1 was treated
+  as needing 50 XP to "reach", even though new users start at level 1 with
+  0 XP. Before total XP passed 50 (that is, before finishing the first
+  mission, since the smallest catalog mission is only 15 XP), the XP bar
+  rendered values like "-50/100 XP". Visible on the first screen every new
+  user opens. Fixed by shifting the curve base so level 1 starts at 0 XP.
+- The **REROLL** button is now truly disabled (not just a snackbar) once
+  the daily reroll budget runs out.
+- `flutter_lints` was already in `pubspec.yaml` but never active because
+  `analysis_options.yaml` was missing. Added.
+
+### Improved
+- Unlocked achievements now sort first in the Achievements grid (newest
+  unlock first).
+- Mission history on the Missions tab uses `ListView.builder` (lazy),
+  not a plain `ListView`, lighter once history reaches hundreds of rows.
+- Light haptic feedback on ACCEPT, on mission COMPLETE, and on reroll.
+- App version footer plus repo link on the Profile tab.
 
 ### Added
 - `LICENSE` (MIT).
 - `analysis_options.yaml`.
-- Roadmap lanjutan di README.
+- Follow-up roadmap in README.
 
-Nggak ada perubahan pada model data / format penyimpanan lokal — progress yang udah ada di HP tetap kebaca normal setelah update.
+No changes to the stored data format, so progress already on the phone
+keeps loading normally after the update.

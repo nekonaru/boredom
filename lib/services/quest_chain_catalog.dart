@@ -5,57 +5,124 @@ class QuestChainCatalog {
     QuestChain(
       id: 'qc_touch_grass',
       title: 'Touch Grass Arc',
+      titleId: 'Arc Keluar Rumah',
       emoji: '🌆',
-      description: 'Rantai misi buat maksa diri kamu keluar dari kamar.',
+      description: 'A chain of missions to force yourself out of your room.',
+      descriptionId: 'Rantai misi buat maksa diri kamu keluar dari kamar.',
       rewardXp: 500,
       steps: [
-        QuestStep(title: 'Keluar Rumah', description: 'Keluar rumah selama minimal 10 menit.'),
         QuestStep(
-          title: 'Tempat Baru',
-          description: 'Cari tempat di sekitar kamu yang belum pernah kamu kunjungi.',
-        ),
-        QuestStep(title: 'Abadikan', description: 'Ambil satu foto di tempat itu.'),
-        QuestStep(
-          title: 'Diam Sejenak',
-          description: 'Duduk di sana selama 15 menit tanpa membuka HP.',
+          title: 'Leave the House',
+          titleId: 'Keluar Rumah',
+          description: 'Go outside for at least 10 minutes.',
+          descriptionId: 'Keluar rumah selama minimal 10 menit.',
         ),
         QuestStep(
-          title: 'Refleksi',
-          description: 'Tulis satu kalimat tentang pengalaman kamu barusan.',
+          title: 'Somewhere New',
+          titleId: 'Tempat Baru',
+          description: 'Find a place near you that you have never visited.',
+          descriptionId: 'Cari tempat di sekitar kamu yang belum pernah kamu kunjungi.',
+        ),
+        QuestStep(
+          title: 'Capture It',
+          titleId: 'Abadikan',
+          description: 'Take one photo at that place.',
+          descriptionId: 'Ambil satu foto di tempat itu.',
+        ),
+        QuestStep(
+          title: 'Sit Still',
+          titleId: 'Diam Sejenak',
+          description: 'Sit there for 15 minutes without opening your phone.',
+          descriptionId: 'Duduk di sana selama 15 menit tanpa membuka HP.',
+        ),
+        QuestStep(
+          title: 'Reflect',
+          titleId: 'Refleksi',
+          description: 'Write one sentence about the experience.',
+          descriptionId: 'Tulis satu kalimat tentang pengalaman kamu barusan.',
         ),
       ],
     ),
     QuestChain(
       id: 'qc_creator_arc',
       title: 'Creator Arc',
+      titleId: 'Arc Kreator',
       emoji: '🎬',
-      description: 'Dari ide receh sampai jadi sesuatu yang beneran selesai.',
+      description: 'From a random idea to something actually finished.',
+      descriptionId: 'Dari ide receh sampai jadi sesuatu yang beneran selesai.',
       rewardXp: 450,
       steps: [
-        QuestStep(title: 'Cari Ide', description: 'Tulis 3 ide random buat sesuatu yang mau kamu buat.'),
-        QuestStep(title: 'Pilih Satu', description: 'Pilih satu ide yang paling nyata buat dikerjain hari ini.'),
-        QuestStep(title: 'Kerjain Draft', description: 'Bikin draft/kerangka kasar dari ide itu.'),
-        QuestStep(title: 'Selesaikan', description: 'Selesaikan versi paling sederhana dari ide itu sampai bisa ditunjukin.'),
-        QuestStep(title: 'Share', description: 'Tunjukin hasilnya ke minimal satu orang.'),
+        QuestStep(
+          title: 'Find Ideas',
+          titleId: 'Cari Ide',
+          description: 'Write down 3 random ideas for something to make.',
+          descriptionId: 'Tulis 3 ide random buat sesuatu yang mau kamu buat.',
+        ),
+        QuestStep(
+          title: 'Pick One',
+          titleId: 'Pilih Satu',
+          description: 'Pick the one idea most realistic to finish today.',
+          descriptionId: 'Pilih satu ide yang paling nyata buat dikerjain hari ini.',
+        ),
+        QuestStep(
+          title: 'Draft It',
+          titleId: 'Kerjain Draft',
+          description: 'Make a rough draft or skeleton of that idea.',
+          descriptionId: 'Bikin draft/kerangka kasar dari ide itu.',
+        ),
+        QuestStep(
+          title: 'Finish It',
+          titleId: 'Selesaikan',
+          description: 'Finish the simplest version of the idea so it can be shown.',
+          descriptionId: 'Selesaikan versi paling sederhana dari ide itu sampai bisa ditunjukin.',
+        ),
+        QuestStep(
+          title: 'Share It',
+          titleId: 'Bagikan',
+          description: 'Show the result to at least one person.',
+          descriptionId: 'Tunjukin hasilnya ke minimal satu orang.',
+        ),
       ],
     ),
     QuestChain(
       id: 'qc_reset_arc',
       title: 'Reset Arc',
+      titleId: 'Arc Reset',
       emoji: '🔄',
-      description: 'Buat hari-hari yang berasa berantakan dan butuh restart.',
+      description: 'For messy days that need a restart.',
+      descriptionId: 'Buat hari-hari yang berasa berantakan dan butuh restart.',
       rewardXp: 400,
       steps: [
-        QuestStep(title: 'Beresin Fisik', description: 'Rapihin satu ruangan/area yang paling berantakan.'),
-        QuestStep(title: 'Beresin Digital', description: 'Hapus/arsipkan notifikasi dan file yang numpuk.'),
-        QuestStep(title: 'Gerak Badan', description: 'Olahraga ringan atau jalan kaki minimal 15 menit.'),
-        QuestStep(title: 'Rencana Besok', description: 'Tulis 3 hal yang mau kamu selesaikan besok.'),
+        QuestStep(
+          title: 'Tidy Physically',
+          titleId: 'Beresin Fisik',
+          description: 'Tidy the messiest room or area.',
+          descriptionId: 'Rapihin satu ruangan/area yang paling berantakan.',
+        ),
+        QuestStep(
+          title: 'Tidy Digitally',
+          titleId: 'Beresin Digital',
+          description: 'Delete or archive piled-up notifications and files.',
+          descriptionId: 'Hapus/arsipkan notifikasi dan file yang numpuk.',
+        ),
+        QuestStep(
+          title: 'Move Your Body',
+          titleId: 'Gerak Badan',
+          description: 'Light exercise or a walk, at least 15 minutes.',
+          descriptionId: 'Olahraga ringan atau jalan kaki minimal 15 menit.',
+        ),
+        QuestStep(
+          title: 'Plan Tomorrow',
+          titleId: 'Rencana Besok',
+          description: 'Write 3 things to get done tomorrow.',
+          descriptionId: 'Tulis 3 hal yang mau kamu selesaikan besok.',
+        ),
       ],
     ),
   ];
 
-  /// orElse fallback ke entri pertama - jaga-jaga kalau id chain lama
-  /// (tersimpan di device user) nggak ketemu lagi di katalog saat ini.
+  /// orElse falls back to the first entry, so an old stored chain id
+  /// never crashes the app when the catalog changes.
   static QuestChain byId(String id) =>
       all.firstWhere((c) => c.id == id, orElse: () => all.first);
 }

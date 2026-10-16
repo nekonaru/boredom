@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import '../models/achievement.dart';
 import '../utils/app_theme.dart';
 
@@ -10,6 +11,8 @@ class AchievementBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.str;
+    final code = s.code;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -28,7 +31,9 @@ class AchievementBadge extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            unlocked ? achievement.title : '???',
+            unlocked
+                ? localizedTitle(en: achievement.title, id: achievement.titleId, code: code)
+                : s.lockedName,
             style: TextStyle(
               color: unlocked ? AppColors.textPrimary : AppColors.textSecondary,
               fontWeight: FontWeight.bold,
@@ -37,7 +42,13 @@ class AchievementBadge extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            unlocked ? achievement.description : 'Belum ke-unlock',
+            unlocked
+                ? localizedTitle(
+                    en: achievement.description,
+                    id: achievement.descriptionId,
+                    code: code,
+                  )
+                : s.lockedDesc,
             style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, height: 1.3),
           ),
         ],

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Versi app yang ditampilin di footer Profile - samain sama `version:`
-/// di pubspec.yaml tiap kali rilis baru.
-const String kAppVersion = '1.1.0';
+/// App version shown in the Profile footer. Keep in sync with `version:`
+/// in pubspec.yaml on every release.
+const String kAppVersion = '1.2.0';
 
-/// Palet warna dark-minimal buat Boredom.
-/// Sengaja nggak neon/cyberpunk - lebih ke "premium dark app" vibe.
+/// Dark-minimal palette for Boredom.
+/// Deliberately not neon or cyberpunk: closer to a premium dark app vibe.
 class AppColors {
   static const background = Color(0xFF0E0E12);
   static const surface = Color(0xFF17171D);

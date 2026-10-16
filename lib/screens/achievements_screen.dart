@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../providers/boredom_provider.dart';
 import '../services/achievement_catalog.dart';
 import '../utils/app_theme.dart';
@@ -10,8 +11,10 @@ class AchievementsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unlockedIds =
-        context.watch<BoredomProvider>().achievements.map((a) => a.achievementId).toSet();
+    final s = context.str;
+    final unlockedIds = context.select<BoredomProvider, Set<String>>(
+      (p) => p.achievements.map((a) => a.achievementId).toSet(),
+    );
     const all = AchievementCatalog.all;
     final unlockedCount = all.where((a) => unlockedIds.contains(a.id)).length;
 
@@ -24,9 +27,9 @@ class AchievementsScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Achievements',
-                  style: TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+                Text(
+                  s.achievementsTitle,
+                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

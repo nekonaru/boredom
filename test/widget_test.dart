@@ -6,19 +6,19 @@ import 'package:boredom/main.dart';
 
 void main() {
   testWidgets('Boredom app boots without crashing', (WidgetTester tester) async {
-    // Mock SharedPreferences biar StorageService nggak nabrak platform
-    // channel asli yang nggak ada di environment test.
+    // Mock SharedPreferences so StorageService never touches the real
+    // platform channel, which does not exist in the test environment.
     SharedPreferences.setMockInitialValues({});
 
     await tester.pumpWidget(const BoredomApp());
 
-    // Render pertama: masih nunggu progress ke-load dari storage (lihat
-    // _AppGate di main.dart), jadi yang muncul duluan loading indicator.
+    // First render: still waiting for progress to load from storage (see
+    // _AppGate in main.dart), so the loading indicator shows first.
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    // Kasih waktu buat init() (baca SharedPreferences) kelar. Sengaja
-    // nggak pakai pumpAndSettle() karena CircularProgressIndicator punya
-    // animasi tak-terhingga yang bikin pumpAndSettle() nggak pernah selesai.
+    // Give init() (SharedPreferences reads) time to finish. Deliberately
+    // not pumpAndSettle(): CircularProgressIndicator has an infinite
+    // animation that would never let pumpAndSettle() complete.
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('YOU ARE BORED.'), findsOneWidget);

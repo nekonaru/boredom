@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
+import '../models/daily_challenge.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
 
@@ -8,11 +10,16 @@ class DailyChallengeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<BoredomProvider>();
-    final challenge = provider.currentDailyChallenge;
+    final s = context.str;
+    final challenge = context.select<BoredomProvider, DailyChallenge?>(
+      (p) => p.currentDailyChallenge,
+    );
     if (challenge == null) return const SizedBox.shrink();
 
-    final completed = provider.dailyChallengeCompleted;
+    final completed = context.select<BoredomProvider, bool>(
+      (p) => p.dailyChallengeCompleted,
+    );
+    final code = s.code;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -31,9 +38,9 @@ class DailyChallengeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "TODAY'S CHALLENGE",
-                  style: TextStyle(
+                Text(
+                  s.todayChallenge,
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -42,7 +49,7 @@ class DailyChallengeCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  challenge.title,
+                  localizedTitle(en: challenge.title, id: challenge.titleId, code: code),
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
@@ -51,7 +58,11 @@ class DailyChallengeCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  challenge.description,
+                  localizedTitle(
+                    en: challenge.description,
+                    id: challenge.descriptionId,
+                    code: code,
+                  ),
                   style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.3),
                 ),
               ],
@@ -62,11 +73,12 @@ class DailyChallengeCard extends StatelessWidget {
               ? const Icon(Icons.check_circle, color: AppColors.success)
               : ElevatedButton(
                   onPressed: () async {
+                    final provider = context.read<BoredomProvider>();
                     await provider.completeDailyChallenge();
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Challenge selesai! +${challenge.rewardXp} XP 🎉'),
+                          content: Text(s.challengeDone(challenge.rewardXp)),
                           backgroundColor: AppColors.success,
                         ),
                       );

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../models/mission.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
 
-/// Tampilin mission card sebagai bottom sheet yang nggak bisa di-dismiss
-/// asal-asalan (biar user mikir ACCEPT / REROLL, bukan swipe-away).
+/// Shows the mission card as a bottom sheet that cannot be casually
+/// dismissed (so the user thinks ACCEPT vs REROLL instead of swiping away).
 Future<void> showMissionSheet(BuildContext context) {
   return showModalBottomSheet(
     context: context,
@@ -25,28 +26,39 @@ class MissionSheet extends StatefulWidget {
 }
 
 class _MissionSheetState extends State<MissionSheet> {
-  // Guard di level UI: begitu ACCEPT ke-tap, semua tombol langsung
-  // ke-disable sampai proses selesai/sheet ketutup. Lapis pertahanan kedua
-  // di atas guard yang udah ada di BoredomProvider.completeMission() -
-  // provider-nya emang udah aman dari dobel XP walau tombol ini nggak ada,
-  // tapi ini nyegah spam-tap keliatan "nyala-nyala" sebelum sheet ketutup.
+  // UI-level guard: once ACCEPT is tapped, every button disables until the
+  // flow finishes or the sheet closes. Second layer above the guard already
+  // in BoredomProvider.completeMission: the provider is safe from double XP
+  // even without this, but this stops spam taps from visibly flickering.
   bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<BoredomProvider>();
-    final instance = provider.currentMission;
+    final s = context.str;
+    final instance = context.select<BoredomProvider, MissionInstance?>(
+      (p) => p.currentMission,
+    );
 
     if (instance == null) {
-      // Mission udah selesai/di-dismiss dari luar - tutup sheet.
+      // Mission was finished or dismissed from outside, close the sheet.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Navigator.of(context).canPop()) Navigator.of(context).pop();
       });
       return const SizedBox.shrink();
     }
 
+    final provider = context.read<BoredomProvider>();
     final mission = instance.mission;
-    final numberLabel = '#${instance.missionNumber.toString().padLeft(3, '0')}';
+    final code = s.code;
+    final title = localizedTitle(en: mission.title, id: mission.titleId, code: code);
+    final description = localizedTitle(
+      en: mission.description,
+      id: mission.descriptionId,
+      code: code,
+    );
+    final rerollsLeft = context.select<BoredomProvider, int>(
+      (p) => p.rerollsLeft,
+    );
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -61,7 +73,7 @@ class _MissionSheetState extends State<MissionSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'MISSION $numberLabel',
+              s.missionNo(instance.missionNumber),
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.bold,
@@ -73,7 +85,7 @@ class _MissionSheetState extends State<MissionSheet> {
             Text(mission.emoji, style: const TextStyle(fontSize: 44)),
             const SizedBox(height: 8),
             Text(
-              mission.title,
+              title,
               style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 24,
@@ -82,7 +94,7 @@ class _MissionSheetState extends State<MissionSheet> {
             ),
             const SizedBox(height: 10),
             Text(
-              mission.description,
+              description,
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 15,
@@ -94,9 +106,9 @@ class _MissionSheetState extends State<MissionSheet> {
               spacing: 10,
               runSpacing: 10,
               children: [
-                _InfoPill(label: mission.category.label),
+                _InfoPill(label: mission.category.labelFor(code)),
                 _InfoPill(label: mission.difficultyStars),
-                _InfoPill(label: '${mission.maxTime.minutes} min'),
+                _InfoPill(label: s.minutesShort(mission.maxTime.minutes)),
                 _InfoPill(label: '+${mission.baseXp} XP', highlight: true),
               ],
             ),
@@ -109,10 +121,10 @@ class _MissionSheetState extends State<MissionSheet> {
                         ? null
                         : () {
                             final ok = provider.rerollMission();
-                            if (!ok) {
+                            if (!ok && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Reroll harian udah abis. Coba lagi besok 😅'),
+                                SnackBar(
+                                  content: Text(s.rerollEmpty),
                                 ),
                               );
                             }
@@ -125,7 +137,7 @@ class _MissionSheetState extends State<MissionSheet> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: Text('REROLL (${provider.rerollsLeft})'),
+                    child: Text(s.rerollBtn(rerollsLeft)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -137,11 +149,10 @@ class _MissionSheetState extends State<MissionSheet> {
                         : () async {
                             setState(() => _isSubmitting = true);
                             await provider.completeMission();
-                            // Nggak perlu setState(_isSubmitting = false) lagi:
-                            // widget ini bakal ke-pop/dispose begitu
-                            // currentMission jadi null (lewat postFrameCallback
-                            // di atas), jadi state ini nggak akan sempat
-                            // dipakai buat rebuild lagi.
+                            // No need to reset _isSubmitting: this widget is
+                            // popped/disposed once currentMission becomes
+                            // null (via the post-frame callback above), so
+                            // this state never rebuilds again.
                             if (context.mounted) Navigator.of(context).pop();
                           },
                     child: _isSubmitting
@@ -153,7 +164,7 @@ class _MissionSheetState extends State<MissionSheet> {
                               valueColor: AlwaysStoppedAnimation(Colors.white),
                             ),
                           )
-                        : const Text('ACCEPT & COMPLETE'),
+                        : Text(s.acceptBtn),
                   ),
                 ),
               ],
@@ -167,9 +178,9 @@ class _MissionSheetState extends State<MissionSheet> {
                         provider.dismissMission();
                         Navigator.of(context).pop();
                       },
-                child: const Text(
-                  'Skip buat sekarang',
-                  style: TextStyle(color: AppColors.textSecondary),
+                child: Text(
+                  s.skipBtn,
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ),
             ),

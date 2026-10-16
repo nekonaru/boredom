@@ -1,4 +1,4 @@
-/// Nama-nama level absurd, biar berasa game bukan aplikasi produktivitas.
+/// Absurd level names, so it feels like a game instead of a productivity app.
 class LevelTitles {
   static const Map<int, String> _milestones = {
     1: 'Bored',
@@ -20,7 +20,7 @@ class LevelTitles {
   }
 }
 
-/// Progress user: level dihitung dari total XP dengan kurva sederhana.
+/// User progress: level is derived from total XP with a simple curve.
 class UserProgress {
   final int totalXp;
   final int streakDays;
@@ -29,7 +29,7 @@ class UserProgress {
   final DateTime? rerollResetDate;
   final int totalMissionsCompleted;
 
-  // Dipakai buat Statistics & Achievements.
+  // Used for Statistics and Achievements.
   final int totalRerollsAllTime;
   final int chaosMissionsCompleted;
   final int questChainsCompleted;
@@ -54,17 +54,17 @@ class UserProgress {
     this.longestStreak = 0,
   });
 
-  // Kurva level: makin tinggi level, makin butuh banyak XP.
-  // Level 1 = titik start gratis (0 XP). Level N (N>=2) butuh total XP
-  // = 50 * (N-1) * N / 2 (segitiga, biar smooth).
+  // Level curve: higher levels need progressively more XP.
+  // Level 1 is the free starting point (0 XP). Level N (N>=2) needs total XP
+  // = 50 * (N-1) * N / 2 (triangular, so it stays smooth).
   //
-  // FIX: sebelumnya formulanya `50 * level * (level+1) / 2`, yang berarti
-  // "level 1" sendiri dianggap butuh 50 XP buat dicapai - padahal user baru
-  // langsung start di level 1 dengan 0 XP. Akibatnya xpIntoCurrentLevel jadi
-  // NEGATIF (nampilin "-50/100 XP" dst) buat semua user baru sebelum total
-  // XP mereka tembus 50 (yaitu sebelum nyelesain misi pertama, karena XP
-  // misi paling kecil pun 15). Formula ini geser basis-nya biar level 1
-  // konsisten mulai dari 0 XP.
+  // FIX: the formula used to be `50 * level * (level+1) / 2`, which treated
+  // "level 1" itself as costing 50 XP to reach, even though new users start
+  // at level 1 with 0 XP. That made xpIntoCurrentLevel go NEGATIVE
+  // (rendering "-50/100 XP" and friends) for every new user until their
+  // total XP passed 50 (that is, until finishing the first mission, since
+  // the smallest mission XP in the catalog is only 15). This formula shifts
+  // the base so level 1 consistently starts at 0 XP.
   static int xpNeededForLevel(int level) =>
       level <= 1 ? 0 : (50 * (level - 1) * level) ~/ 2;
 
@@ -160,7 +160,7 @@ class UserProgress {
       );
 }
 
-/// Satu baris riwayat misi yang sudah selesai.
+/// One completed-mission history row.
 class CompletedMission {
   final String missionId;
   final String title;

@@ -1,0 +1,142 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Regenerate android folder from the official Flutter template
+        run: |
+          rm -rf android
+          flutter create --platforms=android --org com.nikodwidharma --project-name boredom .
+
+      - name: Ensure Gradle resolves from Google Maven, Maven Central, and Flutter storage
+        run: |
+          python3 - << 'PYEOF'
+          import pathlib
+
+          p = pathlib.Path('android/settings.gradle.kts')
+          content = p.read_text()
+
+          block = """dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
+              }
+          }
+          """
+
+          key = 'dependencyResolutionManagement'
+          idx = content.find(key)
+
+          if idx == -1:
+              content = content.rstrip('\n') + '\n\n' + block
+          else:
+              brace_start = content.find('{', idx)
+              depth = 0
+              i = brace_start
+              while i < len(content):
+                  if content[i] == '{':
+                      depth += 1
+                  elif content[i] == '}':
+                      depth -= 1
+                      if depth == 0:
+                          break
+                  i += 1
+              block_end = i + 1
+              content = content[:idx] + block.rstrip('\n') + content[block_end:]
+
+          p.write_text(content)
+          print(content)
+          PYEOF
+
+      - name: Set app label to "Boredom"
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          sed -i 's/android:label="boredom"/android:label="Boredom"/' "$MANIFEST"
+          if ! grep -q 'android:label="Boredom"' "$MANIFEST"; then
+            echo "FAILED: label 'Boredom' not found in manifest. Current content:"
+            cat "$MANIFEST"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code (flutter analyze)
+        run: flutter analyze
+
+      - name: Run tests (flutter test)
+        run: flutter test
+
+      - name: Install Gradle init script to patch old plugins (namespace/JVM-target)
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat > ~/.gradle/init.d/boredom-patch.gradle << 'EOF'
+          allprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty('android')) {
+                      def androidExt = project.extensions.findByName('android')
+                      if (androidExt != null) {
+                          if (androidExt.hasProperty('namespace') && androidExt.namespace == null) {
+                              def groupStr = project.group?.toString()
+                              if (groupStr != null && groupStr.trim() != '' && groupStr != 'null') {
+                                  androidExt.namespace groupStr
+                              } else {
+                                  androidExt.namespace 'com.nikodwidharma.boredom.' + project.name.replace('-', '_')
+                              }
+                          }
+                          androidExt.compileOptions {
+                              sourceCompatibility JavaVersion.VERSION_17
+                              targetCompatibility JavaVersion.VERSION_17
+                              coreLibraryDesugaringEnabled true
+                          }
+                          project.dependencies.add('coreLibraryDesugaring', 'com.android.tools:desugar_jdk_libs:2.1.4')
+                          if (androidExt.hasProperty('defaultConfig')) {
+                              androidExt.defaultConfig.multiDexEnabled = true
+                          }
+                          if (project.plugins.hasPlugin('org.jetbrains.kotlin.android') ||
+                              project.plugins.hasPlugin('kotlin-android')) {
+                              project.tasks.configureEach { task ->
+                                  if (task.name.contains('Kotlin') && task.hasProperty('kotlinOptions')) {
+                                      task.kotlinOptions.jvmTarget = "17"
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+      - name: Build split APKs
+        run: flutter build apk --release --split-per-abi
+
+      - name: Create GitHub Release with APKs
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/app/outputs/flutter-apk/app-*-release.apk
+          generate_release_notes: true

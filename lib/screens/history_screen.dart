@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
+import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
+import '../utils/date_format.dart';
 import '../widgets/quest_chain_section.dart';
 
 class HistoryScreen extends StatelessWidget {
@@ -10,88 +12,113 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final history = context.watch<BoredomProvider>().history;
-    final dateFormat = DateFormat('d MMM, HH:mm');
+    final s = context.str;
+    final history = context.select<BoredomProvider, List<CompletedMission>>(
+      (p) => p.history,
+    );
 
     return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-        children: [
-          const Text(
-            'Missions',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      // Sliver list with a builder so hundreds of entries stay cheap.
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            sliver: SliverList.list(
+              children: [
+                Text(
+                  s.missionsTitle,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const QuestChainSection(),
+                const SizedBox(height: 24),
+                Text(
+                  s.historyTitle,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          const QuestChainSection(),
-          const SizedBox(height: 24),
-          const Text(
-            'Riwayat',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
           if (history.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                'Belum ada misi yang selesai.\nBalik ke Home dan klik "I\'M BORED".',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.8)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              sliver: SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text(
+                    s.historyEmpty,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.textSecondary),
+                  ),
+                ),
               ),
             )
           else
-            ...history.map((entry) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(entry.emoji, style: const TextStyle(fontSize: 26)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              entry.title,
-                              style: const TextStyle(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${entry.categoryLabel} · ${dateFormat.format(entry.completedAt)}',
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              sliver: SliverList.builder(
+                itemCount: history.length,
+                itemBuilder: (context, index) {
+                  final entry = history[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      Text(
-                        '+${entry.xpEarned} XP',
-                        style: const TextStyle(
-                          color: AppColors.success,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
+                      child: Row(
+                        children: [
+                          Text(entry.emoji, style: const TextStyle(fontSize: 26)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  entry.title,
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${entry.categoryLabel} · ${formatHistoryDate(entry.completedAt, code: s.code)}',
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '+${entry.xpEarned} XP',
+                            style: const TextStyle(
+                              color: AppColors.success,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../models/achievement.dart';
+import '../models/quest_chain.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
 
@@ -9,14 +11,19 @@ class QuestChainSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<BoredomProvider>();
-    final chain = provider.currentChain;
+    final chain = context.select<BoredomProvider, QuestChain?>(
+      (p) => p.currentChain,
+    );
 
     if (chain == null) {
-      return _NoActiveChain(provider: provider);
+      return const _NoActiveChain();
     }
 
-    final stepIndex = provider.currentChainStepIndex;
+    final s = context.str;
+    final code = s.code;
+    final stepIndex = context.select<BoredomProvider, int>(
+      (p) => p.currentChainStepIndex,
+    );
     final step = chain.steps[stepIndex];
     final isLastStep = stepIndex == chain.steps.length - 1;
 
@@ -36,7 +43,7 @@ class QuestChainSection extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  chain.title,
+                  localizedTitle(en: chain.title, id: chain.titleId, code: code),
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
@@ -45,7 +52,7 @@ class QuestChainSection extends StatelessWidget {
                 ),
               ),
               Text(
-                'Step ${stepIndex + 1}/${chain.steps.length}',
+                s.stepOf(stepIndex + 1, chain.steps.length),
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
               ),
             ],
@@ -62,12 +69,12 @@ class QuestChainSection extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            step.title,
+            localizedTitle(en: step.title, id: step.titleId, code: code),
             style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 14),
           ),
           const SizedBox(height: 4),
           Text(
-            step.description,
+            localizedTitle(en: step.description, id: step.descriptionId, code: code),
             style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
           ),
           const SizedBox(height: 14),
@@ -75,13 +82,13 @@ class QuestChainSection extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => _confirmAbandon(context, provider),
+                  onPressed: () => _confirmAbandon(context, s),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.danger,
                     side: const BorderSide(color: AppColors.danger),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: const Text('Batalkan'),
+                  child: Text(s.chainCancel),
                 ),
               ),
               const SizedBox(width: 10),
@@ -89,23 +96,29 @@ class QuestChainSection extends StatelessWidget {
                 flex: 2,
                 child: ElevatedButton(
                   onPressed: () async {
+                    final provider = context.read<BoredomProvider>();
                     final unlocked = await provider.completeCurrentChainStep();
                     if (!context.mounted) return;
                     if (isLastStep) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${chain.title} tuntas! +${chain.rewardXp} XP 🎉'),
+                          content: Text(
+                            s.chainComplete(
+                              localizedTitle(en: chain.title, id: chain.titleId, code: code),
+                              chain.rewardXp,
+                            ),
+                          ),
                           backgroundColor: AppColors.success,
                         ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Step selesai, lanjut ke berikutnya!')),
+                        SnackBar(content: Text(s.chainStepNext)),
                       );
                     }
-                    _showAchievementSnackbars(context, unlocked);
+                    _showAchievementSnackbars(context, s, unlocked);
                   },
-                  child: Text(isLastStep ? 'SELESAIKAN CHAIN' : 'STEP SELESAI'),
+                  child: Text(isLastStep ? s.chainFinish : s.chainStepDone),
                 ),
               ),
             ],
@@ -115,32 +128,38 @@ class QuestChainSection extends StatelessWidget {
     );
   }
 
-  void _confirmAbandon(BuildContext context, BoredomProvider provider) {
+  void _confirmAbandon(BuildContext context, AppStrings s) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.surfaceElevated,
-        title: const Text('Batalkan quest chain?', style: TextStyle(color: AppColors.textPrimary)),
-        content: const Text('Progress chain ini akan hilang.', style: TextStyle(color: AppColors.textSecondary)),
+        title: Text(s.abandonTitle, style: const TextStyle(color: AppColors.textPrimary)),
+        content: Text(s.abandonBody, style: const TextStyle(color: AppColors.textSecondary)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Nggak jadi')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(s.abandonKeep)),
           TextButton(
             onPressed: () {
-              provider.abandonChain();
+              context.read<BoredomProvider>().abandonChain();
               Navigator.of(context).pop();
             },
-            child: const Text('Batalkan', style: TextStyle(color: AppColors.danger)),
+            child: Text(s.abandonConfirm, style: const TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
     );
   }
 
-  void _showAchievementSnackbars(BuildContext context, List<Achievement> unlocked) {
+  void _showAchievementSnackbars(
+    BuildContext context,
+    AppStrings s,
+    List<Achievement> unlocked,
+  ) {
     for (final a in unlocked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Achievement unlocked: ${a.emoji} ${a.title}'),
+          content: Text(
+            '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: s.code)}',
+          ),
           backgroundColor: AppColors.accent,
         ),
       );
@@ -149,11 +168,17 @@ class QuestChainSection extends StatelessWidget {
 }
 
 class _NoActiveChain extends StatelessWidget {
-  final BoredomProvider provider;
-  const _NoActiveChain({required this.provider});
+  const _NoActiveChain();
 
   @override
   Widget build(BuildContext context) {
+    final s = context.str;
+    final code = s.code;
+    final chains = context.select<BoredomProvider, List<QuestChain>>(
+      (p) => p.availableChains,
+    );
+    final actions = context.read<BoredomProvider>();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -163,22 +188,22 @@ class _NoActiveChain extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '🧩 Quest Chains',
-            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+          Text(
+            '🧩 ${s.chainsTitle}',
+            style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Rantai misi bertahap dengan reward XP besar di akhir.',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+          Text(
+            s.chainsDesc,
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
           ),
           const SizedBox(height: 12),
-          ...provider.availableChains.map(
+          ...chains.map(
             (chain) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: InkWell(
                 borderRadius: BorderRadius.circular(14),
-                onTap: () => provider.startChain(chain.id),
+                onTap: () => actions.startChain(chain.id),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -193,9 +218,11 @@ class _NoActiveChain extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(chain.title,
-                                style: const TextStyle(
-                                    color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 13)),
+                            Text(
+                              localizedTitle(en: chain.title, id: chain.titleId, code: code),
+                              style: const TextStyle(
+                                color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 13),
+                            ),
                             Text('${chain.steps.length} step · +${chain.rewardXp} XP',
                                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
                           ],

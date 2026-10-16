@@ -1,8 +1,8 @@
 import 'mission.dart';
 
-/// Metrik yang dipakai buat nentuin kapan sebuah achievement ke-unlock.
-/// `special` dipakai buat achievement yang di-trigger langsung oleh sebuah
-/// event (bukan dihitung dari angka progress), misalnya "selesai jam 11 malam".
+/// Metric used to decide when an achievement unlocks.
+/// `special` marks event-triggered achievements (not derived from a counter),
+/// for example "finished after 11 PM".
 enum AchievementMetric {
   totalMissions,
   streak,
@@ -18,24 +18,28 @@ enum AchievementMetric {
 class Achievement {
   final String id;
   final String title;
-  final String emoji;
   final String description;
+  final String? titleId;
+  final String? descriptionId;
+  final String emoji;
   final AchievementMetric metric;
   final int target;
-  final MissionCategory? category; // hanya dipakai kalau metric == categoryCount
+  final MissionCategory? category; // only used when metric == categoryCount
 
   const Achievement({
     required this.id,
     required this.title,
-    required this.emoji,
     required this.description,
+    this.titleId,
+    this.descriptionId,
+    required this.emoji,
     required this.metric,
     required this.target,
     this.category,
   });
 }
 
-/// Achievement yang sudah ke-unlock, plus kapan.
+/// An unlocked achievement, plus when it happened.
 class UnlockedAchievement {
   final String achievementId;
   final DateTime unlockedAt;

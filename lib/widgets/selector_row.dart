@@ -8,7 +8,7 @@ class SelectorOption<T> {
   const SelectorOption(this.value, this.emoji, this.label);
 }
 
-/// Baris pilihan chip (dipakai buat Mood / Time / Location / Energy).
+/// Chip option row (used for Mood / Time / Location / Energy).
 class SelectorRow<T> extends StatelessWidget {
   final String title;
   final List<SelectorOption<T>> options;

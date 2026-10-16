@@ -1,20 +1,24 @@
 class DailyChallenge {
   final String id;
   final String title;
-  final String emoji;
   final String description;
+  final String? titleId;
+  final String? descriptionId;
+  final String emoji;
   final int rewardXp;
 
   const DailyChallenge({
     required this.id,
     required this.title,
-    required this.emoji,
     required this.description,
+    this.titleId,
+    this.descriptionId,
+    required this.emoji,
     required this.rewardXp,
   });
 }
 
-/// State harian: challenge apa yang aktif hari ini dan apakah sudah selesai.
+/// Daily state: which challenge is active today and whether it is done.
 class DailyChallengeState {
   final DateTime date;
   final String challengeId;

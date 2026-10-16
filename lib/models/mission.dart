@@ -1,4 +1,4 @@
-/// Kategori misi. Dipakai buat filtering & statistik nanti.
+/// Mission category. Used for filtering and statistics.
 enum MissionCategory {
   gaming,
   entertainment,
@@ -9,6 +9,7 @@ enum MissionCategory {
   outdoor,
   social,
   selfImprovement,
+  custom,
   chaos,
 }
 
@@ -33,8 +34,24 @@ extension MissionCategoryX on MissionCategory {
         return 'Social';
       case MissionCategory.selfImprovement:
         return 'Self-Improvement';
+      case MissionCategory.custom:
+        return 'Custom';
       case MissionCategory.chaos:
         return 'Chaos';
+    }
+  }
+
+  String labelFor(String code) {
+    if (code != 'id') return label;
+    switch (this) {
+      case MissionCategory.selfImprovement:
+        return 'Pengembangan Diri';
+      case MissionCategory.custom:
+        return 'Buatanmu';
+      case MissionCategory.chaos:
+        return 'Chaos';
+      default:
+        return label;
     }
   }
 }
@@ -100,9 +117,9 @@ extension TimeBudgetX on TimeBudget {
       case TimeBudget.thirtyMin:
         return '30 min';
       case TimeBudget.oneHour:
-        return '1 jam';
+        return '1 hour';
       case TimeBudget.twoHourPlus:
-        return '2 jam+';
+        return '2 hours+';
     }
   }
 }
@@ -163,26 +180,32 @@ extension EnergyLevelX on EnergyLevel {
   }
 }
 
-/// Satu entri di katalog misi (definisi statis, bukan instance yang sudah diterima user).
+/// One entry in the mission catalog (a static definition, not a user-facing
+/// instance). English fields are canonical; the *Id fields hold the
+/// Indonesian translation and fall back to English when empty.
 class Mission {
   final String id;
   final String title;
-  final String emoji;
   final String description;
+  final String? titleId;
+  final String? descriptionId;
+  final String emoji;
   final MissionCategory category;
   final int difficulty; // 1-5
   final int baseXp;
-  final TimeBudget maxTime; // misi butuh waktu <= ini
+  final TimeBudget maxTime; // mission takes at most this long
   final Set<Mood> moods;
   final Set<LocationType> locations;
   final Set<EnergyLevel> energyLevels;
-  final bool chaosOnly; // hanya muncul di Chaos Mode
+  final bool chaosOnly; // only shows up in Chaos Mode
 
   const Mission({
     required this.id,
     required this.title,
-    required this.emoji,
     required this.description,
+    this.titleId,
+    this.descriptionId,
+    required this.emoji,
     required this.category,
     required this.difficulty,
     required this.baseXp,
@@ -196,7 +219,8 @@ class Mission {
   String get difficultyStars => '⭐' * difficulty + '☆' * (5 - difficulty);
 }
 
-/// Misi yang sudah "digenerate" untuk sesi ini - dibungkus nomor urut biar berasa game.
+/// A generated mission for this session, wrapped with a running number
+/// so it feels like a game.
 class MissionInstance {
   final Mission mission;
   final int missionNumber;

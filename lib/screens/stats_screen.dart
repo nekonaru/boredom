@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../models/mission.dart';
+import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
 
@@ -9,16 +11,20 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<BoredomProvider>();
-    final progress = provider.progress;
+    final s = context.str;
+    final progress = context.select<BoredomProvider, UserProgress>(
+      (p) => p.progress,
+    );
 
     final categoryCounts = progress.categoryCounts;
     final maxCount = categoryCounts.values.isEmpty
         ? 1
         : categoryCounts.values.reduce((a, b) => a > b ? a : b);
 
-    // Urutkan semua kategori (termasuk yang masih 0) biar chart konsisten.
-    final sortedCategories = MissionCategory.values.where((c) => c != MissionCategory.chaos).toList()
+    // Sort every category (including zeros) so the chart stays consistent.
+    final sortedCategories = MissionCategory.values
+        .where((c) => c != MissionCategory.chaos && c != MissionCategory.custom)
+        .toList()
       ..sort((a, b) =>
           (categoryCounts[b.name] ?? 0).compareTo(categoryCounts[a.name] ?? 0));
 
@@ -28,19 +34,19 @@ class StatsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Statistics',
-              style: TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              s.statsTitle,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(label: 'Total Misi', value: '${progress.totalMissionsCompleted}', emoji: '🎯'),
+                  child: _MetricCard(label: s.mTotalMissions, value: '${progress.totalMissionsCompleted}', emoji: '🎯'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _MetricCard(label: 'Longest Streak', value: '${progress.longestStreak} hari', emoji: '🔥'),
+                  child: _MetricCard(label: s.mLongestStreak, value: s.days(progress.longestStreak), emoji: '🔥'),
                 ),
               ],
             ),
@@ -48,26 +54,26 @@ class StatsScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(label: 'Total Reroll', value: '${progress.totalRerollsAllTime}', emoji: '🎲'),
+                  child: _MetricCard(label: s.mTotalRerolls, value: '${progress.totalRerollsAllTime}', emoji: '🎲'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _MetricCard(label: 'Chaos Missions', value: '${progress.chaosMissionsCompleted}', emoji: '☢️'),
+                  child: _MetricCard(label: s.mChaos, value: '${progress.chaosMissionsCompleted}', emoji: '☢️'),
                 ),
               ],
             ),
             const SizedBox(height: 28),
-            const Text(
-              'Misi per Kategori',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            Text(
+              s.perCategory,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             if (progress.totalMissionsCompleted == 0)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Text(
-                  'Belum ada data. Selesaikan beberapa misi dulu.',
-                  style: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.8)),
+                  s.statsEmpty,
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               )
             else
@@ -82,7 +88,7 @@ class StatsScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(cat.label,
+                          Text(cat.labelFor(s.code),
                               style: const TextStyle(color: AppColors.textPrimary, fontSize: 13)),
                           Text('$count',
                               style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),

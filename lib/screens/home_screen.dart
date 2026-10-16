@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../models/mission.dart';
+import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../utils/app_theme.dart';
 import '../widgets/selector_row.dart';
@@ -13,8 +15,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<BoredomProvider>();
-    final progress = provider.progress;
+    final s = context.str;
+    // Selective rebuilds: each piece only listens to the field it renders,
+    // so tapping a chip does not rebuild the whole page.
+    final progress = context.select<BoredomProvider, UserProgress>((p) => p.progress);
+    final selectedMood = context.select<BoredomProvider, Mood>((p) => p.selectedMood);
+    final selectedTime = context.select<BoredomProvider, TimeBudget>((p) => p.selectedTime);
+    final selectedLocation = context.select<BoredomProvider, LocationType>((p) => p.selectedLocation);
+    final selectedEnergy = context.select<BoredomProvider, EnergyLevel>((p) => p.selectedEnergy);
+    final chaosMode = context.select<BoredomProvider, bool>((p) => p.chaosMode);
+    final rerollsLeft = context.select<BoredomProvider, int>((p) => p.rerollsLeft);
+    final actions = context.read<BoredomProvider>();
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -25,9 +36,9 @@ class HomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'B O R E D O M',
-                  style: TextStyle(
+                Text(
+                  s.brand,
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -42,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      '🔥 ${progress.streakDays} DAY STREAK',
+                      '🔥 ${s.streak(progress.streakDays)}',
                       style: const TextStyle(
                         color: AppColors.warning,
                         fontSize: 11,
@@ -53,9 +64,9 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            const Text(
-              'YOU ARE BORED.',
-              style: TextStyle(
+            Text(
+              s.headline,
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 30,
                 fontWeight: FontWeight.w900,
@@ -63,9 +74,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              'So... what now?',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+            Text(
+              s.subhead,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
             ),
             const SizedBox(height: 24),
             XpBar(progress: progress),
@@ -74,36 +85,36 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 28),
 
             SelectorRow<Mood>(
-              title: 'MOOD',
-              selected: provider.selectedMood,
-              onChanged: provider.setMood,
+              title: s.secMood,
+              selected: selectedMood,
+              onChanged: actions.setMood,
               options: Mood.values
                   .map((m) => SelectorOption(m, m.emoji, m.label))
                   .toList(),
             ),
             const SizedBox(height: 16),
             SelectorRow<TimeBudget>(
-              title: 'PUNYA WAKTU',
-              selected: provider.selectedTime,
-              onChanged: provider.setTime,
+              title: s.secTime,
+              selected: selectedTime,
+              onChanged: actions.setTime,
               options: TimeBudget.values
-                  .map((t) => SelectorOption(t, '⏱️', t.label))
+                  .map((t) => SelectorOption(t, '⏱️', s.timeLabel(t)))
                   .toList(),
             ),
             const SizedBox(height: 16),
             SelectorRow<LocationType>(
-              title: 'LOKASI',
-              selected: provider.selectedLocation,
-              onChanged: provider.setLocation,
+              title: s.secLocation,
+              selected: selectedLocation,
+              onChanged: actions.setLocation,
               options: LocationType.values
                   .map((l) => SelectorOption(l, l.emoji, l.label))
                   .toList(),
             ),
             const SizedBox(height: 16),
             SelectorRow<EnergyLevel>(
-              title: 'ENERGI',
-              selected: provider.selectedEnergy,
-              onChanged: provider.setEnergy,
+              title: s.secEnergy,
+              selected: selectedEnergy,
+              onChanged: actions.setEnergy,
               options: EnergyLevel.values
                   .map((e) => SelectorOption(e, e.emoji, e.label))
                   .toList(),
@@ -113,17 +124,17 @@ class HomeScreen extends StatelessWidget {
 
             // Chaos mode toggle.
             InkWell(
-              onTap: () => provider.setChaosMode(!provider.chaosMode),
+              onTap: () => actions.setChaosMode(!chaosMode),
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: provider.chaosMode
+                  color: chaosMode
                       ? AppColors.danger.withValues(alpha: 0.15)
                       : AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: provider.chaosMode ? AppColors.danger : Colors.white12,
+                    color: chaosMode ? AppColors.danger : Colors.white12,
                   ),
                 ),
                 child: Row(
@@ -134,16 +145,16 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'CHAOS MODE',
-                            style: TextStyle(
+                          Text(
+                            s.chaosTitle,
+                            style: const TextStyle(
                               color: AppColors.textPrimary,
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                             ),
                           ),
                           Text(
-                            'Abaikan semua preferensi. Apapun bisa keluar.',
+                            s.chaosDesc,
                             style: TextStyle(
                               color: AppColors.textSecondary.withValues(alpha: 0.9),
                               fontSize: 11,
@@ -153,8 +164,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     Switch(
-                      value: provider.chaosMode,
-                      onChanged: provider.setChaosMode,
+                      value: chaosMode,
+                      onChanged: actions.setChaosMode,
                       activeThumbColor: AppColors.danger,
                     ),
                   ],
@@ -169,22 +180,28 @@ class HomeScreen extends StatelessWidget {
               height: 64,
               child: ElevatedButton(
                 onPressed: () async {
-                  provider.rollMission();
+                  actions.rollMission();
+                  if (!context.mounted) return;
                   await showMissionSheet(context);
                   if (!context.mounted) return;
+                  final provider = context.read<BoredomProvider>();
                   if (provider.lastXpGained != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Mantap! +${provider.lastXpGained} XP 🎉'),
+                        content: Text(s.xpSnack(provider.lastXpGained!)),
                         backgroundColor: AppColors.success,
                       ),
                     );
                     provider.clearLastXpGained();
                   }
+                  final code = s.code;
                   for (final a in provider.lastUnlockedAchievements) {
+                    if (!context.mounted) break;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Achievement unlocked: ${a.emoji} ${a.title}'),
+                        content: Text(
+                          '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: code)}',
+                        ),
                         backgroundColor: AppColors.accent,
                       ),
                     );
@@ -193,16 +210,16 @@ class HomeScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      provider.chaosMode ? AppColors.danger : AppColors.accent,
+                      chaosMode ? AppColors.danger : AppColors.accent,
                   textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                 ),
-                child: Text(provider.chaosMode ? '☢️ CHAOS ME' : '🎲 I\'M BORED'),
+                child: Text(chaosMode ? '☢️ ${s.chaosButton}' : '🎲 ${s.boredButton}'),
               ),
             ),
             const SizedBox(height: 10),
             Center(
               child: Text(
-                '${provider.rerollsLeft} reroll tersisa hari ini',
+                s.rerollsLeft(rerollsLeft),
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
             ),

@@ -1,7 +1,7 @@
 name: boredom
-description: Boredom - game kecil untuk manusia yang tidak tahu harus ngapain.
+description: Boredom, a tiny game for humans who do not know what to do with themselves.
 publish_to: 'none'
-version: 1.1.0+2
+version: 1.2.0+3
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -13,13 +13,8 @@ dependencies:
   # State management
   provider: ^6.1.2
 
-  # Simpan progress (XP, level, reroll count, history, streak) secara lokal
+  # Local persistence (XP, level, reroll count, history, streak)
   shared_preferences: ^2.3.2
-
-  # Format tanggal (streak, riwayat misi)
-  intl: ^0.19.0
-
-  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
