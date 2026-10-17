@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// One mission parked in the inbox, saved for later instead of rolled now.
 class SavedMission {
   final String missionId;

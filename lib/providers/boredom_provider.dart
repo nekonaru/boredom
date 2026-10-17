@@ -47,10 +47,9 @@ class BoredomProvider extends ChangeNotifier {
   // Undo snapshot of the last completion (cleared after the window ends
   // or once undo is used).
   UserProgress? _undoProgress;
-  CompletedMission? _undoEntry;
   DateTime? _undoAt;
   int _undoHistoryLength = 0;
-  List<Achievement> _undoAchievements = const [];
+  List<UnlockedAchievement> _undoAchievements = const [];
 
   bool _loaded = false;
   bool get loaded => _loaded;
@@ -133,7 +132,6 @@ class BoredomProvider extends ChangeNotifier {
 
   void _clearUndo() {
     _undoProgress = null;
-    _undoEntry = null;
     _undoAt = null;
   }
 
@@ -526,7 +524,6 @@ class BoredomProvider extends ChangeNotifier {
       xpEarned: gainedXp,
       completedAt: now,
     );
-    _undoEntry = entry;
     history.insert(0, entry);
 
     await StorageService.instance.saveProgress(progress);
@@ -736,7 +733,6 @@ class BoredomProvider extends ChangeNotifier {
       xpEarned: gainedXp,
       completedAt: now,
     );
-    _undoEntry = entry;
     history.insert(0, entry);
 
     await StorageService.instance.saveProgress(progress);

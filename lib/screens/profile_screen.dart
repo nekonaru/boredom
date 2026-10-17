@@ -471,7 +471,6 @@ class ProfileScreen extends StatelessWidget {
     AppStrings s,
     BoredomProvider provider,
   ) {
-    final now = TimeOfDay.now();
     showTimePicker(
       context: context,
       initialTime: TimeOfDay(
