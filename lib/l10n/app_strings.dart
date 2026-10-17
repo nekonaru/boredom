@@ -100,10 +100,11 @@ class AppStrings {
         'Step-by-step chains with a big XP reward at the end.',
         'Rantai misi bertahap dengan hadiah XP besar di akhir.',
       );
-  String get stepOf(int i, int n) =>
+  String stepOf(int i, int n) =>
       isId ? 'Langkah $i/$n' : 'Step $i/$n';
-  String chainStepsReward(int steps, int rewardXp) =>
-      isId ? '$steps langkah · +$rewardXp XP' : '$steps step${steps == 1 ? '' : 's'} · +$rewardXp XP';
+  String chainStepsReward(int steps, int rewardXp) => isId
+      ? '$steps langkah · +$rewardXp XP'
+      : '$steps step${steps == 1 ? '' : 's'} · +$rewardXp XP';
   String get chainCancel => _pick('Cancel', 'Batalkan');
   String get chainStepDone => _pick('COMPLETE STEP', 'SELESAIKAN LANGKAH');
   String get chainFinish => _pick('FINISH CHAIN', 'SELESAIKAN RANTAI');

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:boredom/models/mission.dart';
@@ -88,7 +87,7 @@ void main() {
 
       final restored = await p.restoreSavedMission('code_02');
       expect(restored, isNotNull);
-      expect(restored!.mission.id, 'code_02');
+      expect(restored!.mission.mission.id, 'code_02');
       // The other inbox entry is untouched.
       expect(p.isSavedForLater('home_01'), isTrue);
       expect(p.isSavedForLater('code_02'), isFalse);

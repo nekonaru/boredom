@@ -19,8 +19,20 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  /// Calls the provider's day-rollover check when the app resumes, so a
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Runs the provider's day-rollover check when the app resumes, so a
   /// long-lived process does not keep serving yesterday's challenge.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

@@ -397,7 +397,7 @@ class BoredomProvider extends ChangeNotifier {
   /// Muting the last remaining category is refused: the generator would
   /// otherwise fall back to the full catalog and the mute would silently
   /// stop meaning anything.
-  Future<void> toggleCategoryMuted(MissionCategory category) async {
+  Future<bool> toggleCategoryMuted(MissionCategory category) async {
     final name = category.name;
     if (mutedCategories.contains(name)) {
       mutedCategories = {...mutedCategories}..remove(name);
@@ -456,7 +456,7 @@ class BoredomProvider extends ChangeNotifier {
   /// This deliberately does not set `currentMission`: that slot belongs to
   /// `rollMission()`, which overwrites whatever is there, so a restored
   /// mission parked in it would silently disappear.
-  Future<Mission?> restoreSavedMission(String missionId) async {
+  Future<MissionInstance?> restoreSavedMission(String missionId) async {
     final index = savedMissions.indexWhere((m) => m.missionId == missionId);
     if (index < 0) return null;
     final mission = missionById(missionId);
@@ -595,7 +595,9 @@ class BoredomProvider extends ChangeNotifier {
       xpEarned: gainedXp,
       completedAt: now,
     );
-    _undoEntry = entry;
+    // New list instance: `context.select((p) => p.history)` in HistoryScreen
+    // compares with DeepCollectionEquality, which treats an in-place
+    // mutation as unchanged and would skip the rebuild.
     history = [entry, ...history];
     await StorageService.instance.saveProgress(progress);
     await StorageService.instance.addHistoryEntry(entry);
