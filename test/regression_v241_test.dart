@@ -168,7 +168,7 @@ void main() {
           emoji: '🧪',
           categoryLabel: 'Test',
           xpEarned: 10,
-          // Higher index = older, so index 0 is the newest.
+          // Index 0 gets the latest timestamp, so m0 is the newest.
           completedAt: DateTime(2026, 1, 1).add(Duration(minutes: 205 - i)),
         ),
       );
@@ -177,10 +177,11 @@ void main() {
       final loaded = await storage.loadHistory();
 
       expect(loaded.length, 200);
-      // The newest 200 survive; the 5 oldest are dropped.
-      expect(loaded.first.missionId, 'm4');
-      expect(loaded.last.missionId, 'm204');
-      expect(loaded.map((e) => e.missionId), isNot(contains('m0')));
+      // m0 has the newest timestamp, so the newest 200 are m0..m199 and
+      // the 5 oldest (m200..m204) are dropped.
+      expect(loaded.first.missionId, 'm0');
+      expect(loaded.last.missionId, 'm199');
+      expect(loaded.map((e) => e.missionId), isNot(contains('m204')));
     });
 
     test('history stays ordered after appending past the cap', () async {
@@ -198,7 +199,7 @@ void main() {
       );
       await storage.saveHistory(list);
 
-      // Now append two more through the normal path.
+      // Now append two more through the normal path, newest last.
       for (var i = 0; i < 2; i++) {
         await storage.addHistoryEntry(
           CompletedMission(
@@ -207,16 +208,17 @@ void main() {
             emoji: '🧪',
             categoryLabel: 'Test',
             xpEarned: 10,
-            completedAt: DateTime(2026, 1, 2),
+            completedAt: DateTime(2026, 1, 2).add(Duration(minutes: i)),
           ),
         );
       }
 
       final loaded = await storage.loadHistory();
       expect(loaded.length, 200);
-      // The newest entry must not have been silently dropped.
+      // Both appends survived and the newest is on top, which is what the
+      // old trim order broke.
       expect(loaded.first.missionId, 'new1');
-      expect(loaded.map((e) => e.missionId), isNot(contains('m0')));
+      expect(loaded.map((e) => e.missionId), contains('new0'));
     });
   });
 
