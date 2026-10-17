@@ -1,5 +1,34 @@
 # Changelog
 
+## v2.4.0
+
+Additive feature release. Old saves and backups keep loading, and this
+is the first version that asks for the notification permission (opt-in,
+off by default, requested only when you turn reminders on).
+
+### Added
+- Daily reminder notifications at a time you choose, with a switch and a
+  time picker in Profile. Permission is requested only on enable.
+- Share card: any mission renders into a 1080x1080 PNG (emoji, title,
+  description, XP, level) built with dart:ui and handed to the system
+  share sheet.
+- Inbox: save a mission for later with the bookmark button, then roll it
+  when you are ready. Capped at 50 entries and included in backups.
+- Quick wins toggle: narrows rolls to missions of 15 minutes or less.
+- Not interested: mute a whole category from the mission sheet, or
+  manage muted categories in Profile.
+- Weekly recap strip on Home: missions, XP, and current streak.
+- Milestone bonus XP when a completion crosses every 10th level.
+- Undo now covers daily challenges, quest chain steps, and custom
+  missions, not just rolled missions.
+- 4 new achievements tracking freeze tokens earned and saved missions,
+  with progress bars for every tracked achievement.
+- Achievement progress bars under the grid.
+
+### Improved
+- CI upgraded to Flutter 3.47.7 so current notification and share
+  plugins can be used.
+
 ## v2.3.0
 
 Game-depth release without breaking changes: old saves and backups

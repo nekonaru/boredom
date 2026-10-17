@@ -33,7 +33,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | ⭐ **XP and levels** | Progressive curve with absurd level titles, double XP every weekend |
 | 🔥 **Streaks** | Daily streak plus longest streak, with a 1-day grace period, freeze tokens, and an at-risk warning |
 | 📜 **Quest chains** | 4 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") with a big final reward |
-| 🏆 **Achievements** | 21 achievements, progress-based and event-based (like "Night Owl") |
+| 🏆 **Achievements** | 25 achievements, progress-based and event-based (like "Night Owl") |
 | 📅 **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
 | ⭐ **Custom missions** | Create your own missions with your own XP rewards |
 | ❤️ **Favorites** | Pin catalog missions to find them again fast |
@@ -42,15 +42,21 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | 💾 **Backup and restore** | Export all local data as text, import it back (phone-switch friendly, no account needed) |
 | 📊 **Statistics** | Last-7-days and last-30-days charts drawn dependency-free, average XP per active day, busiest weekday, per-category distribution, reroll and chaos totals |
 | 👎 **Dislikes** | Downvote missions so the generator stops rolling them |
-| 📤 **Share** | Copy any mission as text and paste it anywhere |
+| 🔔 **Daily reminder** | One notification a day at the time you choose, off by default |
 | 🌍 **English and Indonesian UI** | English by default, switch to Bahasa Indonesia in Profile |
 | 🎨 **Light and dark themes** | Dark by default, light mode plus 5 accent colors in Profile |
 | 📳 **Haptic feedback** | Tiny vibration on taps and completions, toggleable |
-| 🔒 **Fully offline** | Everything is stored locally on the phone, no account, no server, no new permissions |
+| 📤 **Share card** | Render any mission into a 1080x1080 PNG card, or copy it as text |
+| 📥 **Inbox** | Save missions for later and roll them when you are ready |
+| ⚡ **Quick wins** | Narrow rolls to missions of 15 minutes or less |
+| 🙈 **Mute categories** | Silence a whole category when you are not interested |
+| 📊 **Weekly recap** | Missions, XP, and streak visible straight on Home |
+| 🎁 **Milestone bonus** | Extra XP every time you cross a 10-level boundary |
+| ↩️ **Full undo** | 5-minute undo for missions, daily challenges, chain steps, and custom missions |
 
 ## 📦 Requirements
 
-- **Flutter** 3.35 or newer (stable channel)
+- **Flutter** 3.47 or newer (stable channel)
 - **JDK** 17
 - **Android SDK** (API 34+)
 - An Android phone or emulator (minimum Android 8.0 / API 26)
@@ -155,9 +161,11 @@ boredom/
 │   │                             # ThemeProvider (dark/light, accent)
 │   ├── screens/                  # Home, Missions, Stats, Achievements, Profile, shell
 │   │                             # onboarding (first-run walkthrough)
-│   ├── services/                 # catalogs, generator, local storage
+│   ├── services/                 # catalogs, generator, local storage,
+│   │                             # reminders, share card
 │   ├── utils/                    # theme, lightweight date formatting
-│   └── widgets/                  # selector chips, mission sheet, XP bar, charts, ...
+│   └── widgets/                  # selector chips, mission sheet, XP bar, charts,
+│                                 # weekly summary, inbox, ...
 ├── test/
 │   ├── widget_test.dart          # app boots, onboarding on fresh installs
 │   ├── user_progress_test.dart   # level curve
@@ -165,7 +173,8 @@ boredom/
 │   ├── localization_test.dart    # string coverage, catalog sanity
 │   ├── onboarding_test.dart      # onboarding flag persists
 │   ├── stats_theme_test.dart     # monthly stats, palettes, weekday names
-│   └── events_test.dart          # weekend XP, seasonal rolls, weighting
+│   ├── events_test.dart          # weekend XP, seasonal rolls, weighting
+│   └── v24_test.dart             # muted categories, milestone XP, recap
 ├── android_res_extra/            # launcher icon + splash drawn into the APK by CI
 ├── .github/
 │   └── workflows/

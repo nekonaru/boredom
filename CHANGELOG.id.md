@@ -1,5 +1,36 @@
 # Changelog
 
+## v2.4.0
+
+Rilis fitur aditif. Simpanan dan cadangan lama tetap terbaca, dan ini
+versi pertama yang meminta izin notifikasi (opt-in, mati secara
+default, diminta hanya saat kamu menyalakan pengingat).
+
+### Ditambahkan
+- Notifikasi pengingat harian pada waktu pilihanmu, dengan toggle dan
+  pemilih waktu di Profil. Izin hanya diminta saat dinyalakan.
+- Share card: misi apa pun dirender jadi PNG 1080x1080 (emoji, judul,
+  deskripsi, XP, level) memakai dart:ui lalu dikirim ke menu berbagi
+  sistem.
+- Kotak masuk (Inbox): simpan misi untuk nanti lewat tombol bookmark,
+  lalu mulai kerjakan saat siap. Maksimal 50 entri dan ikut dalam
+  cadangan.
+- Toggle misi kilat: membatasi roll ke misi 15 menit atau kurang.
+- Tidak tertarik: matikan satu kategori penuh dari mission sheet, atau
+  kelola kategori yang dimatikan di Profil.
+- Strip ringkasan mingguan di Beranda: jumlah misi, XP, dan streak
+  saat ini.
+- Bonus XP milestone saat penyelesaian melewati setiap level kelipatan 10.
+- Urungkan kini mencakup tantangan harian, langkah quest chain, dan
+  misi buatanmu, bukan hanya misi hasil roll.
+- 4 pencapaian baru untuk token beku yang didapat dan misi yang
+  disimpan, plus progress bar untuk setiap pencapaian yang dilacak.
+- Progress bar pencapaian di bawah grid.
+
+### Ditingkatkan
+- CI dinaikkan ke Flutter 3.47.7 agar plugin notifikasi dan share
+  terbaru bisa dipakai.
+
 ## v2.3.0
 
 Rilis kedalaman game tanpa breaking change: simpanan dan cadangan lama

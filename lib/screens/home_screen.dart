@@ -6,6 +6,7 @@ import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/feedback.dart';
+import '../widgets/weekly_summary.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
@@ -29,6 +30,9 @@ class HomeScreen extends StatelessWidget {
     final rerollsLeft = context.select<BoredomProvider, int>((p) => p.rerollsLeft);
     final streakAtRisk = context.select<BoredomProvider, bool>(
       (p) => p.streakAtRisk,
+    );
+    final quickWins = context.select<BoredomProvider, bool>(
+      (p) => p.quickWinsOnly,
     );
     final actions = context.read<BoredomProvider>();
 
@@ -115,6 +119,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 16),
+            const WeeklySummaryStrip(),
+            const SizedBox(height: 16),
             const DailyChallengeCard(),
             const SizedBox(height: 28),
 
@@ -152,6 +158,59 @@ class HomeScreen extends StatelessWidget {
               options: EnergyLevel.values
                   .map((e) => SelectorOption(e, e.emoji, e.label))
                   .toList(),
+            ),
+
+            // Quick wins toggle: narrows rolls to missions of 15 minutes or less.
+            InkWell(
+              onTap: () => actions.setQuickWins(!quickWins),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: quickWins
+                      ? pal.success.withValues(alpha: 0.12)
+                      : pal.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: quickWins
+                        ? pal.success
+                        : pal.textSecondary.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Text('⚡', style: TextStyle(fontSize: 20)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.quickWins,
+                            style: TextStyle(
+                              color: pal.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                          Text(
+                            s.quickWinsDesc,
+                            style: TextStyle(
+                              color: pal.textSecondary,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: quickWins,
+                      onChanged: actions.setQuickWins,
+                      activeThumbColor: pal.success,
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 28),

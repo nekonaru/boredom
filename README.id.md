@@ -33,7 +33,7 @@ Ada juga **Chaos Mode** yang mengabaikan semua filter, jadi misi apa pun bisa ke
 | ⭐ **XP dan level** | Kurva progresif dengan judul level yang absurd, XP ganda setiap akhir pekan |
 | 🔥 **Streak** | Streak harian plus streak terpanjang, dengan toleransi 1 hari libur, token beku, dan peringatan saat terancam putus |
 | 📜 **Quest chain** | 4 arc bertahap ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") dengan hadiah besar di akhir |
-| 🏆 **Pencapaian** | 21 pencapaian, berbasis progres dan event (seperti "Night Owl") |
+| 🏆 **Pencapaian** | 25 pencapaian, berbasis progres dan event (seperti "Night Owl") |
 | 📅 **Tantangan harian** | Satu tantangan spesial per hari, sama untuk semua orang di tanggal yang sama, hadiah XP besar |
 | ⭐ **Misi buatanmu** | Buat misi sendiri dengan hadiah XP pilihanmu |
 | ❤️ **Favorit** | Tandai misi katalog agar mudah ditemukan lagi |
@@ -42,15 +42,21 @@ Ada juga **Chaos Mode** yang mengabaikan semua filter, jadi misi apa pun bisa ke
 | 💾 **Cadangan dan pulihkan** | Ekspor semua data lokal sebagai teks, impor kembali untuk pulihkan (pindah HP jadi mudah, tanpa akun) |
 | 📊 **Statistik** | Grafik 7 dan 30 hari terakhir tanpa dependency, rata-rata XP per hari aktif, hari tersibuk, distribusi per kategori, total reroll dan chaos |
 | 👎 **Dislike** | Downvote misi supaya generator berhenti mengeluarkannya |
-| 📤 **Bagikan** | Salin misi apa pun sebagai teks dan tempel di mana saja |
+| 🔔 **Pengingat harian** | Satu notifikasi sehari pada waktu pilihanmu, mati secara default |
 | 🌍 **UI Inggris dan Indonesia** | Inggris sebagai default, ganti ke Bahasa Indonesia di Profil |
 | 🎨 **Tema terang dan gelap** | Gelap sebagai default, mode terang plus 5 warna aksen di Profil |
 | 📳 **Haptic feedback** | Getaran kecil saat ketuk dan selesai, bisa dimatikan |
-| 🔒 **Sepenuhnya offline** | Semua tersimpan lokal di HP, tanpa akun, tanpa server, tanpa izin baru |
+| 📤 **Share card** | Render misi apa pun jadi kartu PNG 1080x1080, atau salin sebagai teks |
+| 📥 **Kotak masuk** | Simpan misi untuk nanti dan mulai kerjakan saat siap |
+| ⚡ **Misi kilat** | Batasi roll ke misi 15 menit atau kurang |
+| 🙈 **Matikan kategori** | Bisukan satu kategori penuh saat kamu tidak tertarik |
+| 📊 **Ringkasan mingguan** | Jumlah misi, XP, dan streak langsung di Beranda |
+| 🎁 **Bonus milestone** | XP ekstra setiap melewati kelipatan 10 level |
+| ↩️ **Urungkan penuh** | Urungkan 5 menit untuk misi, tantangan harian, langkah chain, dan misi buatanmu |
 
 ## 📦 Kebutuhan
 
-- **Flutter** 3.35 atau lebih baru (stable channel)
+- **Flutter** 3.47 atau lebih baru (stable channel)
 - **JDK** 17
 - **Android SDK** (API 34+)
 - HP atau emulator Android (minimum Android 8.0 / API 26)
@@ -155,16 +161,19 @@ boredom/
 │   │                             # ThemeProvider (gelap/terang, aksen)
 │   ├── screens/                  # Beranda, Misi, Statistik, Pencapaian, Profil, shell
 │   │                             # onboarding (tur perkenalan pertama buka)
-│   ├── services/                 # katalog, generator, penyimpanan lokal
+│   ├── services/                 # katalog, generator, penyimpanan lokal,
+│   │                             # pengingat, share card
 │   ├── utils/                    # tema, format tanggal yang ringan
-│   └── widgets/                  # chip selector, mission sheet, XP bar, grafik, ...
+│   └── widgets/                  # chip selector, mission sheet, XP bar, grafik,
+│                                 # ringkasan mingguan, inbox, ...
 ├── test/
 │   ├── widget_test.dart          # app menyala tanpa crash
 │   ├── user_progress_test.dart   # kurva level
 │   ├── mission_service_test.dart # fallback generator, filter, pengecualian
 │   └── localization_test.dart    # cakupan string, kewarasan katalog
 │   ├── stats_theme_test.dart     # statistik bulanan, palet, nama hari
-│   └── events_test.dart          # XP akhir pekan, roll musiman, bobot
+│   ├── events_test.dart          # XP akhir pekan, roll musiman, bobot
+│   └── v24_test.dart             # kategori dimatikan, XP milestone, ringkasan
 │   └── onboarding_test.dart      # flag onboarding tersimpan
 ├── android_res_extra/            # icon launcher + splash yang dipasang CI ke APK
 ├── .github/

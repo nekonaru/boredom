@@ -21,7 +21,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.0'
+          flutter-version: '3.47.7'
           channel: 'stable'
 
       - name: Cache pub and Gradle dependencies
@@ -30,9 +30,9 @@ jobs:
           path: |
             ~/.pub-cache
             ~/.gradle
-          key: ${{ runner.os }}-flutter-3.35.0-${{ hashFiles('pubspec.yaml') }}
+          key: ${{ runner.os }}-flutter-3.47.7-${{ hashFiles('pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-flutter-3.35.0-
+            ${{ runner.os }}-flutter-3.47.7-
 
       - name: Regenerate folder android dari template resmi Flutter
         run: |
@@ -47,6 +47,23 @@ jobs:
           cp android_res_extra/drawable/*.xml android/app/src/main/res/drawable/
           cp android_res_extra/launcher/mipmap-anydpi-v26/*.xml android/app/src/main/res/mipmap-anydpi-v26/
           cp android_res_extra/launcher/values/*.xml android/app/src/main/res/values/
+
+      - name: Declare notification permissions and receivers
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          sed -i 's#<manifest xmlns:android="http://schemas.android.com/apk/res/android">#<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />#' "$MANIFEST"
+          sed -i 's#</application>#    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />\n    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n        <intent-filter>\n            <action android:name="android.intent.action.BOOT_COMPLETED"/>\n            <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>\n            <action android:name="android.intent.action.QUICKBOOT_POWERON"/>\n            <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>\n        </intent-filter>\n    </receiver>\n</application>#' "$MANIFEST"
+          grep -c "ScheduledNotificationReceiver" "$MANIFEST"
+          grep -c "RECEIVE_BOOT_COMPLETED" "$MANIFEST"
+
+      - name: Keep notification resources from the R8 resource shrinker
+        run: |
+          mkdir -p android/app/src/main/res/raw
+          cat > android/app/src/main/res/raw/keep.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@drawable/ic_launcher_foreground,@drawable/launch_background" />
+          EOF
+          cat android/app/src/main/res/raw/keep.xml
 
       - name: Cek format file Gradle yang beneran ke-generate (debug)
         run: |
@@ -163,7 +180,7 @@ jobs:
                               targetCompatibility JavaVersion.VERSION_17
                               coreLibraryDesugaringEnabled true
                           }
-                          project.dependencies.add('coreLibraryDesugaring', 'com.android.tools:desugar_jdk_libs:2.1.4')
+                          project.dependencies.add('coreLibraryDesugaring', 'com.android.tools:desugar_jdk_libs:2.1.5')
                           if (androidExt.hasProperty('defaultConfig')) {
                               androidExt.defaultConfig.multiDexEnabled = true
                           }

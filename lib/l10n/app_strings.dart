@@ -145,6 +145,7 @@ class AppStrings {
   String get lockedName => '???';
   String get lockedDesc =>
       _pick('Not unlocked yet', 'Belum terbuka');
+  String get progressTitle => _pick('Progress', 'Progres');
 
   // Profile
   String get profileTitle => _pick('Profile', 'Profil');
@@ -284,6 +285,49 @@ class AppStrings {
         'Streak at risk: complete a mission today to keep it alive.',
         'Streak terancam: selesaikan satu misi hari ini agar tidak putus.',
       );
+
+  // Inbox, quick wins, reminders, share card (v2.4)
+  String get inboxTitle => _pick('Inbox', 'Kotak Masuk');
+  String get inboxEmpty => _pick(
+        'Nothing saved for later. Tap the bookmark on a mission to park it here.',
+        'Belum ada yang disimpan untuk nanti. Ketuk ikon bookmark pada misi untuk menaruhnya di sini.',
+      );
+  String get inboxDone => _pick('Removed from inbox', 'Dihapus dari kotak masuk');
+  String get inboxRestored => _pick(
+        'Mission restored. Roll it when you are ready.',
+        'Misi dipulihkan. Kerjakan saat kamu siap.',
+      );
+  String get quickWins => _pick('Quick wins', 'Misi Kilat');
+  String get quickWinsDesc => _pick(
+        'Only missions that take 15 minutes or less.',
+        'Hanya misi yang butuh 15 menit atau kurang.',
+      );
+  String get weeklySummary => _pick('Your week', 'Pekanmu');
+  String summaryMissions(int n) => isId ? '$n misi' : '$n mission${n == 1 ? '' : 's'}';
+  String get notInterested => _pick('Not interested', 'Tidak tertarik');
+  String get mutedLabel => _pick('CATEGORY MUTED', 'KATEGORI DIMATIKAN');
+  String get mutedCategories => _pick('Muted categories', 'Kategori yang dimatikan');
+  String get mutedDesc => _pick(
+        'Muted categories never come out of the generator.',
+        'Kategori yang dimatikan tidak akan keluar dari generator.',
+      );
+  String get unmuted => _pick('Unmute', 'Aktifkan lagi');
+  String get remindersTitle => _pick('Daily reminder', 'Pengingat harian');
+  String get remindersDesc => _pick(
+        'One notification a day at the time you pick. Off by default.',
+        'Satu notifikasi sehari pada waktu yang kamu pilih. Mati secara default.',
+      );
+  String get reminderBlocked => _pick(
+        'Notifications are blocked. Enable them in system settings.',
+        'Notifikasi diblokir. Aktifkan di pengaturan sistem.',
+      );
+  String get shareCard => _pick('Share card', 'Bagikan kartu');
+  String get shareCardFailed => _pick(
+        'Could not build the share card. Sharing as text instead.',
+        'Kartu berbagi gagal dibuat. Bagikan sebagai teks saja.',
+      );
+  String get savedForLater => _pick('Saved for later', 'Disimpan untuk nanti');
+  String get playSaved => _pick('Roll it', 'Mulai kerjakan');
 
   // Freeze + weekend (v2.3)
   String get freezeTitle => _pick('Streak Freeze', 'Beku Streak');

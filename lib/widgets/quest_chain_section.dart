@@ -102,6 +102,7 @@ class QuestChainSection extends StatelessWidget {
                     final provider = context.read<BoredomProvider>();
                     final unlocked = await provider.completeCurrentChainStep();
                     if (!context.mounted) return;
+                    final undo = provider.canUndo;
                     if (isLastStep) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -112,6 +113,20 @@ class QuestChainSection extends StatelessWidget {
                             ),
                           ),
                           backgroundColor: pal.success,
+                          action: undo
+                              ? SnackBarAction(
+                                  label: s.undoAction,
+                                  textColor: Colors.white,
+                                  onPressed: () async {
+                                    final ok = await provider.undoLastAction();
+                                    if (context.mounted && ok) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(s.undoDone)),
+                                      );
+                                    }
+                                  },
+                                )
+                              : null,
                         ),
                       );
                     } else {

@@ -9,6 +9,7 @@ import '../providers/theme_provider.dart';
 import '../services/mission_catalog.dart';
 import '../utils/date_format.dart';
 import '../utils/feedback.dart';
+import '../widgets/inbox_section.dart';
 import '../widgets/quest_chain_section.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -66,6 +67,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
                 const SizedBox(height: 16),
                 const QuestChainSection(),
+                const SizedBox(height: 24),
+                const InboxSection(),
                 const SizedBox(height: 24),
                 Text(
                   s.customTitle,
@@ -469,8 +472,22 @@ class _CustomMissionTile extends StatelessWidget {
                       s.customDone(mission.title, mission.baseXp),
                     ),
                     backgroundColor: pal.success,
-                  ),
-                );
+                        action: actions.canUndo
+                            ? SnackBarAction(
+                                label: s.undoAction,
+                                textColor: Colors.white,
+                                onPressed: () async {
+                                  final ok = await actions.undoLastAction();
+                                  if (context.mounted && ok) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(s.undoDone)),
+                                    );
+                                  }
+                                },
+                              )
+                            : null,
+                      ),
+                    );
                 for (final a in unlocked) {
                   if (!context.mounted) break;
                   ScaffoldMessenger.of(context).showSnackBar(

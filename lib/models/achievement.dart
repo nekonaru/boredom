@@ -12,6 +12,8 @@ enum AchievementMetric {
   appOpensSingleDay,
   questChainsCompleted,
   categoryCount,
+  freezeTokensEarned,
+  savedMissions,
   special,
 }
 

@@ -1,10 +1,10 @@
 name: boredom
 description: Boredom, a tiny game for humans who do not know what to do with themselves.
 publish_to: 'none'
-version: 2.3.0+10
+version: 2.4.0+11
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -16,10 +16,19 @@ dependencies:
   # Local persistence (XP, level, reroll count, history, streak)
   shared_preferences: ^2.3.2
 
+  # Daily reminder notifications (Android only for now)
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
+
+  # Share missions as text or as a generated PNG card
+  share_plus: ^13.3.1
+  cross_file: ^0.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

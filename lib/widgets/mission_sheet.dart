@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/share_card.dart';
 import '../utils/feedback.dart';
 
 /// Shows the mission card as a bottom sheet that cannot be casually
@@ -65,6 +65,12 @@ class _MissionSheetState extends State<MissionSheet> {
     final isDisliked = context.select<BoredomProvider, bool>(
       (p) => p.isDisliked(mission.id),
     );
+    final isSaved = context.select<BoredomProvider, bool>(
+      (p) => p.isSavedForLater(mission.id),
+    );
+    final categoryMuted = context.select<BoredomProvider, bool>(
+      (p) => p.isCategoryMuted(mission.category.name),
+    );
     final rerollsLeft = context.select<BoredomProvider, int>(
       (p) => p.rerollsLeft,
     );
@@ -109,15 +115,40 @@ class _MissionSheetState extends State<MissionSheet> {
                   ),
                 ),
                 IconButton(
+                  onPressed: () async {
+                    await provider.saveForLater(mission.id);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(s.savedForLater)),
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    isSaved ? Icons.bookmark : Icons.bookmark_border,
+                    color: isSaved ? pal.success : pal.textSecondary,
+                  ),
+                ),
+                IconButton(
                   onPressed: () {
-                    Clipboard.setData(ClipboardData(
-                      text: s.shareText(title, mission.baseXp, provider.progress.level),
-                    ));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(s.sharedCopied)),
+                    // Share sheet origin keeps the iPad-style popup anchored
+                    // near the tapped icon.
+                    final box = context.findRenderObject() as RenderBox?;
+                    final origin = box == null
+                        ? null
+                        : box.localToGlobal(Offset.zero) & box.size;
+                    ShareCard.shareMission(
+                      emoji: mission.emoji,
+                      title: title,
+                      description: description,
+                      xp: mission.baseXp,
+                      level: provider.progress.level,
+                      levelTitle: provider.progress.levelTitle,
+                      accent: pal.accent,
+                      background: pal.background,
+                      origin: origin,
                     );
                   },
-                  icon: Icon(Icons.share_outlined, color: pal.textSecondary),
+                  icon: Icon(Icons.ios_share, color: pal.textSecondary),
                 ),
               ],
             ),
@@ -152,7 +183,25 @@ class _MissionSheetState extends State<MissionSheet> {
                 _InfoPill(label: '+${mission.baseXp} XP', highlight: true),
                 if (BoredomProvider.isWeekend(DateTime.now()))
                   _InfoPill(label: s.weekendTag, highlight: true),
+                if (categoryMuted) _InfoPill(label: s.mutedLabel),
               ],
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () =>
+                    provider.toggleCategoryMuted(mission.category),
+                icon: const Icon(Icons.visibility_off_outlined, size: 16),
+                label: Text(
+                  categoryMuted ? s.unmuted : s.notInterested,
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: pal.textSecondary,
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             Row(

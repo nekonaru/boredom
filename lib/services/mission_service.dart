@@ -32,6 +32,7 @@ class MissionService {
     bool chaosMode = false,
     Set<String> excludeIds = const {},
     Map<String, int> categoryCounts = const {},
+    Set<String> excludeCategories = const {},
     DateTime? now,
   }) {
     final month = (now ?? DateTime.now()).month;
@@ -47,11 +48,20 @@ class MissionService {
         .where((m) =>
             !m.chaosOnly &&
             (m.months.isEmpty || m.months.contains(month)))
+        .where((m) => !excludeCategories.contains(m.category.name))
         .toList();
+    // Every category muted would leave nothing to offer, so fall back to
+    // the unmuted non-chaos pool rather than an empty screen.
+    final pool = nonChaosPool.isEmpty
+        ? MissionCatalog.all
+            .where((m) => !m.chaosOnly)
+            .where((m) => m.months.isEmpty || m.months.contains(month))
+            .toList()
+        : nonChaosPool;
 
     // Level 0: every filter strict.
     var candidates = _filterMissions(
-      nonChaosPool,
+      pool,
       mood: filter.mood,
       timeBudget: filter.timeBudget,
       location: filter.location,
@@ -63,7 +73,7 @@ class MissionService {
 
     // Level 1: ignore energy.
     candidates = _filterMissions(
-      nonChaosPool,
+      pool,
       mood: filter.mood,
       timeBudget: filter.timeBudget,
       location: filter.location,
@@ -74,7 +84,7 @@ class MissionService {
 
     // Level 2: ignore energy and mood.
     candidates = _filterMissions(
-      nonChaosPool,
+      pool,
       timeBudget: filter.timeBudget,
       location: filter.location,
     );
@@ -83,13 +93,13 @@ class MissionService {
     if (candidates.isNotEmpty) return _pickWeighted(candidates, categoryCounts);
 
     // Level 3: keep only the time budget so durations stay sane.
-    candidates = _filterMissions(nonChaosPool, timeBudget: filter.timeBudget);
+    candidates = _filterMissions(pool, timeBudget: filter.timeBudget);
     final fresh3 = _withoutExcluded(candidates, excludeIds);
     if (fresh3.isNotEmpty) return _pickWeighted(fresh3, categoryCounts);
     if (candidates.isNotEmpty) return _pickWeighted(candidates, categoryCounts);
 
     // Last resort: full random from the non-chaos catalog.
-    return _pickWeighted(nonChaosPool, categoryCounts);
+    return _pickWeighted(pool, categoryCounts);
   }
 
   /// Higher weight for less-played categories (1/(1+count)), so variety

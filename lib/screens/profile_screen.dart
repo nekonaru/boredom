@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
+import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/language_provider.dart';
@@ -24,6 +25,15 @@ class ProfileScreen extends StatelessWidget {
     );
     final hapticsEnabled = context.select<BoredomProvider, bool>(
       (p) => p.hapticsEnabled,
+    );
+    final reminderEnabled = context.select<BoredomProvider, bool>(
+      (p) => p.reminderEnabled,
+    );
+    final reminderTime = context.select<BoredomProvider, int>(
+      (p) => p.reminderHour * 60 + p.reminderMinute,
+    );
+    final muted = context.select<BoredomProvider, Set<String>>(
+      (p) => p.mutedCategories,
     );
     final isIndonesian = context.select<LanguageProvider, bool>(
       (p) => p.isIndonesian,
@@ -261,6 +271,110 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
+              s.remindersTitle,
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: pal.surface,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              s.remindersTitle,
+                              style: TextStyle(color: pal.textPrimary, fontSize: 14),
+                            ),
+                            Text(
+                              s.remindersDesc,
+                              style: TextStyle(color: pal.textSecondary, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Switch(
+                        value: reminderEnabled,
+                        onChanged: (v) async {
+                          final ok = await provider.setReminder(v);
+                          if (!context.mounted) return;
+                          if (v && !ok) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(s.reminderBlocked)),
+                            );
+                          }
+                        },
+                        activeThumbColor: pal.accent,
+                      ),
+                    ],
+                  ),
+                  if (reminderEnabled) ...[
+                    const SizedBox(height: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _pickReminderTime(context, s, provider),
+                      icon: const Icon(Icons.schedule, size: 18),
+                      label: Text(
+                        '${(reminderTime ~/ 60).toString().padLeft(2, '0')}:'
+                        '${(reminderTime % 60).toString().padLeft(2, '0')}',
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: pal.accent,
+                        side: BorderSide(color: pal.accent),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              s.mutedCategories,
+              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              s.mutedDesc,
+              style: TextStyle(color: pal.textSecondary, fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: MissionCategory.values
+                  .where((c) => c != MissionCategory.chaos)
+                  .map((c) {
+                final isMuted = muted.contains(c.name);
+                return FilterChip(
+                  label: Text(c.labelFor(s.code)),
+                  selected: isMuted,
+                  showCheckmark: false,
+                  avatar: Icon(
+                    isMuted ? Icons.visibility_off : Icons.visibility,
+                    size: 16,
+                    color: isMuted ? pal.warning : pal.textSecondary,
+                  ),
+                  backgroundColor: pal.surface,
+                  selectedColor: pal.warning.withValues(alpha: 0.18),
+                  labelStyle: TextStyle(
+                    color: isMuted ? pal.warning : pal.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  onSelected: (_) => provider.toggleCategoryMuted(c),
+                );
+              })
+              .toList(),
+            ),
+            const SizedBox(height: 24),
+            Text(
               s.backupTitle,
               style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
             ),
@@ -350,6 +464,28 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _pickReminderTime(
+    BuildContext context,
+    AppStrings s,
+    BoredomProvider provider,
+  ) {
+    final now = TimeOfDay.now();
+    showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: provider.reminderHour,
+        minute: provider.reminderMinute,
+      ),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    ).then((picked) {
+      if (picked == null) return;
+      provider.setReminderTime(picked.hour, picked.minute);
+    });
   }
 
   void _showImportDialog(

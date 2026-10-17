@@ -5,6 +5,7 @@ import '../models/achievement.dart';
 import '../models/daily_challenge.dart';
 import '../models/quest_chain.dart';
 import '../models/custom_mission.dart';
+import '../models/saved_mission.dart';
 
 /// All local reads/writes go through here.
 class StorageService {
@@ -21,6 +22,11 @@ class StorageService {
   static const _kDisliked = 'boredom_disliked';
   static const _kHaptics = 'boredom_haptics';
   static const _kOnboarding = 'boredom_onboarding_done';
+  static const _kSaved = 'boredom_saved';
+  static const _kMuted = 'boredom_muted_categories';
+  static const _kReminderEnabled = 'boredom_reminder_enabled';
+  static const _kReminderHour = 'boredom_reminder_hour';
+  static const _kReminderMinute = 'boredom_reminder_minute';
 
   SharedPreferences? _cache;
 
@@ -74,6 +80,18 @@ class StorageService {
     // Keep at most 200 entries so prefs never bloat.
     final trimmed = raw.length > 200 ? raw.sublist(raw.length - 200) : raw;
     await p.setStringList(_kHistory, trimmed);
+  }
+
+  /// Replaces the whole history. Used by undo when the snapshot predates
+  /// the last write.
+  Future<void> saveHistory(List<CompletedMission> history) async {
+    final p = await prefs;
+    final trimmed =
+        history.length > 200 ? history.sublist(history.length - 200) : history;
+    await p.setStringList(
+      _kHistory,
+      trimmed.map((e) => jsonEncode(e.toJson())).toList(),
+    );
   }
 
   /// Removes the most recent history entry. Used by undo.
@@ -206,6 +224,67 @@ class StorageService {
   Future<void> setOnboardingDone(bool done) async {
     final p = await prefs;
     await p.setBool(_kOnboarding, done);
+  }
+
+  // ---------------- Inbox, muted categories, reminders ----------------
+
+  Future<List<SavedMission>> loadSavedMissions() async {
+    final p = await prefs;
+    final raw = p.getStringList(_kSaved) ?? [];
+    return raw
+        .map((e) {
+          try {
+            return SavedMission.fromJson(jsonDecode(e));
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<SavedMission>()
+        .toList();
+  }
+
+  Future<void> saveSavedMissions(List<SavedMission> missions) async {
+    final p = await prefs;
+    await p.setStringList(
+      _kSaved,
+      missions.map((m) => jsonEncode(m.toJson())).toList(),
+    );
+  }
+
+  Future<Set<String>> loadMutedCategories() async {
+    final p = await prefs;
+    return (p.getStringList(_kMuted) ?? []).toSet();
+  }
+
+  Future<void> saveMutedCategories(Set<String> names) async {
+    final p = await prefs;
+    await p.setStringList(_kMuted, names.toList());
+  }
+
+  Future<bool> loadReminderEnabled() async {
+    final p = await prefs;
+    return p.getBool(_kReminderEnabled) ?? false;
+  }
+
+  Future<int> loadReminderHour() async {
+    final p = await prefs;
+    return p.getInt(_kReminderHour) ?? 19;
+  }
+
+  Future<int> loadReminderMinute() async {
+    final p = await prefs;
+    return p.getInt(_kReminderMinute) ?? 0;
+  }
+
+  Future<void> saveReminder({
+    required bool enabled,
+    required int hour,
+    required int minute,
+  }) async {
+    final p = await prefs;
+    await p.setBool(_kReminderEnabled, enabled);
+    await p.setInt(_kReminderHour, hour);
+    await p.setInt(_kReminderMinute, minute);
   }
 
   Future<void> resetAll() async {

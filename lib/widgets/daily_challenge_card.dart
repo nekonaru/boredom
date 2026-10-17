@@ -85,6 +85,22 @@ class DailyChallengeCard extends StatelessWidget {
                         SnackBar(
                           content: Text(s.challengeDone(challenge.rewardXp)),
                           backgroundColor: pal.success,
+                          action: provider.canUndo
+                              ? SnackBarAction(
+                                  label: s.undoAction,
+                                  textColor: Colors.white,
+                                  onPressed: () async {
+                                    final ok = await provider.undoLastAction();
+                                    if (!context.mounted) return;
+                                    await provider.reopenDailyChallenge();
+                                    if (context.mounted && ok) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(s.undoDone)),
+                                      );
+                                    }
+                                  },
+                                )
+                              : null,
                         ),
                       );
                       provider.clearLastXpGained();
