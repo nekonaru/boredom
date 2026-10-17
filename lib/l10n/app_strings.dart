@@ -100,8 +100,10 @@ class AppStrings {
         'Step-by-step chains with a big XP reward at the end.',
         'Rantai misi bertahap dengan hadiah XP besar di akhir.',
       );
-  String stepOf(int i, int n) =>
+  String get stepOf(int i, int n) =>
       isId ? 'Langkah $i/$n' : 'Step $i/$n';
+  String chainStepsReward(int steps, int rewardXp) =>
+      isId ? '$steps langkah · +$rewardXp XP' : '$steps step${steps == 1 ? '' : 's'} · +$rewardXp XP';
   String get chainCancel => _pick('Cancel', 'Batalkan');
   String get chainStepDone => _pick('COMPLETE STEP', 'SELESAIKAN LANGKAH');
   String get chainFinish => _pick('FINISH CHAIN', 'SELESAIKAN RANTAI');
@@ -216,10 +218,6 @@ class AppStrings {
         'No favorites yet. Tap the heart on a mission to pin it here.',
         'Belum ada favorit. Ketuk ikon hati pada misi untuk menyimpan di sini.',
       );
-  String get sharedCopied => _pick(
-        'Mission text copied. Paste it anywhere to share.',
-        'Teks misi disalin. Tempel di mana saja untuk dibagikan.',
-      );
   String get deleteTitle => _pick('Delete this mission?', 'Hapus misi ini?');
   String get deleteConfirm => _pick('Delete', 'Hapus');
 
@@ -293,19 +291,21 @@ class AppStrings {
         'Belum ada yang disimpan untuk nanti. Ketuk ikon bookmark pada misi untuk menaruhnya di sini.',
       );
   String get inboxDone => _pick('Removed from inbox', 'Dihapus dari kotak masuk');
-  String get inboxRestored => _pick(
-        'Mission restored. Roll it when you are ready.',
-        'Misi dipulihkan. Kerjakan saat kamu siap.',
-      );
+  String get playSaved => _pick('Roll it', 'Mulai kerjakan');
+  String get savedForLater => _pick('Saved for later', 'Disimpan untuk nanti');
   String get quickWins => _pick('Quick wins', 'Misi Kilat');
   String get quickWinsDesc => _pick(
         'Only missions that take 15 minutes or less.',
         'Hanya misi yang butuh 15 menit atau kurang.',
       );
   String get weeklySummary => _pick('Your week', 'Pekanmu');
-  String summaryMissions(int n) => isId ? '$n misi' : '$n mission${n == 1 ? '' : 's'}';
+  String get missionsWord => _pick('missions', 'misi');
   String get notInterested => _pick('Not interested', 'Tidak tertarik');
   String get mutedLabel => _pick('CATEGORY MUTED', 'KATEGORI DIMATIKAN');
+  String get muteLastBlocked => _pick(
+        'Keep at least one category on, otherwise nothing would be left to roll.',
+        'Sisakan minimal satu kategori, kalau tidak tidak ada yang bisa keluar.',
+      );
   String get mutedCategories => _pick('Muted categories', 'Kategori yang dimatikan');
   String get mutedDesc => _pick(
         'Muted categories never come out of the generator.',
@@ -326,8 +326,6 @@ class AppStrings {
         'Could not build the share card. Sharing as text instead.',
         'Kartu berbagi gagal dibuat. Bagikan sebagai teks saja.',
       );
-  String get savedForLater => _pick('Saved for later', 'Disimpan untuk nanti');
-  String get playSaved => _pick('Roll it', 'Mulai kerjakan');
 
   // Freeze + weekend (v2.3)
   String get freezeTitle => _pick('Streak Freeze', 'Beku Streak');
@@ -345,10 +343,6 @@ class AppStrings {
   String get mAvgXp => _pick('Avg XP / Day', 'Rata-rata XP / Hari');
   String get mBestDay => _pick('Busiest Day', 'Hari Tersibuk');
 
-  List<String> get weekdaysShort => isId
-      ? const ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
-      : const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
   String weekdayName(int weekday) {
     // 1=Monday .. 7=Sunday.
     const en = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -356,7 +350,6 @@ class AppStrings {
     final list = isId ? id : en;
     return list[(weekday - 1).clamp(0, 6)];
   }
-  String get shareBtn => _pick('Share', 'Bagikan');
   String shareText(String title, int xp, int level) => isId
       ? 'Aku baru saja menyelesaikan "$title" (+$xp XP) dan mencapai level $level di Boredom!'
       : 'I just completed "$title" (+$xp XP) and reached level $level on Boredom!';

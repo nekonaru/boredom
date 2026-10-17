@@ -76,10 +76,15 @@ void main() {
 
   group('Weekday names', () {
     test('both languages cover all 7 days', () {
-      expect(const AppStrings('en').weekdaysShort.length, 7);
-      expect(const AppStrings('id').weekdaysShort.length, 7);
       expect(const AppStrings('en').weekdayName(1), 'Monday');
+      expect(const AppStrings('en').weekdayName(7), 'Sunday');
+      expect(const AppStrings('id').weekdayName(1), 'Senin');
       expect(const AppStrings('id').weekdayName(7), 'Minggu');
+    });
+
+    test('weekdayName clamps out-of-range input', () {
+      expect(const AppStrings('en').weekdayName(0), 'Monday');
+      expect(const AppStrings('en').weekdayName(99), 'Sunday');
     });
   });
 }

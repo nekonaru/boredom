@@ -17,8 +17,11 @@ class AchievementsScreen extends StatelessWidget {
     final unlockedIds = context.select<BoredomProvider, Set<String>>(
       (p) => p.achievements.map((a) => a.achievementId).toSet(),
     );
-    final progress = context.select<BoredomProvider, ({int missions, int xp})>(
-      (p) => (missions: p.progress.totalMissionsCompleted, xp: p.progress.totalXp),
+    final progress = context.select<BoredomProvider, ({int missions, int level})>(
+      (p) => (
+        missions: p.progress.totalMissionsCompleted,
+        level: p.progress.level,
+      ),
     );
     final actions = context.read<BoredomProvider>();
     const all = AchievementCatalog.all;
@@ -75,7 +78,7 @@ class AchievementsScreen extends StatelessWidget {
                 .where((a) => a.metric != AchievementMetric.special)
                 .map((a) {
               final current =
-                  actions.achievementProgress(a, missions: progress.missions, xp: progress.xp);
+                  actions.achievementProgress(a, missions: progress.missions, level: progress.level);
               final ratio = a.target == 0
                   ? 0.0
                   : (current / a.target).clamp(0.0, 1.0);

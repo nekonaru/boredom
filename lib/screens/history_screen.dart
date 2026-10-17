@@ -466,10 +466,13 @@ class _CustomMissionTile extends StatelessWidget {
                 buzzIfEnabled(context);
                 final unlocked = await actions.completeCustomMission(mission);
                 if (!context.mounted) return;
+                // Report what was actually awarded (weekend double XP and
+                // milestone bonuses included), not the base reward.
+                final gained = actions.lastXpGained ?? mission.baseXp;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      s.customDone(mission.title, mission.baseXp),
+                      s.customDone(mission.title, gained),
                     ),
                     backgroundColor: pal.success,
                         action: actions.canUndo

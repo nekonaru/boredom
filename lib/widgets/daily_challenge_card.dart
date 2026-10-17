@@ -81,18 +81,19 @@ class DailyChallengeCard extends StatelessWidget {
                     final provider = context.read<BoredomProvider>();
                     await provider.completeDailyChallenge();
                     if (context.mounted) {
+                      final gained =
+                          provider.lastXpGained ?? challenge.rewardXp;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(s.challengeDone(challenge.rewardXp)),
+                          content: Text(s.challengeDone(gained)),
                           backgroundColor: pal.success,
                           action: provider.canUndo
                               ? SnackBarAction(
                                   label: s.undoAction,
                                   textColor: Colors.white,
                                   onPressed: () async {
+                                    // Undo restores the challenge state itself.
                                     final ok = await provider.undoLastAction();
-                                    if (!context.mounted) return;
-                                    await provider.reopenDailyChallenge();
                                     if (context.mounted && ok) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text(s.undoDone)),

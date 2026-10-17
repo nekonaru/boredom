@@ -50,6 +50,8 @@ class BoredomProvider extends ChangeNotifier {
   DateTime? _undoAt;
   int _undoHistoryLength = 0;
   List<UnlockedAchievement> _undoAchievements = const [];
+  QuestChainProgress? _undoChainProgress;
+  DailyChallengeState? _undoDailyChallenge;
 
   bool _loaded = false;
   bool get loaded => _loaded;
@@ -127,12 +129,16 @@ class BoredomProvider extends ChangeNotifier {
     _undoProgress = progress;
     _undoHistoryLength = history.length;
     _undoAchievements = List<UnlockedAchievement>.from(achievements);
+    _undoChainProgress = questChainProgress;
+    _undoDailyChallenge = dailyChallengeState;
     _undoAt = DateTime.now();
   }
 
   void _clearUndo() {
     _undoProgress = null;
     _undoAt = null;
+    _undoChainProgress = null;
+    _undoDailyChallenge = null;
   }
 
   Future<void> completeOnboarding() async {
@@ -200,13 +206,12 @@ class BoredomProvider extends ChangeNotifier {
     } else {
       streak = 1;
     }
-    if (streak > streakDays && streak % 7 == 0 && remaining < 3) {
-      remaining += 1;
-    }
-    // A newly earned token is tracked separately so achievements can count
-    // tokens earned over time, not just tokens still held.
-    final earned = progress.freezeTokensEarned +
-        ((streak > streakDays && streak % 7 == 0) ? 1 : 0);
+    // Only count tokens that were actually granted. The 3-token cap means a
+    // player holding the cap earns nothing here, so counting it would let
+    // the freeze achievements unlock for tokens never received.
+    final granted = streak > streakDays && streak % 7 == 0 && remaining < 3;
+    if (granted) remaining += 1;
+    final earned = progress.freezeTokensEarned + (granted ? 1 : 0);
     return _StreakResolution(
       streak: streak,
       tokens: remaining,
@@ -240,14 +245,60 @@ class BoredomProvider extends ChangeNotifier {
     return level;
   }
 
+  /// Total milestone XP for one completion, or 0 when no boundary was
+  /// crossed. Passing the level before and after the gain matters: paying
+  /// whenever the resulting level is a multiple of ten would repeat the
+  /// bonus on every completion spent sitting on that level.
+  static int milestoneXpFor(int totalXp, int baseXp, DateTime now) {
+    final before = milestoneLevel(totalXp, 0, now);
+    final after = milestoneLevel(totalXp, baseXp, now);
+    if (after == before) return 0;
+    var total = 0;
+    for (var level = before + 1; level <= after; level++) {
+      total += milestoneBonus(level);
+    }
+    return total;
+  }
+
   /// True when the user completed something yesterday or the day before
   /// but nothing today: the streak is alive yet at risk.
+  /// A 3-day gap also counts, because a freeze token would silently absorb
+  /// it on the next completion.
   bool get streakAtRisk {
     final last = progress.lastCompletedDate;
     if (last == null || progress.streakDays == 0) return false;
     final now = DateTime.now();
     if (_isSameDay(last, now)) return false;
-    return _isYesterday(last, now) || _isTwoDaysAgo(last, now);
+    return _isYesterday(last, now) ||
+        _isTwoDaysAgo(last, now) ||
+        _isThreeDaysAgo(last, now);
+  }
+
+  /// Rolls the date over to a new day without restarting the app. Without
+  /// this, a process left open (or backgrounded while warm) past midnight
+  /// keeps yesterday's daily challenge, reroll allowance, and streak state.
+  void refreshIfDayChanged() {
+    final now = DateTime.now();
+    final changed = progress.rerollResetDate == null ||
+        !_isSameDay(progress.rerollResetDate!, now) ||
+        progress.appOpensResetDate == null ||
+        !_isSameDay(progress.appOpensResetDate!, now) ||
+        dailyChallengeState == null ||
+        !_isSameDay(dailyChallengeState!.date, now);
+    if (!changed) return;
+
+    progress = _resetRerollsIfNewDay(progress, now);
+    progress = _handleAppOpen(progress, now);
+
+    if (dailyChallengeState == null ||
+        !_isSameDay(dailyChallengeState!.date, now)) {
+      final challenge = DailyChallengeCatalog.forDate(now);
+      dailyChallengeState =
+          DailyChallengeState(date: now, challengeId: challenge.id, completed: false);
+      StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
+    }
+    StorageService.instance.saveProgress(progress);
+    notifyListeners();
   }
 
   int get rerollsLeft =>
@@ -338,15 +389,28 @@ class BoredomProvider extends ChangeNotifier {
 
   bool isCategoryMuted(String categoryName) => mutedCategories.contains(categoryName);
 
+  /// Mutes or unmutes a whole category. Always publishes a new Set
+  /// instance so `context.select` in Profile sees a change (it compares
+  /// with DeepCollectionEquality, which treats an in-place mutated set as
+  /// unchanged).
+  ///
+  /// Muting the last remaining category is refused: the generator would
+  /// otherwise fall back to the full catalog and the mute would silently
+  /// stop meaning anything.
   Future<void> toggleCategoryMuted(MissionCategory category) async {
     final name = category.name;
     if (mutedCategories.contains(name)) {
-      mutedCategories.remove(name);
+      mutedCategories = {...mutedCategories}..remove(name);
     } else {
-      mutedCategories.add(name);
+      final playable = MissionCategory.values
+          .where((c) => c != MissionCategory.chaos)
+          .length;
+      if (mutedCategories.length + 1 >= playable) return false;
+      mutedCategories = {...mutedCategories, name};
     }
     await StorageService.instance.saveMutedCategories(mutedCategories);
     notifyListeners();
+    return true;
   }
 
   // ---------------- Inbox ----------------
@@ -385,25 +449,32 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Moves a saved mission back into the active slot so it can be accepted.
-  Future<bool> restoreSavedMission() async {
-    if (savedMissions.isEmpty || currentMission != null) return false;
-    final entry = savedMissions.first;
-    final mission = missionById(entry.missionId);
+  /// Moves a saved mission back out of the inbox and returns it so the
+  /// caller can present it. Returns null when the id is not in the inbox
+  /// or the catalog no longer has it (the stale entry is dropped).
+  ///
+  /// This deliberately does not set `currentMission`: that slot belongs to
+  /// `rollMission()`, which overwrites whatever is there, so a restored
+  /// mission parked in it would silently disappear.
+  Future<Mission?> restoreSavedMission(String missionId) async {
+    final index = savedMissions.indexWhere((m) => m.missionId == missionId);
+    if (index < 0) return null;
+    final mission = missionById(missionId);
     if (mission == null) {
       // Stale entry (catalog changed): drop it instead of showing nothing.
-      await removeSavedMission(entry.missionId);
-      return false;
+      await removeSavedMission(missionId);
+      return null;
     }
+    await removeSavedMission(missionId);
     _missionCounter++;
-    currentMission = MissionInstance(
+    final instance = MissionInstance(
       mission: mission,
       missionNumber: _missionCounter,
       isChaos: false,
     );
-    await removeSavedMission(entry.missionId);
+    currentMission = instance;
     notifyListeners();
-    return true;
+    return instance;
   }
 
   /// Catalog lookup by id, or null when the id no longer exists.
@@ -492,10 +563,10 @@ class BoredomProvider extends ChangeNotifier {
     );
     final newStreak = resolved.streak;
     lastFreezeUsed = resolved.usedFreeze;
-    // Milestone bonus applies when this completion crosses a 10-level
-    // boundary, judged against the level after adding the mission XP.
+    // Milestone bonus applies only when this completion crosses a 10-level
+    // boundary, judged against the level before and after the gain.
     final gainedXp = xpForDate(mission.baseXp, now) +
-        milestoneBonus(milestoneLevel(progress.totalXp, mission.baseXp, now));
+        milestoneXpFor(progress.totalXp, mission.baseXp, now);
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
     final catKey = mission.category.name;
@@ -524,8 +595,8 @@ class BoredomProvider extends ChangeNotifier {
       xpEarned: gainedXp,
       completedAt: now,
     );
-    history.insert(0, entry);
-
+    _undoEntry = entry;
+    history = [entry, ...history];
     await StorageService.instance.saveProgress(progress);
     await StorageService.instance.addHistoryEntry(entry);
 
@@ -557,15 +628,20 @@ class BoredomProvider extends ChangeNotifier {
     if (snapshot == null) return false;
     progress = snapshot;
     achievements = List<UnlockedAchievement>.from(_undoAchievements);
+    // Undoing a finished quest chain must bring the chain back, otherwise
+    // the steps completed for it are lost while its XP is rolled back.
+    questChainProgress = _undoChainProgress;
+    if (questChainProgress != null) {
+      await StorageService.instance.saveQuestChainProgress(questChainProgress);
+    }
+    if (_undoDailyChallenge != null) {
+      dailyChallengeState = _undoDailyChallenge;
+      await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
+    }
 
     // Restore the history list to its pre-action length.
     if (history.length > _undoHistoryLength) {
       history = history.sublist(0, _undoHistoryLength);
-    } else if (history.length < _undoHistoryLength) {
-      history = List<CompletedMission>.from(history);
-      while (history.length < _undoHistoryLength && history.isNotEmpty) {
-        history.add(history.first);
-      }
     }
 
     final storage = StorageService.instance;
@@ -600,15 +676,15 @@ class BoredomProvider extends ChangeNotifier {
 
   /// Current value of an achievement metric, exposed so the UI can show
   /// progress bars without duplicating the metric switch.
-  int achievementProgress(Achievement ach, {int? missions, int? xp}) =>
-      _metricValue(ach, missions: missions, xp: xp);
+  int achievementProgress(Achievement ach, {int? missions, int? level}) =>
+      _metricValue(ach, missions: missions, level: level);
 
-  int _metricValue(Achievement ach, {int? missions, int? xp}) {
+  int _metricValue(Achievement ach, {int? missions, int? level}) {
     switch (ach.metric) {
       case AchievementMetric.totalMissions:
         return missions ?? progress.totalMissionsCompleted;
       case AchievementMetric.level:
-        return xp ?? progress.level;
+        return level ?? progress.level;
       case AchievementMetric.streak:
         return progress.longestStreak;
       case AchievementMetric.chaosMissions:
@@ -643,11 +719,14 @@ class BoredomProvider extends ChangeNotifier {
 
   bool isFavorite(String missionId) => favoriteIds.contains(missionId);
 
+  /// Always publishes a new Set instance so `context.select` on
+  /// favoriteIds rebuilds the Favorites list (an in-place mutation is
+  /// invisible to DeepCollectionEquality).
   Future<void> toggleFavorite(String missionId) async {
     if (favoriteIds.contains(missionId)) {
-      favoriteIds.remove(missionId);
+      favoriteIds = {...favoriteIds}..remove(missionId);
     } else {
-      favoriteIds.add(missionId);
+      favoriteIds = {...favoriteIds, missionId};
     }
     await StorageService.instance.saveFavorites(favoriteIds);
     notifyListeners();
@@ -698,7 +777,8 @@ class BoredomProvider extends ChangeNotifier {
   /// achievement handling as catalog missions.
   Future<List<Achievement>> completeCustomMission(CustomMission mission) async {
     final now = DateTime.now();
-    final gainedXp = xpForDate(mission.baseXp, now);
+    final gainedXp = xpForDate(mission.baseXp, now) +
+        milestoneXpFor(progress.totalXp, mission.baseXp, now);
     final resolved = _resolveStreak(
       last: progress.lastCompletedDate,
       now: now,
@@ -733,7 +813,10 @@ class BoredomProvider extends ChangeNotifier {
       xpEarned: gainedXp,
       completedAt: now,
     );
-    history.insert(0, entry);
+    // New list instance: `context.select((p) => p.history)` in HistoryScreen
+    // compares with DeepCollectionEquality, which treats an in-place
+    // mutation as unchanged and would skip the rebuild.
+    history = [entry, ...history];
 
     await StorageService.instance.saveProgress(progress);
     await StorageService.instance.addHistoryEntry(entry);
@@ -784,41 +867,75 @@ class BoredomProvider extends ChangeNotifier {
 
   /// Restores state from [exportBackup] output. Returns false when the
   /// text is not a valid backup.
+  ///
+  /// Everything is parsed into locals first and only assigned to the
+  /// provider once the whole payload has been read, so a malformed entry
+  /// halfway through leaves the current state untouched instead of
+  /// half-applied.
   Future<bool> importBackup(String text) async {
     try {
       final data = _decodeJson(text.trim());
       if (data['app'] != 'boredom' || data['progress'] == null) return false;
       final storage = StorageService.instance;
 
-      progress = UserProgress.fromJson(
+      final importedProgress = UserProgress.fromJson(
         Map<String, dynamic>.from(data['progress'] as Map),
       );
-      history = ((data['history'] as List?) ?? [])
+      final importedHistory = ((data['history'] as List?) ?? [])
           .map((e) => CompletedMission.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
-      achievements = ((data['achievements'] as List?) ?? [])
+      final importedAchievements = ((data['achievements'] as List?) ?? [])
           .map((e) => UnlockedAchievement.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
       final dc = data['dailyChallenge'] as Map?;
-      dailyChallengeState = dc == null
+      final importedChallenge = dc == null
           ? null
           : DailyChallengeState.fromJson(Map<String, dynamic>.from(dc));
       final qc = data['questChain'] as Map?;
-      questChainProgress = qc == null
+      final importedChain = qc == null
           ? null
           : QuestChainProgress.fromJson(Map<String, dynamic>.from(qc));
-      customMissions = ((data['customMissions'] as List?) ?? [])
+      final importedCustom = ((data['customMissions'] as List?) ?? [])
           .map((e) => CustomMission.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
-      favoriteIds = ((data['favorites'] as List?) ?? []).map((e) => '$e').toSet();
-      dislikedIds = ((data['disliked'] as List?) ?? []).map((e) => '$e').toSet();
-      savedMissions = ((data['saved'] as List?) ?? [])
+      final importedFavorites =
+          ((data['favorites'] as List?) ?? []).map((e) => '$e').toSet();
+      final importedDisliked =
+          ((data['disliked'] as List?) ?? []).map((e) => '$e').toSet();
+      final importedSaved = ((data['saved'] as List?) ?? [])
           .map((e) => SavedMission.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
-      mutedCategories =
+      final importedMuted =
           ((data['mutedCategories'] as List?) ?? []).map((e) => '$e').toSet();
 
+      // Clamp against the current catalog so a backup taken when a chain
+      // was longer cannot index past the end of today's step list.
+      var importedChainSafe = importedChain;
+      if (importedChain != null) {
+        final steps = QuestChainCatalog.byId(importedChain.chainId).steps.length;
+        final maxIndex = steps < 1 ? 0 : steps - 1;
+        if (importedChain.currentStepIndex > maxIndex ||
+            importedChain.currentStepIndex < 0) {
+          importedChainSafe = QuestChainProgress(
+            chainId: importedChain.chainId,
+            currentStepIndex: maxIndex,
+          );
+        }
+      }
+
+      progress = importedProgress;
+      history = importedHistory;
+      achievements = importedAchievements;
+      dailyChallengeState = importedChallenge;
+      questChainProgress = importedChainSafe;
+      customMissions = importedCustom;
+      favoriteIds = importedFavorites;
+      dislikedIds = importedDisliked;
+      savedMissions = importedSaved;
+      mutedCategories = importedMuted;
+
       await storage.saveProgress(progress);
+      await storage.saveHistory(history);
       await storage.saveAchievements(achievements);
       if (dailyChallengeState != null) {
         await storage.saveDailyChallengeState(dailyChallengeState!);
@@ -829,6 +946,13 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveDisliked(dislikedIds);
       await storage.saveSavedMissions(savedMissions);
       await storage.saveMutedCategories(mutedCategories);
+      // A "reset everything" must also clear preferences that live outside
+      // progress, otherwise the UI still shows them as active.
+      await storage.saveReminder(enabled: false, hour: 19, minute: 0);
+      await ReminderService.instance.cancelDaily();
+      reminderEnabled = false;
+      reminderHour = 19;
+      reminderMinute = 0;
       _missionCounter = history.length;
       _clearUndo();
       notifyListeners();
@@ -854,7 +978,8 @@ class BoredomProvider extends ChangeNotifier {
     dailyChallengeState = dailyChallengeState!.copyWith(completed: true);
     await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
 
-    final gainedXp = xpForDate(challenge.rewardXp, DateTime.now());
+    final gainedXp = xpForDate(challenge.rewardXp, DateTime.now()) +
+        milestoneXpFor(progress.totalXp, 0, DateTime.now());
     progress = progress.copyWith(totalXp: progress.totalXp + gainedXp);
     await StorageService.instance.saveProgress(progress);
     lastXpGained = gainedXp;
@@ -862,7 +987,7 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Puts the daily challenge back to unfinished. Used by undo.
+  /// Puts the daily challenge back to unfinished.
   Future<void> reopenDailyChallenge() async {
     if (dailyChallengeState == null || !dailyChallengeState!.completed) return;
     dailyChallengeState = dailyChallengeState!.copyWith(completed: false);
@@ -899,7 +1024,8 @@ class BoredomProvider extends ChangeNotifier {
     _captureUndo();
 
     if (nextIndex >= chain.steps.length) {
-      final gainedXp = xpForDate(chain.rewardXp, DateTime.now());
+      final gainedXp = xpForDate(chain.rewardXp, DateTime.now()) +
+          milestoneXpFor(progress.totalXp, 0, DateTime.now());
       progress = progress.copyWith(
         totalXp: progress.totalXp + gainedXp,
         questChainsCompleted: progress.questChainsCompleted + 1,
@@ -935,6 +1061,7 @@ class BoredomProvider extends ChangeNotifier {
     await storage.saveDisliked(const {});
     await storage.saveSavedMissions(const []);
     await storage.saveMutedCategories(const {});
+    await storage.saveReminder(enabled: false, hour: 19, minute: 0);
     await ReminderService.instance.cancelDaily();
     progress = const UserProgress();
     history = [];
@@ -945,10 +1072,17 @@ class BoredomProvider extends ChangeNotifier {
     dislikedIds = {};
     mutedCategories = {};
     savedMissions = [];
+    // Clear transient completion state too, otherwise a "+XP" toast can
+    // still fire (with a dead Undo) on the next Home interaction.
+    lastXpGained = null;
+    lastFreezeUsed = false;
+    lastUnlockedAchievements = [];
     _clearUndo();
     _missionCounter = 0;
     currentMission = null;
     final now = DateTime.now();
+    progress = _resetRerollsIfNewDay(progress, now);
+    progress = _handleAppOpen(progress, now);
     final challenge = DailyChallengeCatalog.forDate(now);
     dailyChallengeState = DailyChallengeState(date: now, challengeId: challenge.id, completed: false);
     await storage.saveDailyChallengeState(dailyChallengeState!);

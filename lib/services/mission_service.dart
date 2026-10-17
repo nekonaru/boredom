@@ -37,10 +37,17 @@ class MissionService {
   }) {
     final month = (now ?? DateTime.now()).month;
     if (chaosMode) {
+      // Honour muted categories here too, otherwise the mute reads as
+      // broken whenever Chaos Mode is on.
       final pool = MissionCatalog.all
           .where((m) => m.months.isEmpty || m.months.contains(month))
+          .where((m) => !excludeCategories.contains(m.category.name))
           .toList();
-      final source = pool.isEmpty ? MissionCatalog.all : pool;
+      final source = pool.isEmpty
+          ? MissionCatalog.all
+              .where((m) => m.months.isEmpty || m.months.contains(month))
+              .toList()
+          : pool;
       return _pickWeighted(source, categoryCounts);
     }
 
@@ -102,8 +109,13 @@ class MissionService {
     return _pickWeighted(pool, categoryCounts);
   }
 
-  /// Higher weight for less-played categories (1/(1+count)), so variety
+  // Higher weight for less-played categories (1/(1+count)), so variety
   /// grows naturally the more the user plays. Pure and unit-testable.
+  ///
+  /// Applied per mission, which means a category's total pull scales with
+  /// how many missions it contains. That is intentional: a big category
+  /// should stay more likely overall, it just loses ground as it gets
+  /// played.
   static double weightFor(Mission mission, Map<String, int> counts) {
     final played = counts[mission.category.name] ?? 0;
     return 1.0 / (1.0 + played);

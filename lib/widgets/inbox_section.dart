@@ -5,6 +5,7 @@ import '../models/mission.dart';
 import '../models/saved_mission.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
+import 'mission_sheet.dart';
 
 /// Missions parked for later. Kept to 50 entries, newest first.
 class InboxSection extends StatelessWidget {
@@ -95,11 +96,17 @@ class _InboxTile extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                final restored = await actions.restoreSavedMission();
+                final instance = await actions.restoreSavedMission(mission.id);
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(restored ? s.inboxRestored : s.inboxDone)),
-                );
+                if (instance == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(s.inboxDone)),
+                  );
+                  return;
+                }
+                // Present the restored mission right away. Rolling a new one
+                // here would overwrite it, so the sheet is opened directly.
+                await showMissionSheet(context);
               },
               child: Text(s.playSaved),
             ),

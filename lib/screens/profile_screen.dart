@@ -368,7 +368,14 @@ class ProfileScreen extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
-                  onSelected: (_) => provider.toggleCategoryMuted(c),
+                  onSelected: (v) async {
+                    final changed = await provider.toggleCategoryMuted(c);
+                    if (!changed && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(s.muteLastBlocked)),
+                      );
+                    }
+                  },
                 );
               })
               .toList(),

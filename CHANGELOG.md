@@ -1,5 +1,56 @@
 # Changelog
 
+## v2.4.1
+
+Bug-fix release found by a full code audit of v2.4.0. No format changes,
+so every existing save and backup still loads.
+
+### Fixed
+- **Completed missions could be missing from the Missions tab.** History
+  was mutated in place, and `context.select` compares with
+  `DeepCollectionEquality`, which treats an in-place mutation as
+  unchanged, so the screen never rebuilt. History now publishes a new
+  list. Same root cause fixed for Favorites and Muted categories, whose
+  buttons previously looked dead.
+- **History could lose its newest entry.** `saveHistory` wrote the
+  in-memory (newest-first) list in the wrong order and trimmed the wrong
+  end, so after an undo at the 200-entry cap every later completion
+  silently dropped the previous one. It now reverses to the stored
+  oldest-first order and trims the oldest.
+- **Backup import never persisted history**, so restored XP disagreed
+  with the history list after the next launch. Import is also now
+  atomic: a malformed entry leaves your data untouched instead of
+  half-applied.
+- **Inbox "Roll it" lost the mission.** The restored mission was stored in
+  the same slot the next roll always overwrote, so it vanished. The
+  sheet now opens directly on the restored mission.
+- **Undo after finishing a Quest Chain destroyed the chain.** Undo rolled
+  back the XP but not the chain itself. Undo now restores the chain and
+  the daily challenge state too.
+- **Milestone XP repeated on every completion** while the level was a
+  multiple of ten, which handed out hundreds of free XP at level 20. The
+  bonus now pays only when a boundary is actually crossed.
+- **Level achievements showed total XP** ("4500/10") instead of the
+  level on the progress bars.
+- **Weekend double XP was reported at its base value** on the daily
+  challenge and custom mission toasts.
+- **Muting every category silently disabled muting.** Muting is now
+  refused for the last remaining category, with an explanation.
+- **Chaos Mode ignored muted categories**, contradicting the setting.
+- **Reset Progress left the daily reminder enabled**, so the
+  notification came back on the next launch.
+- Reset and backup import now clear leftover "+XP" toast state and clamp
+  quest chain step counts against the current catalog.
+- Streak-at-risk warning now also covers the 3-day freeze case, and the
+  daily challenge rolls over when the app is resumed past midnight
+  instead of serving yesterday's challenge.
+- Share failures fall back to sharing plain text instead of doing
+  nothing.
+- Mission sheet is now scrollable with a height cap, so long content
+  and large text scales no longer overflow.
+- Removed dead code: `inboxRestored`, `sharedCopied`, `weekdaysShort`,
+  `shareBtn`.
+
 ## v2.4.0
 
 Additive feature release. Old saves and backups keep loading, and this

@@ -46,7 +46,7 @@ class WeeklySummaryStrip extends StatelessWidget {
               _Metric(
                 emoji: '🎯',
                 value: '${summary.missions}',
-                label: s.summaryMissions(summary.missions),
+                label: s.missionsWord,
                 color: pal.accent,
               ),
               const SizedBox(width: 18),

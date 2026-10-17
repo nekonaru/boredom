@@ -1,5 +1,54 @@
 # Changelog
 
+## v2.4.1
+
+Rilis perbaikan bug dari audit kode menyeluruh terhadap v2.4.0. Tidak ada
+perubahan format, jadi semua simpanan dan cadangan lama tetap terbaca.
+
+### Diperbaiki
+- **Misi yang selesai bisa tidak muncul di tab Misi.** Riwayat dimutasi
+  in-place, sedangkan `context.select` membandingkan dengan
+  `DeepCollectionEquality` yang menganggap mutasi in-place sebagai
+  "tidak berubah", jadi layarnya tidak pernah rebuild. Kini riwayat
+  membuat list baru. Akar masalah yang sama diperbaiki untuk Favorit dan
+  Kategori yang dimatikan, yang tombolnya sebelumnya tampak mati.
+- **Riwayat bisa kehilangan entri terbaru.** `saveHistory` menulis list
+  in-memory (terbaru dulu) dengan urutan salah dan memotong ujung yang
+  keliru, sehingga setelah undo di batas 200 entri setiap penyelesaian
+  berikutnya diam-diam menghapus entri sebelumnya. Kini urutan
+  dibalik ke oldest-first dan memotong yang tertua.
+- **Impor cadangan tidak pernah menyimpan riwayat**, jadi XP yang
+  dipulihkan tidak cocok dengan daftar riwayat setelah aplikasi dibuka
+  lagi. Impor kini juga atomik: entri rusak tidak mengubah data kamu.
+- **"Mulai kerjakan" di Kotak Masuk membuat misi hilang.** Misi yang
+  dipulihkan disimpan di slot yang selalu ditimpa roll berikutnya. Sheet
+  kini langsung dibuka untuk misi tersebut.
+- **Urungkan setelah menyelesaikan Quest Chain merusak chain.** XP
+  dikembalikan tetapi chain-nya hilang. Urungkan kini mengembalikan
+  chain dan state tantangan harian juga.
+- **Bonus XP milestone berulang di setiap penyelesaian** selama level
+  berada di kelipatan sepuluh, memberi ratusan XP gratis di level 20.
+  Bonus kini hanya dibayar saat batas benar-benar terlewati.
+- **Pencapaian level menampilkan total XP** ("4500/10") bukan level.
+- **XP ganda akhir pekan dilaporkan dengan nilai dasar** di toast
+  tantangan harian dan misi buatan.
+- **Mematikan semua kategori diam-diam mematikan fitur mute.** Mematikan
+  kategori terakhir kini ditolak dengan penjelasan.
+- **Chaos Mode mengabaikan kategori yang dimatikan**, bertentangan dengan
+  pengaturannya.
+- **Reset Progress meninggalkan pengingat harian aktif**, sehingga
+  notifikasi muncul lagi setelah aplikasi dibuka.
+- Reset dan impor cadangan kini membersihkan sisa state toast "+XP" dan
+  membatasi jumlah langkah chain terhadap katalog saat ini.
+- Peringatan streak terancam kini juga mencakup kasus 3 hari dengan token
+  beku, dan tantangan harian berganti hari saat aplikasi dibuka kembali
+  setelah tengah malam, bukan lagi menampilkan tantangan kemarin.
+- Kegagalan berbagi kini fallback ke berbagi teks, bukan diam saja.
+- Mission sheet kini bisa di-scroll dengan batas tinggi, sehingga konten
+  panjang dan ukuran teks besar tidak lagi meluber.
+- Menghapus kode mati: `inboxRestored`, `sharedCopied`, `weekdaysShort`,
+  `shareBtn`.
+
 ## v2.4.0
 
 Rilis fitur aditif. Simpanan dan cadangan lama tetap terbaca, dan ini

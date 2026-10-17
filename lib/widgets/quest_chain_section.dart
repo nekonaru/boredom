@@ -244,7 +244,7 @@ class _NoActiveChain extends StatelessWidget {
                               style: TextStyle(
                                 color: pal.textPrimary, fontWeight: FontWeight.w600, fontSize: 13),
                             ),
-                            Text('${chain.steps.length} step · +${chain.rewardXp} XP',
+                            Text(s.chainStepsReward(chain.steps.length, chain.rewardXp),
                                 style: TextStyle(color: pal.textSecondary, fontSize: 11)),
                           ],
                         ),

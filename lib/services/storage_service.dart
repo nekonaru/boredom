@@ -82,19 +82,27 @@ class StorageService {
     await p.setStringList(_kHistory, trimmed);
   }
 
-  /// Replaces the whole history. Used by undo when the snapshot predates
-  /// the last write.
+  /// Replaces the whole history. Used by undo and backup import.
+  ///
+  /// Takes the in-memory list, which is newest-first. The prefs list is
+  /// stored oldest-first (see [addHistoryEntry]), so this reverses and
+  /// drops the *oldest* overflow entries. Keeping the order matters:
+  /// `addHistoryEntry` appends and trims from the end, which is only
+  /// correct while the list really is oldest-first.
   Future<void> saveHistory(List<CompletedMission> history) async {
     final p = await prefs;
-    final trimmed =
-        history.length > 200 ? history.sublist(history.length - 200) : history;
+    final oldestFirst = history.reversed.toList();
+    final trimmed = oldestFirst.length > 200
+        ? oldestFirst.sublist(oldestFirst.length - 200)
+        : oldestFirst;
     await p.setStringList(
       _kHistory,
       trimmed.map((e) => jsonEncode(e.toJson())).toList(),
     );
   }
 
-  /// Removes the most recent history entry. Used by undo.
+  /// Removes the most recent history entry. Kept for callers that trim
+  /// history by one without a full snapshot.
   Future<void> removeLastHistoryEntry() async {
     final p = await prefs;
     final raw = p.getStringList(_kHistory) ?? [];

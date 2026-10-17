@@ -12,8 +12,22 @@ import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
 import '../widgets/daily_challenge_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  /// Calls the provider's day-rollover check when the app resumes, so a
+  /// long-lived process does not keep serving yesterday's challenge.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<BoredomProvider>().refreshIfDayChanged();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

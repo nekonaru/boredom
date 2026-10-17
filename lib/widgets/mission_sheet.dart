@@ -78,15 +78,21 @@ class _MissionSheetState extends State<MissionSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
         decoration: BoxDecoration(
           color: pal.surfaceElevated,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        // Scrollable so long titles, big text scales, and short viewports
+        // do not overflow.
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               children: [
                 Expanded(
@@ -129,14 +135,12 @@ class _MissionSheetState extends State<MissionSheet> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {
-                    // Share sheet origin keeps the iPad-style popup anchored
-                    // near the tapped icon.
+                  onPressed: () async {
                     final box = context.findRenderObject() as RenderBox?;
                     final origin = box == null
                         ? null
                         : box.localToGlobal(Offset.zero) & box.size;
-                    ShareCard.shareMission(
+                    final ok = await ShareCard.shareMission(
                       emoji: mission.emoji,
                       title: title,
                       description: description,
@@ -147,6 +151,23 @@ class _MissionSheetState extends State<MissionSheet> {
                       background: pal.background,
                       origin: origin,
                     );
+                    if (!ok && context.mounted) {
+                      // Fall back to plain text so a share is never a
+                      // silent no-op.
+                      await ShareCard.shareText(
+                        s.shareText(
+                          title,
+                          mission.baseXp,
+                          provider.progress.level,
+                        ),
+                        origin: origin,
+                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(s.shareCardFailed)),
+                        );
+                      }
+                    }
                   },
                   icon: Icon(Icons.ios_share, color: pal.textSecondary),
                 ),
@@ -190,8 +211,16 @@ class _MissionSheetState extends State<MissionSheet> {
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
-                onPressed: () =>
-                    provider.toggleCategoryMuted(mission.category),
+                onPressed: () async {
+                  final changed = await provider.toggleCategoryMuted(
+                    mission.category,
+                  );
+                  if (!changed && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(s.muteLastBlocked)),
+                    );
+                  }
+                },
                 icon: const Icon(Icons.visibility_off_outlined, size: 16),
                 label: Text(
                   categoryMuted ? s.unmuted : s.notInterested,
@@ -279,7 +308,8 @@ class _MissionSheetState extends State<MissionSheet> {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
