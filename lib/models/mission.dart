@@ -41,17 +41,33 @@ extension MissionCategoryX on MissionCategory {
     }
   }
 
+  /// Indonesian label. Every category has a real translation, so the
+  /// Profile mute chips are never a mix of Indonesian and English.
   String labelFor(String code) {
     if (code != 'id') return label;
     switch (this) {
+      case MissionCategory.gaming:
+        return 'Gim';
+      case MissionCategory.entertainment:
+        return 'Hiburan';
+      case MissionCategory.creative:
+        return 'Kreatif';
+      case MissionCategory.coding:
+        return 'Ngoding';
+      case MissionCategory.learning:
+        return 'Belajar';
+      case MissionCategory.photography:
+        return 'Fotografi';
+      case MissionCategory.outdoor:
+        return 'Outdoor';
+      case MissionCategory.social:
+        return 'Sosial';
       case MissionCategory.selfImprovement:
         return 'Pengembangan Diri';
       case MissionCategory.custom:
         return 'Buatanmu';
       case MissionCategory.chaos:
         return 'Chaos';
-      default:
-        return label;
     }
   }
 }

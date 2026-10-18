@@ -69,19 +69,29 @@ class ReminderService {
   /// `matchDateTimeComponents: DateTimeComponents.time` is what makes this
   /// repeat every day. Without it `zonedSchedule` is a ONE-SHOT: the
   /// notification fires once and never comes back.
-  Future<void> scheduleDaily(int hour, int minute) async {
+  ///
+  /// [code] is the active display language ('en' or 'id'). The
+  /// notification is the only surface that reaches the user outside the
+  /// app, so an English string here is the one leak they cannot switch
+  /// off in Settings.
+  Future<void> scheduleDaily(int hour, int minute, {String code = 'en'}) async {
     await init();
+    final isId = code == 'id';
     try {
       await _plugin.zonedSchedule(
         id: _dailyId,
         title: 'Boredom',
-        body: 'You are bored. So... what now?',
+        body: isId
+            ? 'Kamu lagi bosan. Jadi... mau ngapain?'
+            : 'You are bored. So... what now?',
         scheduledDate: _nextInstanceOf(hour, minute),
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             _channelId,
             _channelName,
-            channelDescription: 'Daily reminder to roll a new mission',
+            channelDescription: isId
+                ? 'Pengingat harian untuk misi baru'
+                : 'Daily reminder to roll a new mission',
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority,
           ),

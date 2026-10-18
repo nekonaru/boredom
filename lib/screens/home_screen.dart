@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               selected: selectedMood,
               onChanged: actions.setMood,
               options: Mood.values
-                  .map((m) => SelectorOption(m, m.emoji, m.label))
+                  .map((m) => SelectorOption(m, m.emoji, s.moodLabel(m)))
                   .toList(),
             ),
             const SizedBox(height: 16),
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               selected: selectedLocation,
               onChanged: actions.setLocation,
               options: LocationType.values
-                  .map((l) => SelectorOption(l, l.emoji, l.label))
+                  .map((l) => SelectorOption(l, l.emoji, s.locationLabel(l)))
                   .toList(),
             ),
             const SizedBox(height: 16),
@@ -182,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               selected: selectedEnergy,
               onChanged: actions.setEnergy,
               options: EnergyLevel.values
-                  .map((e) => SelectorOption(e, e.emoji, e.label))
+                  .map((e) => SelectorOption(e, e.emoji, s.energyLabel(e)))
                   .toList(),
             ),
 

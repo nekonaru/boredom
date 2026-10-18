@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'providers/boredom_provider.dart';
 import 'providers/language_provider.dart';
@@ -8,6 +9,12 @@ import 'screens/root_shell.dart';
 import 'utils/app_theme.dart';
 
 void main() {
+  // Loaded here, once, instead of inside the widget tree: calling load()
+  // from build() re-ran it on every rebuild and could race a user's
+  // language or theme change, snapping the selection back to the
+  // previously persisted value.
+  LanguageProvider.instance.load();
+  ThemeProvider.instance.load();
   runApp(const BoredomApp());
 }
 
@@ -19,8 +26,8 @@ class BoredomApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => BoredomProvider()..init()),
-        ChangeNotifierProvider.value(value: LanguageProvider.instance..load()),
-        ChangeNotifierProvider.value(value: ThemeProvider.instance..load()),
+        ChangeNotifierProvider.value(value: LanguageProvider.instance),
+        ChangeNotifierProvider.value(value: ThemeProvider.instance),
       ],
       child: Consumer2<LanguageProvider, ThemeProvider>(
         builder: (context, lang, tp, _) => MaterialApp(
@@ -30,6 +37,14 @@ class BoredomApp extends StatelessWidget {
           darkTheme: buildBoredomTheme(light: false, accent: tp.accent),
           themeMode: tp.isLight ? ThemeMode.light : ThemeMode.dark,
           locale: lang.locale,
+          // Without these the time picker, date picker and text selection
+          // toolbar stay English inside an otherwise Indonesian app.
+          supportedLocales: const [Locale('en'), Locale('id')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           home: const _AppGate(),
         ),
       ),

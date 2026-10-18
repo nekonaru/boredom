@@ -29,17 +29,59 @@ class AppStrings {
   String get headline => _pick('YOU ARE BORED.', 'KAMU LAGI BOSAN.');
   String get subhead => _pick('So... what now?', 'Jadi... mau ngapain?');
   String streak(int days) => isId ? 'STREAK $days HARI' : '$days DAY STREAK';
-  String get secMood => 'MOOD';
+  String get secMood => _pick('MOOD', 'SUASANA');
   String get secTime => _pick('TIME AVAILABLE', 'WAKTU LUANG');
   String get secLocation => _pick('LOCATION', 'LOKASI');
   String get secEnergy => _pick('ENERGY', 'ENERGI');
-  String get chaosTitle => 'CHAOS MODE';
+  String get chaosTitle => _pick('CHAOS MODE', 'MODE CHAOS');
   String get chaosDesc => _pick(
         'Ignore all preferences. Anything can come out.',
         'Abaikan semua preferensi. Misi apa pun bisa keluar.',
       );
-  String get boredButton => "I'M BORED";
-  String get chaosButton => 'CHAOS ME';
+  String get boredButton => _pick("I'M BORED", 'MISI BOSAN');
+  String get chaosButton => _pick('CHAOS ME', 'ACAK SEBEBASNYA');
+
+  // Mood labels
+  String moodLabel(Mood m) {
+    switch (m) {
+      case Mood.lazy:
+        return _pick('Lazy', 'Malas');
+      case Mood.bored:
+        return _pick('Bored', 'Bosan');
+      case Mood.normal:
+        return _pick('Normal', 'Normal');
+      case Mood.energetic:
+        return _pick('Energetic', 'Berenergi');
+      case Mood.curious:
+        return _pick('Curious', 'Penasaran');
+    }
+  }
+
+  // Location labels
+  String locationLabel(LocationType l) {
+    switch (l) {
+      case LocationType.home:
+        return _pick('Home', 'Rumah');
+      case LocationType.outside:
+        return _pick('Outside', 'Di luar');
+      case LocationType.computer:
+        return _pick('Computer', 'Komputer');
+      case LocationType.anywhere:
+        return _pick('Anywhere', 'Di mana saja');
+    }
+  }
+
+  // Energy labels
+  String energyLabel(EnergyLevel e) {
+    switch (e) {
+      case EnergyLevel.low:
+        return _pick('Low', 'Low');
+      case EnergyLevel.medium:
+        return _pick('Medium', 'Sedang');
+      case EnergyLevel.high:
+        return _pick('High', 'Tinggi');
+    }
+  }
   String rerollsLeft(int n) => isId
       ? '$n reroll tersisa hari ini'
       : '$n reroll${n == 1 ? '' : 's'} left today';

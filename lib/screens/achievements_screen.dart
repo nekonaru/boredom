@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/achievement.dart';
+import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/achievement_catalog.dart';
@@ -17,11 +18,16 @@ class AchievementsScreen extends StatelessWidget {
     final unlockedIds = context.select<BoredomProvider, Set<String>>(
       (p) => p.achievements.map((a) => a.achievementId).toSet(),
     );
-    final progress = context.select<BoredomProvider, ({int missions, int level})>(
-      (p) => (
-        missions: p.progress.totalMissionsCompleted,
-        level: p.progress.level,
-      ),
+    // Select the whole progress object, not a hand-picked subset. The
+    // progress bars read eight different metrics, and the old selector
+    // tracked only two of them, so a reroll or an inbox save changed the
+    // numbers on screen without ever changing the selected value: the
+    // record compared equal, no rebuild happened, and six of the eight
+    // bars stayed frozen until the user completed a mission.
+    // UserProgress has no operator ==, so identity comparison means any
+    // copyWith rebuilds this screen.
+    final progress = context.select<BoredomProvider, UserProgress>(
+      (p) => p.progress,
     );
     final actions = context.read<BoredomProvider>();
     const all = AchievementCatalog.all;
@@ -78,7 +84,11 @@ class AchievementsScreen extends StatelessWidget {
                 .where((a) => a.metric != AchievementMetric.special)
                 .map((a) {
               final current =
-                  actions.achievementProgress(a, missions: progress.missions, level: progress.level);
+                  actions.achievementProgress(
+          a,
+          missions: progress.totalMissionsCompleted,
+          level: progress.level,
+        );
               final ratio = a.target == 0
                   ? 0.0
                   : (current / a.target).clamp(0.0, 1.0);

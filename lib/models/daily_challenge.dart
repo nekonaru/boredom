@@ -1,3 +1,5 @@
+import 'mission.dart';
+
 class DailyChallenge {
   final String id;
   final String title;
@@ -7,6 +9,11 @@ class DailyChallenge {
   final String emoji;
   final int rewardXp;
 
+  /// Which per-category bucket this challenge counts towards when it is
+  /// completed. Catalog-only: the stored DailyChallengeState keeps just
+  /// the id, so adding this needs no migration.
+  final MissionCategory category;
+
   const DailyChallenge({
     required this.id,
     required this.title,
@@ -15,6 +22,7 @@ class DailyChallenge {
     this.descriptionId,
     required this.emoji,
     required this.rewardXp,
+    this.category = MissionCategory.creative,
   });
 }
 

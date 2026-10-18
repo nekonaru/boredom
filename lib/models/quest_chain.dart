@@ -12,6 +12,8 @@ class QuestStep {
   });
 }
 
+import 'mission.dart';
+
 class QuestChain {
   final String id;
   final String title;
@@ -22,6 +24,10 @@ class QuestChain {
   final List<QuestStep> steps;
   final int rewardXp;
 
+  /// Per-category bucket a finished chain counts towards. Catalog-only:
+  /// the stored QuestChainProgress keeps just the chain id and step index.
+  final MissionCategory category;
+
   const QuestChain({
     required this.id,
     required this.title,
@@ -31,6 +37,7 @@ class QuestChain {
     required this.emoji,
     required this.steps,
     required this.rewardXp,
+    this.category = MissionCategory.selfImprovement,
   });
 }
 

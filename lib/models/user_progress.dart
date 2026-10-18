@@ -1,20 +1,36 @@
 /// Absurd level names, so it feels like a game instead of a productivity app.
+///
+/// The milestone list is sorted by level on every lookup instead of relying
+/// on the map's insertion order, so adding an entry out of order cannot
+/// silently hand a player the wrong title.
 class LevelTitles {
-  static const Map<int, String> _milestones = {
-    1: 'Bored',
-    5: 'Slightly Productive',
-    10: 'Touching Grass',
-    20: 'Main Character',
-    35: 'Certified Not Boring',
-    50: 'Chronically Unbored',
-    75: 'Boredom Slayer',
-    100: 'The Final Boss of Boredom',
+  static const List<MapEntry<int, String>> _milestones = [
+    MapEntry(1, 'Bored'),
+    MapEntry(5, 'Slightly Productive'),
+    MapEntry(10, 'Touching Grass'),
+    MapEntry(20, 'Main Character'),
+    MapEntry(35, 'Certified Not Boring'),
+    MapEntry(50, 'Chronically Unbored'),
+    MapEntry(75, 'Boredom Slayer'),
+    MapEntry(100, 'The Final Boss of Boredom'),
+  ];
+
+  static const Map<int, String> _milestonesId = {
+    1: 'Bosan',
+    5: 'Agak Produktif',
+    10: 'Sentuh Rumput',
+    20: 'Tokoh Utama',
+    35: 'Sertifikat Tidak Bosan',
+    50: 'Anti Bosan Kronis',
+    75: 'Pembasmi Kebosanan',
+    100: 'Bos Terakhir Kebosanan',
   };
 
-  static String titleFor(int level) {
-    String title = 'Bored';
-    for (final entry in _milestones.entries) {
-      if (level >= entry.key) title = entry.value;
+  static String titleFor(int level, {String code = 'en'}) {
+    final table = code == 'id' ? _milestonesId : null;
+    String title = table?[1] ?? _milestones.first.value;
+    for (final entry in _milestones) {
+      if (level >= entry.key) title = table?[entry.key] ?? entry.value;
     }
     return title;
   }
@@ -87,6 +103,10 @@ class UserProgress {
       xpNeededForLevel(level + 1) - xpNeededForLevel(level);
   double get levelProgress =>
       xpNeededForNextLevel == 0 ? 1 : xpIntoCurrentLevel / xpNeededForNextLevel;
+
+  /// Localized level title. Defaults to English; pass the active language
+  /// code to render it in Bahasa Indonesia.
+  String levelTitleFor(String code) => LevelTitles.titleFor(level, code: code);
 
   String get levelTitle => LevelTitles.titleFor(level);
 

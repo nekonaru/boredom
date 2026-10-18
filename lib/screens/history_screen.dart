@@ -217,11 +217,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Future<void> _showAddCustomDialog(BuildContext context, AppStrings s) {
+  Future<void> _showAddCustomDialog(BuildContext context, AppStrings s) async {
     final titleCtrl = TextEditingController();
     final descCtrl = TextEditingController();
     double xp = 30;
-    return showDialog(
+    await showDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
@@ -283,7 +283,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 onPressed: () {
                   if (titleCtrl.text.trim().isEmpty ||
                       descCtrl.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    // The dialog closed with a plain return, leaving the
+                    // modal barrier on top of the Scaffold, so the
+                    // snackbar was invisible: tapping Save looked like it
+                    // did nothing at all.
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(this.context).showSnackBar(
                       SnackBar(content: Text(s.customInvalid)),
                     );
                     return;
@@ -302,6 +307,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         },
       ),
     );
+    // Both controllers used to be leaked on every open.
+    titleCtrl.dispose();
+    descCtrl.dispose();
   }
 }
 

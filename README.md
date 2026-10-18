@@ -27,7 +27,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 | Feature | Description |
 |---------|-------------|
-| 🎲 **Mission generator** | Random mission from a 60+ catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
+| 🎲 **Mission generator** | Random mission from a 55-mission catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
 | ⭐ **XP and levels** | Progressive curve with absurd level titles, double XP every weekend |

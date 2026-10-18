@@ -35,14 +35,13 @@ class StatsScreen extends StatelessWidget {
         ? 1
         : categoryCounts.values.reduce((a, b) => a > b ? a : b);
 
-    // Sort every category (including zeros) so the chart stays consistent.
-    // `custom` must stay in: custom missions are counted in
-    // `categoryCounts`, so hiding the row made the bars sum to less than
-    // the "missions completed" total above them. Only `chaos` is excluded,
-    // because it is a mode flag rather than something ever recorded here.
-    final sortedCategories = MissionCategory.values
-        .where((c) => c != MissionCategory.chaos)
-        .toList()
+    // Every category is drawn, including chaos. Chaos Mode can roll the
+    // five chaos-only missions, and those carry `category: chaos`, so
+    // `categoryCounts['chaos']` really is written. Filtering them out made
+    // the bars sum to less than the "missions completed" total above them.
+    // (The Profile mute chips do exclude chaos, which is correct there:
+    // chaos is a mode, not something to silence.)
+    final sortedCategories = MissionCategory.values.toList()
       ..sort((a, b) =>
           (categoryCounts[b.name] ?? 0).compareTo(categoryCounts[a.name] ?? 0));
 

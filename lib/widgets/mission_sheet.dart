@@ -151,7 +151,8 @@ class _MissionSheetState extends State<MissionSheet> {
                       description: description,
                       xp: projectedXp,
                       level: provider.progress.level,
-                      levelTitle: provider.progress.levelTitle,
+                      levelTitle:
+                          provider.progress.levelTitleFor(s.code),
                       accent: pal.accent,
                       background: pal.background,
                       origin: origin,
@@ -244,9 +245,9 @@ class _MissionSheetState extends State<MissionSheet> {
                   child: OutlinedButton(
                     onPressed: _isSubmitting
                         ? null
-                        : () {
+                        : () async {
                             buzzIfEnabled(context);
-                            final ok = provider.rerollMission();
+                            final ok = await provider.rerollMission();
                             if (!ok && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

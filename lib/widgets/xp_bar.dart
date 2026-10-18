@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import '../models/user_progress.dart';
 import '../providers/theme_provider.dart';
 
@@ -32,7 +33,7 @@ class XpBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                progress.levelTitle,
+                progress.levelTitleFor(context.str.code),
                 style: TextStyle(
                   color: pal.textPrimary,
                   fontWeight: FontWeight.w600,

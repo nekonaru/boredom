@@ -1,5 +1,57 @@
 # Changelog
 
+## v2.6.0
+
+Full-app audit pass: 20 findings, most of them making numbers on screen
+wrong rather than merely ugly. Storage format unchanged, so every
+existing save and backup still loads.
+
+### New features
+- **Indonesian is now complete.** Mood, location, and energy chips, the
+  main "I'm bored" and "Chaos me" buttons, the Mood and Chaos section
+  headings, all 10 category labels, the level titles, and the daily
+  reminder notification text are all translated. The reminder was the
+  worst case: it was the one surface that reached the user after they
+  closed the app, and it had no way to be switched to Indonesian.
+- **Framework dialogs follow the app language.** The time picker, date
+  picker, and text selection toolbar were hardwired to English, so an
+  Indonesian app showed Indonesian buttons around an English picker.
+
+### Optimizations
+- **Every completion now counts as a day.** Finishing a daily challenge
+  or a quest chain paid out XP but wrote no history entry, moved no
+  streak, and updated no statistics. A day you actually spent on
+  something showed up blank in the weekly chart, the average XP figure,
+  the busiest-weekday stat, and the streak.
+- **Achievement progress bars update live.** The screen tracked only two
+  of the eight metrics it displays, so a reroll or an inbox save changed
+  the underlying numbers without ever changing the selected value: the
+  comparison came back equal, no rebuild happened, and the bars stayed
+  frozen until you happened to complete a mission.
+- **The 30-day chart is readable.** A fixed 8px gap between bars ate most
+  of the canvas at 30 bars, leaving them under 2px wide, and went
+  negative on narrow screens. The gap now scales with the bar count.
+- **The level title lookup no longer depends on map insertion order.**
+
+### Bug fixes
+- **The statistics breakdown now adds up.** Chaos missions were dropped
+  from the category chart even though Chaos Mode can roll them and they
+  were being counted, so the bars disagreed with the "missions
+  completed" total above them.
+- **Restoring a backup no longer leaves yesterday's daily challenge
+  behind** on disk when the payload did not carry one.
+- **Opening the import dialog twice can no longer close the app.** The
+  dialog was dismissed through the screen's own navigator, so a second
+  pop could take out the app's only route.
+- **Invalid custom mission input now shows its error.** The dialog stayed
+  open behind the message, so tapping Save looked like nothing happened.
+- **Rerolls are saved before the new mission is rolled**, so a kill
+  right after a reroll no longer hands back a free one.
+- **Dislikes publish a new collection** like favorites already did,
+  which keeps the two toggles from diverging.
+- **Starting the app no longer races your language or theme choice**;
+  they were being re-read from disk on every rebuild.
+
 ## v2.5.0
 
 Closes the four long-standing issues left open by the earlier audits.

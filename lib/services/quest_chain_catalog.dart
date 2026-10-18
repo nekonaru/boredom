@@ -1,4 +1,5 @@
 import '../models/quest_chain.dart';
+import '../models/mission.dart';
 
 class QuestChainCatalog {
   static const List<QuestChain> all = [
@@ -10,6 +11,7 @@ class QuestChainCatalog {
       description: 'A chain of missions to force yourself out of your room.',
       descriptionId: 'Rantai misi buat maksa diri kamu keluar dari kamar.',
       rewardXp: 500,
+      category: MissionCategory.outdoor,
       steps: [
         QuestStep(
           title: 'Leave the House',
@@ -51,6 +53,7 @@ class QuestChainCatalog {
       description: 'From a random idea to something actually finished.',
       descriptionId: 'Dari ide receh sampai jadi sesuatu yang beneran selesai.',
       rewardXp: 450,
+      category: MissionCategory.creative,
       steps: [
         QuestStep(
           title: 'Find Ideas',
@@ -92,6 +95,7 @@ class QuestChainCatalog {
       description: 'For messy days that need a restart.',
       descriptionId: 'Buat hari-hari yang berasa berantakan dan butuh restart.',
       rewardXp: 400,
+      category: MissionCategory.selfImprovement,
       steps: [
         QuestStep(
           title: 'Tidy Physically',
@@ -127,6 +131,7 @@ class QuestChainCatalog {
       description: 'From scattered attention to one finished piece of work.',
       descriptionId: 'Dari perhatian yang buyar sampai satu pekerjaan yang selesai.',
       rewardXp: 450,
+      category: MissionCategory.learning,
       steps: [
         QuestStep(
           title: 'Pick the One Thing',

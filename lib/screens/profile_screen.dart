@@ -494,16 +494,18 @@ class ProfileScreen extends StatelessWidget {
     });
   }
 
-  void _showImportDialog(
+  Future<void> _showImportDialog(
     BuildContext context,
     AppStrings s,
     BoredomProvider provider,
   ) {
     final pal = context.palette;
+    // Disposed after the dialog closes. The controller used to leak on
+    // every open.
     final ctrl = TextEditingController();
-    showDialog(
+    await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: pal.surfaceElevated,
         title: Text(s.backupImport, style: TextStyle(color: pal.textPrimary, fontSize: 17)),
         content: TextField(
@@ -514,14 +516,17 @@ class ProfileScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            // Pops through the dialog's own context. Using the outer
+            // ProfileScreen context meant a second pop could dismiss the
+            // app's only route and close it.
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(s.dialogCancel),
           ),
           TextButton(
             onPressed: () async {
               final ok = await provider.importBackup(ctrl.text);
-              if (!context.mounted) return;
-              Navigator.of(context).pop();
+              if (!dialogContext.mounted) return;
+              Navigator.of(dialogContext).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(ok ? s.backupRestored : s.backupInvalid)),
               );
@@ -531,6 +536,7 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
+    ctrl.dispose();
   }
 
   void _confirmReset(

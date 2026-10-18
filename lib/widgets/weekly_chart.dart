@@ -76,10 +76,21 @@ class ActivityBarsPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (counts.isEmpty || size.width <= 0) return;
     final maxValue = counts.fold<int>(1, (a, b) => a > b ? a : b);
-    const gap = 8.0;
-    final barWidth = (size.width - gap * (counts.length - 1)) / counts.length;
+    // The gap has to shrink with the bar count. A fixed 8px gap looked
+    // fine for the 7-day chart but ate 8 * 29 = 232px of the 30-day
+    // chart's canvas, leaving bars 1.9px wide, and went negative on
+    // narrower layouts, which Rect.fromLTWH rejects.
+    final gap = counts.length > 14 ? 2.0 : 8.0;
+    final available = size.width - gap * (counts.length - 1);
+    if (available <= 0) return;
+    final barWidth = available / counts.length;
     final todayIndex = counts.length - 1;
+    // A radius wider than half the bar is not a valid RRect.
+    final radius = Radius.circular(
+      (barWidth / 2).clamp(0.0, counts.length > 14 ? 2.0 : 5.0),
+    );
 
     for (var i = 0; i < counts.length; i++) {
       final ratio = counts[i] / maxValue;
@@ -95,7 +106,7 @@ class ActivityBarsPainter extends CustomPainter {
                 : inactive;
       final rect = RRect.fromRectAndRadius(
         Rect.fromLTWH(x, y, barWidth, barHeight < 4 ? 4 : barHeight),
-        const Radius.circular(5),
+        radius,
       );
       canvas.drawRRect(rect, paint);
     }

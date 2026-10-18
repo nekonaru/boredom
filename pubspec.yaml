@@ -1,13 +1,19 @@
 name: boredom
 description: Boredom, a tiny game for humans who do not know what to do with themselves.
 publish_to: 'none'
-version: 2.5.0+15
+version: 2.6.0+16
 
 environment:
   sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
   flutter:
+    sdk: flutter
+
+  # Framework UI strings (time picker, date picker, text selection toolbar).
+  # Without this the app's own text can be Indonesian while every dialog
+  # Flutter draws stays English.
+  flutter_localizations:
     sdk: flutter
 
   # State management

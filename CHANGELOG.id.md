@@ -1,5 +1,60 @@
 # Changelog
 
+## v2.6.0
+
+Audit seluruh aplikasi: 20 temuan, sebagian besar membuat angka di
+layar salah, bukan cuma tidak rapi. Format penyimpanan tidak berubah,
+jadi semua simpanan dan cadangan lama tetap terbaca.
+
+### Ditambahkan
+- **Bahasa Indonesia sekarang lengkap.** Chip suasana, lokasi, dan
+  energi, tombol utama "Misi Bosan" dan "Acak Sebebasnya", judul
+  section Mood dan Mode Chaos, 10 label kategori, judul level, serta isi
+  notifikasi pengingat semuanya diterjemahkan. Pengingat adalah kasus
+  terburuk: satu-satunya tampilan yang sampai ke user setelah aplikasi
+  ditutup, dan tidak ada cara mengubahnya ke Bahasa Indonesia.
+- **Dialog dari sistem ikut bahasa aplikasi.** Time picker, date picker,
+  dan toolbar pilihan teks terkunci ke Inggris, sehingga aplikasi
+  Bahasa Indonesia menampilkan tombol Indonesia di sekeliling picker
+  berbahasa Inggris.
+
+### Ditingkatkan
+- **Setiap penyelesaian sekarang terhitung sebagai satu hari.**
+  Menyelesaikan tantangan harian atau quest chain memberi XP tapi tidak
+  menulis riwayat, tidak menambah streak, dan tidak memperbarui
+  statistik. Hari yang benar kamu habiskan terlihat kosong di grafik
+  mingguan, angka rata-rata XP, statistik hari tersibuk, dan streak.
+- **Bar progres achievement langsung diperbarui.** Layar itu hanya
+  melacak 2 dari 8 metrik yang ditampilkan, jadi reroll atau simpan ke
+  inbox mengubah angka tanpa mengubah nilai terpilih: perbandingan
+  hasilnya sama, tidak ada rebuild, dan batarnya tetap beku sampai
+  kebetulan kamu menyelesaikan misi.
+- **Grafik 30 hari jadi terbaca.** Jarak tetap 8px antarbatang memakan
+  sebagian besar kanvas di 30 batang, menyisakan lebar di bawah 2px,
+  dan menjadi negatif di layar sempit. Jaraknya kini menyesuaikan
+  jumlah batang.
+- **Pencarian judul level tidak lagi bergantung pada urutan insert map.**
+
+### Diperbaiki
+- **Rincian statistik sekarang jumlahnya pas.** Misi chaos dibuang dari
+  grafik kategori padahal Mode Chaos bisa memunculkannya dan sudah
+  dihitung, sehingga batang tidak cocok dengan total "misi
+  selesai" di atasnya.
+- **Pulihkan cadangan tidak lagi meninggalkan tantangan harian
+  kemarin** di penyimpanan kalau payload-nya tidak membawa satu pun.
+- **Membuka dialog impor dua kali tidak lagi bisa menutup aplikasi.**
+  Dialog ditutup lewat navigator layarnya sendiri, jadi pop kedua bisa
+  mencabut route satu-satunya aplikasi.
+- **Input misi buatan yang tidak valid kini menampilkan pesannya.**
+  Dialog tetap terbuka di belakang pesan, jadi menekan Save terlihat
+  seperti tidak terjadi apa-apa.
+- **Reroll disimpan sebelum misi baru diundi**, jadi aplikasi yang
+  langsung mati setelah reroll tidak mengembalikan jatah gratis.
+- **Dislike menerbitkan koleksi baru** seperti favorit, supaya kedua
+  toggle tidak berbeda cara.
+- **Saat aplikasi dibuka tidak lagi berebut dengan pilihan bahasa atau
+  tema**; keduanya dibaca ulang dari penyimpanan setiap rebuild.
+
 ## v2.5.0
 
 Menutup empat masalah lama yang masih tersisa dari audit sebelumnya.
