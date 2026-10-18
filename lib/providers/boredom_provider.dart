@@ -595,7 +595,16 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Achievement>> completeMission() async {
+  /// Records a completion. [outcome] is how the player says whether they
+  /// actually did the thing, which is what makes the streak and the XP
+  /// mean something.
+  ///
+  /// A [MissionOutcome.skipped] completion is still written to history so
+  /// the attempt is visible, but it pays no XP and never touches the
+  /// streak: pretending you showed up should not keep a streak alive.
+  Future<List<Achievement>> completeMission([
+    MissionOutcome outcome = MissionOutcome.done,
+  ]) async {
     final instance = currentMission;
     if (instance == null) return [];
 
@@ -609,35 +618,56 @@ class BoredomProvider extends ChangeNotifier {
     final mission = instance.mission;
     final now = DateTime.now();
 
-    final resolved = _resolveStreak(
-      last: progress.lastCompletedDate,
-      now: now,
-      streakDays: progress.streakDays,
-      tokens: progress.freezeTokens,
-    );
-    final newStreak = resolved.streak;
-    lastFreezeUsed = resolved.usedFreeze;
-    // Milestone bonus applies only when this completion crosses a 10-level
-    // boundary, judged against the level before and after the gain.
-    final gainedXp = xpForDate(mission.baseXp, now) +
-        milestoneXpFor(progress.totalXp, mission.baseXp, now);
+    final fullXp = xpForDate(mission.baseXp, now);
+    final gainedXp = outcome.countsAsActivity
+        ? (fullXp * outcome.xpShare).round() +
+            milestoneXpFor(progress.totalXp, mission.baseXp, now)
+        : 0;
+
+    // A skipped mission is not an active day, so neither the streak nor
+    // the completion counters move.
+    var streakDays = progress.streakDays;
+    var longestStreak = progress.longestStreak;
+    var lastCompletedDate = progress.lastCompletedDate;
+    var freezeTokens = progress.freezeTokens;
+    var freezeTokensEarned = progress.freezeTokensEarned;
+    lastFreezeUsed = false;
+    if (outcome.countsAsActivity) {
+      final resolved = _resolveStreak(
+        last: progress.lastCompletedDate,
+        now: now,
+        streakDays: progress.streakDays,
+        tokens: progress.freezeTokens,
+      );
+      streakDays = resolved.streak;
+      lastFreezeUsed = resolved.usedFreeze;
+      lastCompletedDate = now;
+      longestStreak =
+          resolved.streak > progress.longestStreak ? resolved.streak : progress.longestStreak;
+      freezeTokens = resolved.tokens;
+      freezeTokensEarned = resolved.tokensEarned;
+    }
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
     final catKey = mission.category.name;
-    newCategoryCounts[catKey] = (newCategoryCounts[catKey] ?? 0) + 1;
+    if (outcome.countsAsActivity) {
+      newCategoryCounts[catKey] = (newCategoryCounts[catKey] ?? 0) + 1;
+    }
 
     _captureUndo();
     progress = progress.copyWith(
       totalXp: progress.totalXp + gainedXp,
-      streakDays: newStreak,
-      longestStreak: newStreak > progress.longestStreak ? newStreak : progress.longestStreak,
-      lastCompletedDate: now,
-      totalMissionsCompleted: progress.totalMissionsCompleted + 1,
+      streakDays: streakDays,
+      longestStreak: longestStreak,
+      lastCompletedDate: lastCompletedDate,
+      totalMissionsCompleted: outcome.countsAsActivity
+          ? progress.totalMissionsCompleted + 1
+          : progress.totalMissionsCompleted,
       chaosMissionsCompleted:
-          progress.chaosMissionsCompleted + (instance.isChaos ? 1 : 0),
+          progress.chaosMissionsCompleted + (instance.isChaos && outcome.countsAsActivity ? 1 : 0),
       categoryCounts: newCategoryCounts,
-      freezeTokens: resolved.tokens,
-      freezeTokensEarned: resolved.tokensEarned,
+      freezeTokens: freezeTokens,
+      freezeTokensEarned: freezeTokensEarned,
     );
     lastXpGained = gainedXp;
 
@@ -648,6 +678,7 @@ class BoredomProvider extends ChangeNotifier {
       categoryLabel: mission.category.label,
       xpEarned: gainedXp,
       completedAt: now,
+      outcome: outcome,
     );
     // New list instance: `context.select((p) => p.history)` in HistoryScreen
     // compares with DeepCollectionEquality, which treats an in-place
@@ -759,6 +790,14 @@ class BoredomProvider extends ChangeNotifier {
         return progress.freezeTokensEarned;
       case AchievementMetric.savedMissions:
         return progress.missionsSaved;
+      case AchievementMetric.missionsDone:
+        return history
+            .where((e) => e.outcome == MissionOutcome.done)
+            .length;
+      case AchievementMetric.missionsPartial:
+        return partialCount;
+      case AchievementMetric.missionsSkipped:
+        return skippedCount;
       case AchievementMetric.special:
         return 0;
     }
@@ -837,33 +876,51 @@ class BoredomProvider extends ChangeNotifier {
 
   /// Completes a custom mission for XP, with the same streak and
   /// achievement handling as catalog missions.
-  Future<List<Achievement>> completeCustomMission(CustomMission mission) async {
+  Future<List<Achievement>> completeCustomMission(
+    CustomMission mission, [
+    MissionOutcome outcome = MissionOutcome.done,
+  ]) async {
     final now = DateTime.now();
-    final gainedXp = xpForDate(mission.baseXp, now) +
-        milestoneXpFor(progress.totalXp, mission.baseXp, now);
-    final resolved = _resolveStreak(
-      last: progress.lastCompletedDate,
-      now: now,
-      streakDays: progress.streakDays,
-      tokens: progress.freezeTokens,
-    );
-    final newStreak = resolved.streak;
+    final fullXp = xpForDate(mission.baseXp, now);
+    final gainedXp = outcome.countsAsActivity
+        ? (fullXp * outcome.xpShare).round() +
+            milestoneXpFor(progress.totalXp, mission.baseXp, now)
+        : 0;
+    final resolved = outcome.countsAsActivity
+        ? _resolveStreak(
+            last: progress.lastCompletedDate,
+            now: now,
+            streakDays: progress.streakDays,
+            tokens: progress.freezeTokens,
+          )
+        : const _StreakResolution(
+            streak: 0,
+            tokens: 0,
+            usedFreeze: false,
+            tokensEarned: 0,
+          );
+    final newStreak = outcome.countsAsActivity ? resolved.streak : progress.streakDays;
     lastFreezeUsed = resolved.usedFreeze;
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
-    newCategoryCounts[mission.category.name] =
-        (newCategoryCounts[mission.category.name] ?? 0) + 1;
+    if (outcome.countsAsActivity) {
+      newCategoryCounts[mission.category.name] =
+          (newCategoryCounts[mission.category.name] ?? 0) + 1;
+    }
 
     _captureUndo();
     progress = progress.copyWith(
       totalXp: progress.totalXp + gainedXp,
       streakDays: newStreak,
       longestStreak: newStreak > progress.longestStreak ? newStreak : progress.longestStreak,
-      lastCompletedDate: now,
-      totalMissionsCompleted: progress.totalMissionsCompleted + 1,
+      lastCompletedDate: outcome.countsAsActivity ? now : progress.lastCompletedDate,
+      totalMissionsCompleted: outcome.countsAsActivity
+          ? progress.totalMissionsCompleted + 1
+          : progress.totalMissionsCompleted,
       categoryCounts: newCategoryCounts,
-      freezeTokens: resolved.tokens,
-      freezeTokensEarned: resolved.tokensEarned,
+      freezeTokens: outcome.countsAsActivity ? resolved.tokens : progress.freezeTokens,
+      freezeTokensEarned:
+          outcome.countsAsActivity ? resolved.tokensEarned : progress.freezeTokensEarned,
     );
     lastXpGained = gainedXp;
 
@@ -874,6 +931,7 @@ class BoredomProvider extends ChangeNotifier {
       categoryLabel: mission.category.label,
       xpEarned: gainedXp,
       completedAt: now,
+      outcome: outcome,
     );
     // New list instance: `context.select((p) => p.history)` in HistoryScreen
     // compares with DeepCollectionEquality, which treats an in-place
@@ -1244,12 +1302,20 @@ class BoredomProvider extends ChangeNotifier {
 
   // ---------------- Weekly stats (v2.0) ----------------
 
+  /// Rows that represent real activity. A skipped mission is an attempt
+  /// that never happened, so it must not inflate any "missions completed"
+  /// figure. Rows with no recorded outcome predate the feature and count
+  /// as activity, which is what they always did.
+  Iterable<CompletedMission> get _activeHistory => history.where(
+        (e) => e.outcome == null || e.outcome!.countsAsActivity,
+      );
+
   /// Completed-mission counts for the last 7 days, oldest first.
   /// Index 6 is today.
   List<int> get last7DaysCounts {
     final now = DateTime.now();
     final counts = List<int>.filled(7, 0);
-    for (final e in history) {
+    for (final e in _activeHistory) {
       final diff = DateTime(now.year, now.month, now.day)
           .difference(DateTime(e.completedAt.year, e.completedAt.month, e.completedAt.day))
           .inDays;
@@ -1265,7 +1331,7 @@ class BoredomProvider extends ChangeNotifier {
   List<int> get last30DaysCounts {
     final now = DateTime.now();
     final counts = List<int>.filled(30, 0);
-    for (final e in history) {
+    for (final e in _activeHistory) {
       final diff = DateTime(now.year, now.month, now.day)
           .difference(DateTime(e.completedAt.year, e.completedAt.month, e.completedAt.day))
           .inDays;
@@ -1274,23 +1340,49 @@ class BoredomProvider extends ChangeNotifier {
     return counts;
   }
 
-  /// Average XP per active day (days with at least one completion).
+  /// Completions that recorded an outcome, newest data included.
+  /// Rows saved before outcome tracking are excluded rather than counted
+  /// as successes.
+  int get trackedCompletions =>
+      history.where((e) => e.outcome != null).length;
+
+  /// Share of tracked completions actually carried out, 0 to 1.
+  /// Null when nothing has been tracked yet, which is different from a
+  /// genuine 0 percent.
+  double? get followThroughRate {
+    final tracked = trackedCompletions;
+    if (tracked == 0) return null;
+    final done = history
+        .where((e) => e.outcome == MissionOutcome.done)
+        .length;
+    return done / tracked;
+  }
+
+  int get partialCount =>
+      history.where((e) => e.outcome == MissionOutcome.partial).length;
+
+  int get skippedCount =>
+      history.where((e) => e.outcome == MissionOutcome.skipped).length;
+
+  /// Average XP per active day (days with at least one real completion).
   double get avgXpPerActiveDay {
-    if (history.isEmpty) return 0;
-    final days = history
+    final active = _activeHistory.toList();
+    if (active.isEmpty) return 0;
+    final days = active
         .map((e) => DateTime(e.completedAt.year, e.completedAt.month, e.completedAt.day))
         .toSet()
         .length;
     if (days == 0) return 0;
-    final total = history.fold<int>(0, (sum, e) => sum + e.xpEarned);
+    final total = active.fold<int>(0, (sum, e) => sum + e.xpEarned);
     return total / days;
   }
 
   /// Weekday (1=Monday, 7=Sunday) with the most completions, or null.
   int? get busiestWeekday {
-    if (history.isEmpty) return null;
+    final active = _activeHistory.toList();
+    if (active.isEmpty) return null;
     final counts = List<int>.filled(7, 0);
-    for (final e in history) {
+    for (final e in active) {
       counts[e.completedAt.weekday - 1]++;
     }
     var best = 0;
@@ -1305,7 +1397,7 @@ class BoredomProvider extends ChangeNotifier {
     final cutoff = DateTime.now().subtract(const Duration(days: 7));
     var missions = 0;
     var xp = 0;
-    for (final e in history) {
+    for (final e in _activeHistory) {
       if (e.completedAt.isAfter(cutoff)) {
         missions++;
         xp += e.xpEarned;

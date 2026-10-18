@@ -29,6 +29,14 @@ class StatsScreen extends StatelessWidget {
     final bestDay = context.select<BoredomProvider, int?>(
       (p) => p.busiestWeekday,
     );
+    // Both derive from `history`, which is not part of `progress`, so they
+    // need their own selectors or the new cards would never update.
+    final tracked = context.select<BoredomProvider, int>(
+      (p) => p.trackedCompletions,
+    );
+    final rate = context.select<BoredomProvider, double?>(
+      (p) => p.followThroughRate,
+    );
 
     final categoryCounts = progress.categoryCounts;
     final maxCount = categoryCounts.values.isEmpty
@@ -76,6 +84,30 @@ class StatsScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _MetricCard(label: s.mChaos, value: '${progress.chaosMissionsCompleted}', emoji: '☢️'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Null means nothing has been tracked yet, which is different
+            // from a real 0 percent, so it renders as a dash.
+            Row(
+              children: [
+                Expanded(
+                  child: _MetricCard(
+                    label: s.mFollowThrough,
+                    value: rate == null
+                        ? '—'
+                        : '${(rate * 100).round()}%',
+                    emoji: '🎖️',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetricCard(
+                    label: s.mFollowThroughDesc,
+                    value: '${tracked}',
+                    emoji: '📋',
+                  ),
                 ),
               ],
             ),

@@ -198,6 +198,40 @@ class UserProgress {
       );
 }
 
+/// Did the player actually carry out the mission?
+///
+/// `null` on [CompletedMission.outcome] means the row predates outcome
+/// tracking, which is why it is not defaulted to [done]: treating old
+/// rows as successes would quietly inflate the follow-through figure.
+enum MissionOutcome {
+  done,
+  partial,
+  skipped;
+
+  static MissionOutcome? parse(String? raw) {
+    for (final o in values) {
+      if (o.name == raw) return o;
+    }
+    return null;
+  }
+
+  /// Share of the mission's XP this outcome is worth.
+  double get xpShare {
+    switch (this) {
+      case MissionOutcome.done:
+        return 1;
+      case MissionOutcome.partial:
+        return 0.6;
+      case MissionOutcome.skipped:
+        return 0;
+    }
+  }
+
+  /// A skipped mission is not an active day, so it must not touch the
+  /// streak at all.
+  bool get countsAsActivity => this != MissionOutcome.skipped;
+}
+
 /// One completed-mission history row.
 class CompletedMission {
   final String missionId;
@@ -207,6 +241,9 @@ class CompletedMission {
   final int xpEarned;
   final DateTime completedAt;
 
+  /// Null for rows saved before outcome tracking existed.
+  final MissionOutcome? outcome;
+
   const CompletedMission({
     required this.missionId,
     required this.title,
@@ -214,6 +251,7 @@ class CompletedMission {
     required this.categoryLabel,
     required this.xpEarned,
     required this.completedAt,
+    this.outcome,
   });
 
   Map<String, dynamic> toJson() => {
@@ -223,6 +261,7 @@ class CompletedMission {
         'categoryLabel': categoryLabel,
         'xpEarned': xpEarned,
         'completedAt': completedAt.toIso8601String(),
+        'outcome': outcome?.name,
       };
 
   factory CompletedMission.fromJson(Map<String, dynamic> json) =>
@@ -233,5 +272,6 @@ class CompletedMission {
         categoryLabel: json['categoryLabel'],
         xpEarned: json['xpEarned'],
         completedAt: DateTime.parse(json['completedAt']),
+        outcome: MissionOutcome.parse(json['outcome']),
       );
 }

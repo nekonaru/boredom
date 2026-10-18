@@ -332,6 +332,88 @@ String _categoryFor(
     provider.missionById(entry.missionId)?.category.labelFor(code) ??
     entry.categoryLabel;
 
+/// One tappable outcome row in the custom-mission bottom sheet.
+class _OutcomeOption extends StatelessWidget {
+  final String label;
+  final String emoji;
+  final VoidCallback onTap;
+  const _OutcomeOption({
+    required this.label,
+    required this.emoji,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: pal.surface,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  color: pal.textPrimary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small pill showing how a completion actually went. Rows saved before
+/// outcome tracking have no outcome and render nothing.
+class _OutcomeBadge extends StatelessWidget {
+  final MissionOutcome outcome;
+  final String code;
+  const _OutcomeBadge({required this.outcome, required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final s = context.str;
+    final (label, color) = switch (outcome) {
+      MissionOutcome.done => (s.outcomeDoneShort, pal.success),
+      MissionOutcome.partial => (s.outcomePartialShort, pal.warning),
+      MissionOutcome.skipped => (s.outcomeSkippedShort, pal.textSecondary),
+    };
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _HistoryTile extends StatelessWidget {
   final CompletedMission entry;
   final String code;
@@ -377,6 +459,10 @@ class _HistoryTile extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
+                  if (entry.outcome != null) ...[
+                    const SizedBox(height: 6),
+                    _OutcomeBadge(outcome: entry.outcome!, code: code),
+                  ],
                 ],
               ),
             ),
@@ -502,7 +588,53 @@ class _CustomMissionTile extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 buzzIfEnabled(context);
-                final unlocked = await actions.completeCustomMission(mission);
+                // Same three-way outcome as the mission sheet, so custom
+                // missions are measured the same way.
+                final outcome = await showModalBottomSheet<MissionOutcome>(
+                  context: context,
+                  builder: (sheetContext) => SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            s.outcomeQuestion,
+                            style: TextStyle(
+                              color: context.palette.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _OutcomeOption(
+                            label: s.outcomeDone,
+                            emoji: '✅',
+                            onTap: () => Navigator.of(sheetContext)
+                                .pop(MissionOutcome.done),
+                          ),
+                          _OutcomeOption(
+                            label: s.outcomePartial,
+                            emoji: '🟡',
+                            onTap: () => Navigator.of(sheetContext)
+                                .pop(MissionOutcome.partial),
+                          ),
+                          _OutcomeOption(
+                            label: s.outcomeSkipped,
+                            emoji: '⭕️',
+                            onTap: () => Navigator.of(sheetContext)
+                                .pop(MissionOutcome.skipped),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+                // Dismissed without answering: record nothing rather than
+                // assuming a success.
+                if (outcome == null || !context.mounted) return;
+                final unlocked =
+                    await actions.completeCustomMission(mission, outcome);
                 if (!context.mounted) return;
                 // Report what was actually awarded (weekend double XP and
                 // milestone bonuses included), not the base reward.

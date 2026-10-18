@@ -14,6 +14,9 @@ enum AchievementMetric {
   categoryCount,
   freezeTokensEarned,
   savedMissions,
+  missionsDone,
+  missionsPartial,
+  missionsSkipped,
   special,
 }
 

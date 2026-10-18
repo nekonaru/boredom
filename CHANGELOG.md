@@ -1,5 +1,42 @@
 # Changelog
 
+## v2.7.0
+
+Mission outcome tracking. Until now every completion looked identical:
+the app could not tell whether you actually did the thing or just
+tapped a button, so a streak measured button presses rather than
+activity. Storage format is additive, so existing history still loads.
+
+### New features
+- **Say whether you actually did it.** The mission sheet now offers
+  "Done", "Partly done", and "Didn't do it" alongside the existing
+  accept button. One extra row, no extra tap, and no follow-up dialog
+  that could be dismissed and lose the completion.
+- **A skipped mission costs you the streak.** It is still written to
+  history so the attempt is visible, but it pays no XP and never
+  advances the streak. Pretending you showed up no longer keeps a
+  streak alive.
+- **Partial credit.** A partly done mission pays 60 percent of its XP
+  and still counts as an active day.
+- **Follow-through stat** in Stats, showing the share of tracked
+  completions you actually carried out. It shows a dash rather than
+  0 percent until you have tracked something, so no data does not look
+  like a failure.
+- **Outcome badges in History**, so you can scan what you actually
+  finished versus what you walked away from.
+- **Four new achievements**, including one for honestly reporting the
+  missions you skipped.
+- **Custom missions ask the same question** before paying out.
+
+### Optimizations
+- **Skipped attempts are excluded from "missions completed".** The
+  weekly and 30-day charts, the active-day average, the busiest
+  weekday, and the Home recap all count real activity only, so they
+  stay consistent with the total above them.
+- **Rows saved before this feature count as activity**, exactly as they
+  did before, and are left out of the follow-through figure rather than
+  being quietly counted as successes.
+
 ## v2.6.0
 
 Full-app audit pass: 20 findings, most of them making numbers on screen

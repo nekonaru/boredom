@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
+import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/share_card.dart';
@@ -33,6 +34,23 @@ class _MissionSheetState extends State<MissionSheet> {
   // in BoredomProvider.completeMission: the provider is safe from double XP
   // even without this, but this stops spam taps from visibly flickering.
   bool _isSubmitting = false;
+
+  /// Single entry point for all three outcome buttons, so the submitting
+  /// guard and the pop behave identically no matter which was tapped.
+  Future<void> _submit(
+    BuildContext context,
+    BoredomProvider provider,
+    MissionOutcome outcome,
+  ) async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+    buzzIfEnabled(context);
+    await provider.completeMission(outcome);
+    // No need to reset _isSubmitting: this widget is popped/disposed once
+    // currentMission becomes null (via the post-frame callback above), so
+    // this state never rebuilds again.
+    if (context.mounted) Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -275,16 +293,7 @@ class _MissionSheetState extends State<MissionSheet> {
                   child: ElevatedButton(
                     onPressed: _isSubmitting
                         ? null
-                        : () async {
-                            setState(() => _isSubmitting = true);
-                            buzzIfEnabled(context);
-                            await provider.completeMission();
-                            // No need to reset _isSubmitting: this widget is
-                            // popped/disposed once currentMission becomes
-                            // null (via the post-frame callback above), so
-                            // this state never rebuilds again.
-                            if (context.mounted) Navigator.of(context).pop();
-                          },
+                        : () => _submit(context, provider, MissionOutcome.done),
                     child: _isSubmitting
                         ? const SizedBox(
                             width: 20,
@@ -295,6 +304,54 @@ class _MissionSheetState extends State<MissionSheet> {
                             ),
                           )
                         : Text(s.acceptBtn),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Outcome tracking. One extra row, no extra tap: the primary
+            // button above is still "Done", and these record the honest
+            // answer without a follow-up dialog that could be dismissed
+            // and lose the completion.
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _isSubmitting
+                        ? null
+                        : () =>
+                            _submit(context, provider, MissionOutcome.partial),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: pal.textPrimary,
+                      side: BorderSide(
+                        color: pal.textSecondary.withValues(alpha: 0.3),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      s.outcomePartial,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _isSubmitting
+                        ? null
+                        : () =>
+                            _submit(context, provider, MissionOutcome.skipped),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: pal.textSecondary,
+                      side: BorderSide(
+                        color: pal.textSecondary.withValues(alpha: 0.3),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      s.outcomeSkipped,
+                      style: const TextStyle(fontSize: 13),
+                    ),
                   ),
                 ),
               ],

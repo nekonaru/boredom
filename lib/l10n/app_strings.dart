@@ -86,6 +86,19 @@ class AppStrings {
       ? '$n reroll tersisa hari ini'
       : '$n reroll${n == 1 ? '' : 's'} left today';
 
+  // Outcome tracking
+  String get outcomePartial => _pick('Partly done', 'Dikerjakan sebagian');
+  String get outcomeSkipped => _pick("Didn't do it", 'Tidak dikerjakan');
+  String get outcomeDone => _pick('Done', 'Selesai');
+  String get outcomePartialShort => _pick('Partly', 'Sebagian');
+  String get outcomeQuestion =>
+      _pick('Did you actually do it?', 'Beneran dikerjakan?');
+  String get outcomeSkippedShort => _pick('Skipped', 'Dilewati');
+  String get outcomeDoneShort => _pick('Done', 'Selesai');
+  String get mFollowThrough => _pick('Follow-through', 'Tuntas');
+  String get mFollowThroughDesc =>
+      _pick('Share of missions you actually did', 'Misi yang benar-benar dikerjakan');
+
   // Time budget labels
   String timeLabel(TimeBudget t) {
     switch (t) {

@@ -30,10 +30,12 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | 🎲 **Mission generator** | Random mission from a 55-mission catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
+| 🎚️ **Outcome tracking** | Say whether you actually did it: done, partly, or skipped. Partial pays 60 percent, skipped pays nothing and never advances your streak |
+| 📊 **Follow-through stat** | The share of tracked missions you really carried out, with a dash until you have data |
 | ⭐ **XP and levels** | Progressive curve with absurd level titles, double XP every weekend |
 | 🔥 **Streaks** | Daily streak plus longest streak, with a 1-day grace period, freeze tokens, and an at-risk warning |
 | 📜 **Quest chains** | 4 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") with a big final reward |
-| 🏆 **Achievements** | 25 achievements, progress-based and event-based (like "Night Owl") |
+| 🏆 **Achievements** | 29 achievements, progress-based and event-based (like "Night Owl") |
 | 📅 **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
 | ⭐ **Custom missions** | Create your own missions with your own XP rewards |
 | ❤️ **Favorites** | Pin catalog missions to find them again fast |

@@ -1,5 +1,44 @@
 # Changelog
 
+## v2.7.0
+
+Pelacakan hasil misi. Sampai sekarang setiap penyelesaian terlihat
+sama: aplikasi tidak bisa tahu apakah kamu benar-benar mengerjakan atau
+cuma menekan tombol, jadi streak mengukur tekanan tombol, bukan
+aktivitas. Format penyimpanan bersifat aditif, jadi riwayat lama tetap
+terbaca.
+
+### Ditambahkan
+- **Bilang apakah kamu benar-benar mengerjakannya.** Sheet misi kini
+  menampilkan "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan"
+  di sebelah tombol terima yang sudah ada. Satu baris tambahan, tanpa
+  ketukan ekstra, dan tanpa dialog lanjutan yang bisa ditutup dan
+  membuat penyelesaian hilang.
+- **Misi yang dilewati menguras streak kamu.** Tetap ditulis ke
+  riwayat supaya upanya terlihat, tapi tidak memberi XP dan tidak
+  menambah streak. Berpura-pura hadir tidak lagi menjaga streak tetap
+  hidup.
+- **Poin parsial.** Misi yang dikerjakan sebagian membayar 60 persen XP
+  dan tetap terhitung sebagai hari aktif.
+- **Statistik tuntas** di tab Statistik, menampilkan porsi penyelesaian
+  yang benar-benar kamu kerjakan. Tampilkan tanda hubung, bukan 0
+  persen, sampai ada data, supaya ketiadaan data tidak terlihat seperti
+  gagal.
+- **Lencana hasil di Riwayat**, supaya kamu bisa sekilas melihat yang
+  benar-benar selesai dan yang ditinggalkan.
+- **Empat achievement baru**, termasuk satu untuk misi yang dilaporkan
+  jujur tidak dikerjakan.
+- **Misi buatan menanyakan hal yang sama** sebelum membayar.
+
+### Ditingkatkan
+- **Upaya yang dilewati dikeluarkan dari "misi selesai".** Grafik
+  mingguan dan 30 hari, rata-rata hari aktif, hari tersibuk, dan
+  ringkasan di Beranda semuanya hanya menghitung aktivitas nyata,
+  supaya tetap konsisten dengan total di atasnya.
+- **Baris yang disimpan sebelum fitur ini tetap terhitung sebagai
+  aktivitas**, persis seperti sebelumnya, dan dikeluarkan dari angka
+  tingkat tuntas alih-alih diam-diam dihitung sebagai keberhasilan.
+
 ## v2.6.0
 
 Audit seluruh aplikasi: 20 temuan, sebagian besar membuat angka di
