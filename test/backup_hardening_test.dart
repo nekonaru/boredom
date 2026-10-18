@@ -62,13 +62,13 @@ void main() {
   group('Backup rejects hostile input', () {
     test('rejects deep nesting instead of blowing the stack', () async {
       final p = BoredomProvider();
-      final deep = '{"a":' + '[' * 5000 + ']' * 5000 + '}';
+      final deep = '{"a":${'[' * 5000}${']' * 5000}}';
       expect(await p.importBackup(deep), isFalse);
     });
 
     test('rejects an oversized payload', () async {
       final p = BoredomProvider();
-      final huge = '{"app":"boredom","pad":"${'x' * 3 * 1024 * 1024}"}';
+      final huge = '{"app":"boredom","pad":"${'x' * (3 * 1024 * 1024)}"}';
       expect(await p.importBackup(huge), isFalse);
     });
 
