@@ -1,5 +1,28 @@
 # Changelog
 
+## v2.4.3
+
+Audit ketiga, difokuskan pada sistem undo dan penghitung inbox.
+
+
+### Diperbaiki
+- **Undo bisa membuat penghitung misi tersimpan rusak secara
+  permanen.** Snapshot progress membawa `missionsSaved`, tetapi daftar
+  inbox tidak ikut tersimpan. Simpan misi setelah menyelesaikan satu,
+  lalu undo, dan penghitungnya mundur sementara daftarnya tetap berisi.
+  Setiap penghapusan berikutnya memperbesar selisihnya, dan achievement
+  berbasis jumlah simpanan bisa berhenti muncul. Keduanya kini berjalan
+  bersama.
+- **Achievement jumlah simpanan terbuka tanpa pemberitahuan.** Sempat
+  tersimpan tapi tidak pernah ditampilkan ke pengguna, berbeda dengan
+  semua achievement lain.
+- **Percobaan ulang saat startup gagal bisa menghitung pembukaan
+  aplikasi lebih dari sekali**, cukup untuk membuka achievement streak 7
+  hari tanpa bantuan apa pun. Pembukaan kini dihitung paling banyak satu
+  kali per hari.
+- **Undo bisa meninggalkan quest chain di penyimpanan** padahal aplikasi
+  sudah membuangnya dari memori. Nilai kosong kini ikut ditulis.
+
 ## v2.4.2
 
 Audit kedua, difokuskan pada perbaikan di v2.4.1 sendiri. Format

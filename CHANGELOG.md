@@ -1,5 +1,24 @@
 # Changelog
 
+## v2.4.3
+
+Third audit pass, aimed at the undo system and the inbox counter.
+
+### Fixed
+- **Undoing could permanently desync the saved-mission counter.** The
+  progress snapshot carries `missionsSaved`, but the inbox list was not
+  part of it. Save missions after completing one, then undo, and the
+  counter rolled back while the list kept its entries. Every later removal
+  made the drift worse, and the save-count achievements could stop
+  firing. Both now travel together.
+- **Save-count achievements unlocked silently.** They were persisted but
+  never surfaced to the user, unlike every other unlock.
+- **Retrying a failed startup could count one app open more than once**,
+  enough to unlock the 7-day streak achievement on its own. The open is
+  now counted at most once per day.
+- **Undo could leave a quest chain on disk** that the app had already
+  dropped from memory. The cleared value is now written through.
+
 ## v2.4.2
 
 Second audit pass, focused on the v2.4.1 fixes themselves. Additive

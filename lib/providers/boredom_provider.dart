@@ -52,6 +52,12 @@ class BoredomProvider extends ChangeNotifier {
   List<UnlockedAchievement> _undoAchievements = const [];
   QuestChainProgress? _undoChainProgress;
   DailyChallengeState? _undoDailyChallenge;
+  List<SavedMission> _undoSavedMissions = const [];
+
+  /// Day of the app open already counted by the startup load.
+  /// `retryLoad()` re-runs that load, so without this guard one real app
+  /// open could be counted twice and inflate the streak achievement.
+  DateTime? _countedAppOpenOn;
 
   bool _loaded = false;
   bool get loaded => _loaded;
@@ -119,7 +125,10 @@ class BoredomProvider extends ChangeNotifier {
 
     final now = DateTime.now();
     progress = _resetRerollsIfNewDay(progress, now);
-    progress = _handleAppOpen(progress, now);
+    if (_countedAppOpenOn == null || !_isSameDay(_countedAppOpenOn!, now)) {
+      progress = _handleAppOpen(progress, now);
+      _countedAppOpenOn = now;
+    }
 
     if (storedChallenge == null || !_isSameDay(storedChallenge.date, now)) {
       final challenge = DailyChallengeCatalog.forDate(now);
@@ -153,6 +162,10 @@ class BoredomProvider extends ChangeNotifier {
     _undoAchievements = List<UnlockedAchievement>.from(achievements);
     _undoChainProgress = questChainProgress;
     _undoDailyChallenge = dailyChallengeState;
+    // The inbox list must travel with the progress snapshot: it carries the
+    // `missionsSaved` counter inside `progress`, so restoring one without the
+    // other leaves the counter permanently out of step with the list.
+    _undoSavedMissions = List<SavedMission>.from(savedMissions);
     _undoAt = DateTime.now();
   }
 
@@ -161,6 +174,7 @@ class BoredomProvider extends ChangeNotifier {
     _undoAt = null;
     _undoChainProgress = null;
     _undoDailyChallenge = null;
+    _undoSavedMissions = const [];
   }
 
   Future<void> completeOnboarding() async {
@@ -458,6 +472,9 @@ class BoredomProvider extends ChangeNotifier {
     if (unlocked.isNotEmpty) {
       await StorageService.instance.saveAchievements(achievements);
     }
+    // Without this the save-count achievements unlock into thin air: they
+    // are persisted, but the user is never told.
+    lastUnlockedAchievements = unlocked;
     notifyListeners();
   }
 
@@ -659,13 +676,15 @@ class BoredomProvider extends ChangeNotifier {
     // Undoing a finished quest chain must bring the chain back, otherwise
     // the steps completed for it are lost while its XP is rolled back.
     questChainProgress = _undoChainProgress;
-    if (questChainProgress != null) {
-      await StorageService.instance.saveQuestChainProgress(questChainProgress);
-    }
+    // Always written, even when null, so storage cannot keep a chain the
+    // in-memory state just dropped.
+    await StorageService.instance.saveQuestChainProgress(questChainProgress);
     if (_undoDailyChallenge != null) {
       dailyChallengeState = _undoDailyChallenge;
       await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
     }
+    savedMissions = List<SavedMission>.from(_undoSavedMissions);
+    await StorageService.instance.saveSavedMissions(savedMissions);
 
     // Restore the history list to its pre-action length.
     if (history.length > _undoHistoryLength) {
