@@ -76,8 +76,12 @@ void main() {
     test('pays roughly 60 percent and still counts the day', () async {
       final p = BoredomProvider();
       armed(p);
+      final mission = p.currentMission!.mission;
+      final fullAward =
+          BoredomProvider.xpForDate(mission.baseXp, DateTime.now());
       await p.completeMission(MissionOutcome.partial);
       expect(p.progress.totalXp, greaterThan(0));
+      expect(p.progress.totalXp, lessThan(fullAward));
       expect(p.progress.streakDays, 1);
       expect(p.progress.totalMissionsCompleted, 1);
       expect(p.history.single.outcome, MissionOutcome.partial);
@@ -164,14 +168,15 @@ void main() {
 
     test('rows without an outcome load as null, not as success', () async {
       // Simulates a history row written by a version that predates
-      // outcome tracking.
+      // outcome tracking. Dated today so it lands inside the 7-day
+      // window the statistics actually look at.
       final legacy = CompletedMission(
         missionId: 'home_01',
         title: 'Old row',
         emoji: '🎯',
         categoryLabel: 'Gaming',
         xpEarned: 25,
-        completedAt: DateTime(2024, 1, 1),
+        completedAt: DateTime.now(),
       );
       final parsed = CompletedMission.fromJson(legacy.toJson());
       expect(parsed.outcome, isNull);
@@ -182,6 +187,8 @@ void main() {
       expect(p.last7DaysCounts[6], 1,
           reason: 'a day with only a legacy row still counts');
       expect(p.avgXpPerActiveDay, 25);
+      // Not counted as a success either.
+      expect(p.followThroughRate, isNull);
     });
 
     test('an outcome survives a backup round trip', () async {
@@ -211,12 +218,17 @@ void main() {
     test('a partial custom mission pays about 60 percent', () async {
       final p = BoredomProvider();
       await p.addCustomMission('Mine', 'Do my thing', 60);
+      // The base XP is doubled at the weekend, so the comparison has to
+      // be against the weekend-adjusted full award, not the raw value.
+      final fullAward =
+          BoredomProvider.xpForDate(60, DateTime.now());
       await p.completeCustomMission(
         p.customMissions.single,
         MissionOutcome.partial,
       );
       expect(p.progress.totalXp, greaterThan(0));
-      expect(p.progress.totalXp, lessThan(60));
+      expect(p.progress.totalXp, lessThan(fullAward));
+      expect(p.progress.totalXp, closeTo(fullAward * 0.6, 1.5));
       expect(p.progress.streakDays, 1);
     });
   });
