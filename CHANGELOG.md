@@ -1,5 +1,30 @@
 # Changelog
 
+## v2.4.2
+
+Second audit pass, focused on the v2.4.1 fixes themselves. Additive
+storage format, so every existing save and backup still loads.
+
+### Fixed
+- **The daily reminder only fired once.** `zonedSchedule` was used
+  without `matchDateTimeComponents`, which makes it a one-shot. Now
+  scheduled with `DateTimeComponents.time`, so it really repeats every
+  day as the setting promises.
+- **Milestone bonus never applied to daily challenges and quest
+  chains.** Those call sites passed a base value of 0, which made the
+  before/after level comparison always equal.
+- **Inbox "Roll it" could overwrite a mission already waiting to be
+  accepted.** The restore now refuses and keeps the inbox entry instead
+  of losing either one.
+- **Startup could hang on an endless spinner** if local data could not
+  be read. There is now an error screen with a retry button.
+- **Backup export produced invalid JSON** when a custom mission
+  contained a tab or carriage return, because only backslash, quote,
+  and newline were escaped.
+- **Backup import could be crashed by pasted input.** Payloads are now
+  capped in size and nesting depth, and malformed unicode escapes and
+  numbers are rejected instead of throwing out of the parser.
+
 ## v2.4.1
 
 Bug-fix release found by a full code audit of v2.4.0. No format changes,

@@ -45,6 +45,7 @@ class _AppGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loaded = context.select<BoredomProvider, bool>((p) => p.loaded);
+    final error = context.select<BoredomProvider, String?>((p) => p.loadError);
     if (!loaded) {
       final pal = context.palette;
       return Scaffold(
@@ -54,10 +55,65 @@ class _AppGate extends StatelessWidget {
         ),
       );
     }
+    if (error != null) return _LoadFailedScreen(message: error);
     final seenOnboarding = context.select<BoredomProvider, bool>(
       (p) => p.onboardingDone,
     );
     if (!seenOnboarding) return const OnboardingScreen();
     return const RootShell();
+  }
+}
+
+/// Shown when local data could not be read at startup. Previously this
+/// state was an endless spinner with no way out.
+class _LoadFailedScreen extends StatelessWidget {
+  final String message;
+  const _LoadFailedScreen({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Scaffold(
+      backgroundColor: pal.background,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('😵', style: TextStyle(fontSize: 48)),
+                const SizedBox(height: 16),
+                Text(
+                  'Could not read your saved data.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: pal.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Your progress is still on this phone. Try again, and if it keeps '
+                  'failing, restart the app.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: pal.textSecondary,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: () => context.read<BoredomProvider>().retryLoad(),
+                  child: const Text('Try again'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

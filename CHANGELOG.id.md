@@ -1,5 +1,31 @@
 # Changelog
 
+## v2.4.2
+
+Audit kedua, difokuskan pada perbaikan di v2.4.1 sendiri. Format
+penyimpanan tetap aditif, jadi semua simpanan dan cadangan lama tetap
+terbaca.
+
+### Diperbaiki
+- **Pengingat harian hanya berbunyi sekali.** `zonedSchedule` dipakai
+  tanpa `matchDateTimeComponents`, yang membuatnya sekali jalan. Kini
+  dijadwalkan dengan `DateTimeComponents.time`, jadi benar-benar
+  berulang setiap hari seperti yang dijanjikan pengaturan.
+- **Bonus milestone tidak pernah berlaku untuk tantangan harian dan
+  quest chain.** Dua pemanggilan itu mengirim nilai dasar 0, sehingga
+  perbandingan level sebelum dan sesudah selalu sama.
+- **"Mulai kerjakan" di Kotak Masuk bisa menimpa misi yang masih
+  menunggu diterima.** Pemulihan kini ditolak dan entri inbox
+  dipertahankan, jadi tidak ada yang hilang.
+- **Saat aplikasi dibuka bisa macet di spinner tanpa akhir** jika data
+  lokal tidak terbaca. Kini ada layar error dengan tombol coba lagi.
+- **Ekspor cadangan menghasilkan JSON tidak valid** ketika misi buatan
+  memuat tab atau carriage return, karena hanya backslash, kutip, dan
+  newline yang di-escape.
+- **Impor cadangan bisa dihancurkan oleh input tempelan.** Ukuran dan
+  kedalaman nesting kini dibatasi, serta escape unicode dan angka rusak
+  ditolak alih-alih melempar keluar dari parser.
+
 ## v2.4.1
 
 Rilis perbaikan bug dari audit kode menyeluruh terhadap v2.4.0. Tidak ada

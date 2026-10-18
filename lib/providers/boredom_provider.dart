@@ -56,6 +56,12 @@ class BoredomProvider extends ChangeNotifier {
   bool _loaded = false;
   bool get loaded => _loaded;
 
+  /// Set when startup could not read local data. The gate shows a retry
+  /// instead of spinning forever.
+  String? loadError;
+
+  bool get failedToLoad => loadError != null;
+
   bool onboardingDone = true;
   bool hapticsEnabled = true;
 
@@ -64,6 +70,17 @@ class BoredomProvider extends ChangeNotifier {
   bool lastFreezeUsed = false;
 
   Future<void> init() async {
+    try {
+      await _load();
+    } catch (e) {
+      // Without this the gate would spin forever on unreadable storage.
+      loadError = '$e';
+    }
+    _loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> _load() async {
     final storage = StorageService.instance;
     // Independent reads run concurrently so first paint comes sooner.
     final results = await Future.wait([
@@ -114,13 +131,18 @@ class BoredomProvider extends ChangeNotifier {
     }
 
     await storage.saveProgress(progress);
-    _loaded = true;
-    notifyListeners();
+    loadError = null;
 
     // Notifications are opt-in: only (re)schedule when already enabled.
     if (reminderEnabled) {
       await ReminderService.instance.scheduleDaily(reminderHour, reminderMinute);
     }
+  }
+
+  /// Retries a failed startup load.
+  Future<void> retryLoad() async {
+    loadError = null;
+    await init();
   }
 
   /// Takes the full pre-action snapshot used by undo across every action
@@ -245,11 +267,12 @@ class BoredomProvider extends ChangeNotifier {
     return level;
   }
 
-  /// Total milestone XP for one completion, or 0 when no boundary was
-  /// crossed. Passing the level before and after the gain matters: paying
-  /// whenever the resulting level is a multiple of ten would repeat the
-  /// bonus on every completion spent sitting on that level.
+  /// Milestone XP for adding [baseXp] to [totalXp], or 0 when no 10-level
+  /// boundary is crossed. Passing the level before and after the gain
+  /// matters: paying whenever the resulting level is a multiple of ten
+  /// would repeat the bonus on every completion spent sitting there.
   static int milestoneXpFor(int totalXp, int baseXp, DateTime now) {
+    if (baseXp <= 0) return 0;
     final before = milestoneLevel(totalXp, 0, now);
     final after = milestoneLevel(totalXp, baseXp, now);
     if (after == before) return 0;
@@ -459,6 +482,9 @@ class BoredomProvider extends ChangeNotifier {
   Future<MissionInstance?> restoreSavedMission(String missionId) async {
     final index = savedMissions.indexWhere((m) => m.missionId == missionId);
     if (index < 0) return null;
+    // Never clobber a mission that is already waiting to be accepted, and
+    // never drop the inbox entry either: the user would lose both.
+    if (currentMission != null) return null;
     final mission = missionById(missionId);
     if (mission == null) {
       // Stale entry (catalog changed): drop it instead of showing nothing.
@@ -981,7 +1007,11 @@ class BoredomProvider extends ChangeNotifier {
     await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
 
     final gainedXp = xpForDate(challenge.rewardXp, DateTime.now()) +
-        milestoneXpFor(progress.totalXp, 0, DateTime.now());
+        milestoneXpFor(
+          progress.totalXp,
+          challenge.rewardXp,
+          DateTime.now(),
+        );
     progress = progress.copyWith(totalXp: progress.totalXp + gainedXp);
     await StorageService.instance.saveProgress(progress);
     lastXpGained = gainedXp;
@@ -1027,7 +1057,7 @@ class BoredomProvider extends ChangeNotifier {
 
     if (nextIndex >= chain.steps.length) {
       final gainedXp = xpForDate(chain.rewardXp, DateTime.now()) +
-          milestoneXpFor(progress.totalXp, 0, DateTime.now());
+          milestoneXpFor(progress.totalXp, chain.rewardXp, DateTime.now());
       progress = progress.copyWith(
         totalXp: progress.totalXp + gainedXp,
         questChainsCompleted: progress.questChainsCompleted + 1,
@@ -1177,7 +1207,8 @@ class _StreakResolution {
   });
 }
 
-String _encodeJson(Map<String, dynamic> data) {  final buffer = StringBuffer('{');
+String _encodeJson(Map<String, dynamic> data) {
+  final buffer = StringBuffer('{');
   var first = true;
   void writePair(String key, String valueJson) {
     if (!first) buffer.write(',');
@@ -1194,7 +1225,19 @@ String _encodeJson(Map<String, dynamic> data) {  final buffer = StringBuffer('{'
 
 String _valueToJson(Object? value) {
   if (value == null) return 'null';
-  if (value is String) return '"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll('\n', '\\n')}"';
+  // Escapes the full JSON control-character set. Tabs and carriage returns
+  // must be escaped too: a raw control character makes the export invalid
+  // JSON, which any third-party parser (or a chat app that normalizes
+  // pasted text) would reject.
+  if (value is String) {
+    final escaped = value
+        .replaceAll('\\', '\\\\')
+        .replaceAll('"', '\\"')
+        .replaceAll('\n', '\\n')
+        .replaceAll('\r', '\\r')
+        .replaceAll('\t', '\\t');
+    return '"$escaped"';
+  }
   if (value is num || value is bool) return '$value';
   if (value is Map) {
     final parts = <String>[];
@@ -1205,7 +1248,15 @@ String _valueToJson(Object? value) {
   return '"$value"';
 }
 
+/// Guards against pathological pasted input: a huge string, or deeply
+/// nested arrays that would recurse until the stack blows.
+const int _kMaxBackupChars = 2 * 1024 * 1024;
+const int _kMaxJsonDepth = 64;
+
 Map<String, dynamic> _decodeJson(String text) {
+  if (text.length > _kMaxBackupChars) {
+    throw const FormatException('Backup too large');
+  }
   final result = _JsonReader(text).readValue();
   if (result is Map<String, dynamic>) return result;
   throw const FormatException('Not a JSON object');
@@ -1216,6 +1267,7 @@ Map<String, dynamic> _decodeJson(String text) {
 class _JsonReader {
   final String text;
   int pos = 0;
+  int _depth = 0;
   _JsonReader(this.text);
 
   Object? readValue() {
@@ -1231,12 +1283,23 @@ class _JsonReader {
     return _readNumber();
   }
 
+  /// Guards the recursive descent against stack exhaustion.
+  void _enter() {
+    if (++_depth > _kMaxJsonDepth) {
+      throw const FormatException('Backup nested too deeply');
+    }
+  }
+
+  void _exit() => _depth--;
+
   Map<String, dynamic> _readObject() {
+    _enter();
     pos++; // {
     final map = <String, dynamic>{};
     _skipWs();
     if (_peek() == '}') {
       pos++;
+      _exit();
       return map;
     }
     while (true) {
@@ -1253,6 +1316,7 @@ class _JsonReader {
       }
       if (c == '}') {
         pos++;
+        _exit();
         return map;
       }
       throw const FormatException('Bad object');
@@ -1260,11 +1324,13 @@ class _JsonReader {
   }
 
   List<dynamic> _readArray() {
+    _enter();
     pos++; // [
     final list = <dynamic>[];
     _skipWs();
     if (_peek() == ']') {
       pos++;
+      _exit();
       return list;
     }
     while (true) {
@@ -1277,6 +1343,7 @@ class _JsonReader {
       }
       if (c == ']') {
         pos++;
+        _exit();
         return list;
       }
       throw const FormatException('Bad array');
@@ -1306,8 +1373,13 @@ class _JsonReader {
           case '/':
             out.write('/');
           case 'u':
+            if (pos + 4 > text.length) {
+              throw const FormatException('Bad unicode escape');
+            }
             final hex = text.substring(pos, pos + 4);
-            out.write(String.fromCharCode(int.parse(hex, radix: 16)));
+            final code = int.tryParse(hex, radix: 16);
+            if (code == null) throw const FormatException('Bad unicode escape');
+            out.write(String.fromCharCode(code));
             pos += 4;
           default:
             out.write(e);
@@ -1332,7 +1404,9 @@ class _JsonReader {
     while (pos < text.length && '-+0123456789.eE'.contains(text[pos])) {
       pos++;
     }
-    return num.parse(text.substring(start, pos));
+    final parsed = num.tryParse(text.substring(start, pos));
+    if (parsed == null) throw const FormatException('Bad number');
+    return parsed;
   }
 
   void _skipWs() {

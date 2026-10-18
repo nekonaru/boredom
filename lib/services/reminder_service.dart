@@ -64,7 +64,11 @@ class ReminderService {
     }
   }
 
-  /// Schedules (or reschedules) one repeating daily reminder.
+  /// Schedules (or reschedules) the daily reminder.
+  ///
+  /// `matchDateTimeComponents: DateTimeComponents.time` is what makes this
+  /// repeat every day. Without it `zonedSchedule` is a ONE-SHOT: the
+  /// notification fires once and never comes back.
   Future<void> scheduleDaily(int hour, int minute) async {
     await init();
     try {
@@ -83,6 +87,7 @@ class ReminderService {
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
       );
     } catch (e) {
       debugPrint('ReminderService schedule failed: $e');
