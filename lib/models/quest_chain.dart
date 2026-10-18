@@ -1,3 +1,5 @@
+import 'mission.dart';
+
 class QuestStep {
   final String title;
   final String description;
@@ -11,8 +13,6 @@ class QuestStep {
     this.descriptionId,
   });
 }
-
-import 'mission.dart';
 
 class QuestChain {
   final String id;

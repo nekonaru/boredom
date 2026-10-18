@@ -498,7 +498,7 @@ class ProfileScreen extends StatelessWidget {
     BuildContext context,
     AppStrings s,
     BoredomProvider provider,
-  ) {
+  ) async {
     final pal = context.palette;
     // Disposed after the dialog closes. The controller used to leak on
     // every open.

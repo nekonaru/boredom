@@ -146,9 +146,16 @@ class StorageService {
     }
   }
 
-  Future<void> saveDailyChallengeState(DailyChallengeState state) async {
+  /// Pass null to clear the stored challenge. Without this, an import that
+  /// carries no daily challenge left yesterday's value on disk and it
+  /// reappeared on the next launch.
+  Future<void> saveDailyChallengeState(DailyChallengeState? state) async {
     final p = await prefs;
-    await p.setString(_kDailyChallenge, jsonEncode(state.toJson()));
+    if (state == null) {
+      await p.remove(_kDailyChallenge);
+    } else {
+      await p.setString(_kDailyChallenge, jsonEncode(state.toJson()));
+    }
   }
 
   Future<QuestChainProgress?> loadQuestChainProgress() async {

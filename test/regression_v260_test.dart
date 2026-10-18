@@ -197,8 +197,7 @@ void main() {
       expect(recorder.minWidth, greaterThan(1.0));
     });
 
-    test('a canvas too narrow for any gap draws nothing rather than
-        throwing', () {
+    test('a canvas too narrow for any gap draws nothing', () {
       final recorder = _RecordingCanvas();
       final painter = ActivityBarsPainter(
         counts: List<int>.filled(30, 1),
