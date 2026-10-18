@@ -75,7 +75,7 @@ class AppStrings {
   String energyLabel(EnergyLevel e) {
     switch (e) {
       case EnergyLevel.low:
-        return _pick('Low', 'Low');
+        return _pick('Low', 'Lemah');
       case EnergyLevel.medium:
         return _pick('Medium', 'Sedang');
       case EnergyLevel.high:

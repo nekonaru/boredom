@@ -59,7 +59,7 @@ extension MissionCategoryX on MissionCategory {
       case MissionCategory.photography:
         return 'Fotografi';
       case MissionCategory.outdoor:
-        return 'Outdoor';
+        return 'Alam Terbuka';
       case MissionCategory.social:
         return 'Sosial';
       case MissionCategory.selfImprovement:

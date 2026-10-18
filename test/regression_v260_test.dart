@@ -5,6 +5,7 @@ import 'package:boredom/l10n/app_strings.dart';
 import 'package:boredom/models/mission.dart';
 import 'package:boredom/models/user_progress.dart';
 import 'package:boredom/providers/boredom_provider.dart';
+import 'package:boredom/models/daily_challenge.dart';
 import 'package:boredom/services/daily_challenge_catalog.dart';
 import 'package:boredom/services/quest_chain_catalog.dart';
 import 'package:boredom/services/storage_service.dart';
@@ -43,7 +44,9 @@ void main() {
 
   group('Category labels are fully translated', () {
     test('no category falls back to its English label', () {
-      for (final c in MissionCategory.values) {
+      // "Chaos" is deliberately left alone: it is a real loanword in
+      // Indonesian, so an identical string is correct, not a leak.
+      for (final c in MissionCategory.values.where((c) => c != MissionCategory.chaos)) {
         expect(
           c.labelFor('id'),
           isNot(c.label),
@@ -58,7 +61,9 @@ void main() {
     final id = const AppStrings('id');
 
     test('mood, location and energy labels differ by language', () {
-      for (final m in Mood.values) {
+      // Mood.normal is "Normal" in both languages, which is correct
+      // Indonesian rather than a missing translation.
+      for (final m in Mood.values.where((m) => m != Mood.normal)) {
         expect(id.moodLabel(m), isNot(en.moodLabel(m)), reason: 'mood $m');
       }
       for (final l in LocationType.values) {
@@ -205,7 +210,9 @@ void main() {
         inactive: Colors.blue,
         empty: Colors.grey,
       );
-      painter.paint(recorder, const Size(200, 120));
+      // 30 bars at a 2px gap need 58px of gaps alone, so 40px leaves
+      // nothing for the bars themselves.
+      painter.paint(recorder, const Size(40, 120));
       expect(recorder.drawn, isEmpty);
     });
 
@@ -238,15 +245,42 @@ void main() {
   });
 
   group('Backup import clears state it does not restore', () {
-    test('a null daily challenge is written through, not left stale',
+    test('a null challenge reaches storage instead of leaving a stale one',
         () async {
-      final source = BoredomProvider();
-      await source.init();
-      await source.completeDailyChallenge();
+      // Directly at the storage layer, because that is where the defect
+      // was: the old signature could not accept null, so a clear was
+      // impossible and yesterday's challenge stayed on disk.
+      final storage = StorageService.instance;
+      await storage.saveDailyChallengeState(
+        DailyChallengeState(
+          date: DateTime(2020, 1, 1),
+          challengeId: 'dc_01',
+          completed: true,
+        ),
+      );
+      expect(await storage.loadDailyChallengeState(), isNotNull);
 
-      final backup = await source.exportBackup();
-      // Strip the challenge out, the way a payload from an older build
-      // or a partially written file could.
+      await storage.saveDailyChallengeState(null);
+      expect(await storage.loadDailyChallengeState(), isNull);
+    });
+
+    test('an import without a challenge leaves no stale one in storage',
+        () async {
+      final storage = StorageService.instance;
+      // Stand in for what a payload from an older build can look like:
+      // a completed challenge sitting in storage, then an import that
+      // carries no challenge at all.
+      await storage.saveDailyChallengeState(
+        DailyChallengeState(
+          date: DateTime(2020, 1, 1),
+          challengeId: 'dc_01',
+          completed: true,
+        ),
+      );
+
+      final p = BoredomProvider();
+      await p.init();
+      final backup = await p.exportBackup();
       final stripped = backup.replaceFirst(
         RegExp(r'"dailyChallenge":\{[^}]*\}'),
         '"dailyChallenge":null',
@@ -257,10 +291,15 @@ void main() {
       expect(await fresh.importBackup(stripped), isTrue);
       expect(fresh.dailyChallengeState, isNull);
 
-      // Reload from disk: the stale challenge must not come back.
-      final reloaded = BoredomProvider();
-      await reloaded.init();
-      expect(reloaded.dailyChallengeState, isNull);
+      // The stale 2020 challenge must be gone from disk, not just from
+      // memory. init() would legitimately mint a fresh challenge for
+      // today, so assert the stored date is not the stale one.
+      final stored = await storage.loadDailyChallengeState();
+      expect(
+        stored == null || stored.date.year != 2020,
+        isTrue,
+        reason: 'the stale challenge survived the import',
+      );
     });
   });
 }
