@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:boredom/models/mission.dart';
+import 'package:boredom/models/user_progress.dart';
 import 'package:boredom/providers/boredom_provider.dart';
 import 'package:boredom/services/mission_catalog.dart';
 import 'package:boredom/services/storage_service.dart';
@@ -113,17 +114,22 @@ void main() {
   });
 
   group('Milestone bonus for non-mission rewards', () {
-    test('now actually pays on a daily challenge crossing level 10', () {
-      // 450 XP is the threshold for level 10; a 150 XP challenge from just
-      // below it must cross it and pay.
-      final justBelow = 449;
+    // Derived from the real curve instead of hardcoded XP, so this keeps
+    // working if the level formula ever changes.
+    final level10Threshold = UserProgress.xpNeededForLevel(10);
+
+    test('now actually pays when a daily challenge crosses level 10', () {
+      final justBelow = level10Threshold - 100;
+      // Sanity: this XP must be level 9, or the test proves nothing.
+      expect(UserProgress(totalXp: justBelow).level, 9);
+
       expect(
         BoredomProvider.milestoneXpFor(
           justBelow,
           150,
           DateTime(2026, 1, 5),
         ),
-        30,
+        BoredomProvider.milestoneBonus(10),
       );
     });
 
@@ -132,10 +138,26 @@ void main() {
         BoredomProvider.milestoneXpFor(100, 20, DateTime(2026, 1, 5)),
         0,
       );
+      // Sitting exactly on the boundary and gaining more pays nothing.
+      expect(
+        BoredomProvider.milestoneXpFor(
+          level10Threshold,
+          20,
+          DateTime(2026, 1, 5),
+        ),
+        0,
+      );
     });
 
     test('a zero-value reward can never claim a milestone', () {
-      expect(BoredomProvider.milestoneXpFor(449, 0, DateTime(2026, 1, 5)), 0);
+      expect(
+        BoredomProvider.milestoneXpFor(
+          level10Threshold - 100,
+          0,
+          DateTime(2026, 1, 5),
+        ),
+        0,
+      );
     });
   });
 }
