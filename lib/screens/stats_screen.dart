@@ -105,7 +105,7 @@ class StatsScreen extends StatelessWidget {
                 Expanded(
                   child: _MetricCard(
                     label: s.mFollowThroughDesc,
-                    value: '${tracked}',
+                    value: '$tracked',
                     emoji: '📋',
                   ),
                 ),

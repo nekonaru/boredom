@@ -165,7 +165,7 @@ void main() {
     test('rows without an outcome load as null, not as success', () async {
       // Simulates a history row written by a version that predates
       // outcome tracking.
-      final legacy = const CompletedMission(
+      final legacy = CompletedMission(
         missionId: 'home_01',
         title: 'Old row',
         emoji: '🎯',
