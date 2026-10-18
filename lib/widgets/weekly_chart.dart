@@ -102,6 +102,17 @@ class ActivityBarsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant ActivityBarsPainter oldDelegate) =>
-      oldDelegate.counts != counts;
+  bool shouldRepaint(covariant ActivityBarsPainter oldDelegate) {
+    // List `==` is identity, so comparing the lists directly only ever said
+    // "changed" for the wrong reason. Compare element by element, and
+    // compare the colors too: without them, switching theme or accent kept
+    // the old bar colors painted.
+    if (oldDelegate.counts.length != counts.length) return true;
+    for (var i = 0; i < counts.length; i++) {
+      if (oldDelegate.counts[i] != counts[i]) return true;
+    }
+    return oldDelegate.active != active ||
+        oldDelegate.inactive != inactive ||
+        oldDelegate.empty != empty;
+  }
 }

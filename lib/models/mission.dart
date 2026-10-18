@@ -219,6 +219,17 @@ class Mission {
   });
 
   String get difficultyStars => '⭐' * difficulty + '☆' * (5 - difficulty);
+
+  /// Localized title. Indonesian falls back to English when the catalog
+  /// entry has no translation yet.
+  String titleFor(String code) =>
+      (code == 'id' && titleId != null && titleId!.isNotEmpty) ? titleId! : title;
+
+  /// Localized description, with the same fallback rule as [titleFor].
+  String descriptionFor(String code) =>
+      (code == 'id' && descriptionId != null && descriptionId!.isNotEmpty)
+          ? descriptionId!
+          : description;
 }
 
 /// A generated mission for this session, wrapped with a running number

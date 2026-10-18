@@ -140,11 +140,16 @@ class _MissionSheetState extends State<MissionSheet> {
                     final origin = box == null
                         ? null
                         : box.localToGlobal(Offset.zero) & box.size;
+                    // The sheet is shown before the mission is accepted, so
+                    // this is the XP the mission is worth *now*: on a
+                    // weekend the base value would understate it by half.
+                    final projectedXp =
+                        BoredomProvider.xpForDate(mission.baseXp, DateTime.now());
                     final ok = await ShareCard.shareMission(
                       emoji: mission.emoji,
                       title: title,
                       description: description,
-                      xp: mission.baseXp,
+                      xp: projectedXp,
                       level: provider.progress.level,
                       levelTitle: provider.progress.levelTitle,
                       accent: pal.accent,
@@ -157,7 +162,7 @@ class _MissionSheetState extends State<MissionSheet> {
                       await ShareCard.shareText(
                         s.shareText(
                           title,
-                          mission.baseXp,
+                          projectedXp,
                           provider.progress.level,
                         ),
                         origin: origin,

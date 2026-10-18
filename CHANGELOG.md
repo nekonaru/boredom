@@ -1,5 +1,34 @@
 # Changelog
 
+## v2.5.0
+
+Closes the four long-standing issues left open by the earlier audits.
+No storage format change, so every existing save and backup still loads.
+
+### New features
+- **History now speaks your language.** Entries used to show the English
+  title and category frozen at the moment of completion, so an
+  Indonesian user got an English list. Titles and categories are now
+  resolved from the catalog in the active language.
+- **History search matches what you see.** It searched the stored
+  English text, so searching for the Indonesian word matched nothing on
+  screen.
+
+### Optimizations
+- **Custom missions now appear in the stats breakdown.** They were
+  always counted in the totals and recorded per category, but their row
+  was filtered out, so the category bars added up to less than the
+  "missions completed" number above them.
+- **The activity chart repaints on theme and accent changes.** It
+  compared only the bar counts, so switching light/dark or accent kept
+  the old bar colors on screen. It also compared lists by identity,
+  which meant identical data still counted as a change.
+
+### Bug fixes
+- **The share card understated weekend XP.** The mission sheet opens
+  before a mission is accepted, so the card showed the base value: half
+  of what the mission is actually worth on a weekend.
+
 ## v2.4.3
 
 Third audit pass, aimed at the undo system and the inbox counter.

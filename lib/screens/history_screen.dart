@@ -42,9 +42,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final filtered = q.isEmpty
         ? history
         : history
+            // Search what the row actually shows, otherwise an Indonesian
+            // search for "koding" would match nothing on screen.
             .where((e) =>
-                e.title.toLowerCase().contains(q) ||
-                e.categoryLabel.toLowerCase().contains(q))
+                _titleFor(e, actions, code).toLowerCase().contains(q) ||
+                _categoryFor(e, actions, code).toLowerCase().contains(q))
             .toList();
     final favoriteMissions = MissionCatalog.all
         .where((m) => favorites.contains(m.id))
@@ -202,7 +204,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final entry = filtered[index];
-                  return _HistoryTile(entry: entry, code: code);
+                  return _HistoryTile(
+                    entry: entry,
+                    code: code,
+                    actions: actions,
+                  );
                 },
               ),
             ),
@@ -299,10 +305,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 }
 
+/// Resolves a history entry's title in the active language.
+///
+/// History stores the English text at the moment of completion, so an
+/// Indonesian user used to see an English list even with the app set to
+/// Indonesian. The catalog is the source of truth, and only entries that
+/// no longer resolve (custom missions, or missions dropped from the
+/// catalog) fall back to the stored string.
+String _titleFor(CompletedMission entry, BoredomProvider provider, String code) =>
+    provider.missionById(entry.missionId)?.titleFor(code) ?? entry.title;
+
+/// Same resolution rule as [_titleFor], for the category line.
+String _categoryFor(
+  CompletedMission entry,
+  BoredomProvider provider,
+  String code,
+) =>
+    provider.missionById(entry.missionId)?.category.labelFor(code) ??
+    entry.categoryLabel;
+
 class _HistoryTile extends StatelessWidget {
   final CompletedMission entry;
   final String code;
-  const _HistoryTile({required this.entry, required this.code});
+  final BoredomProvider actions;
+  const _HistoryTile({
+    required this.entry,
+    required this.code,
+    required this.actions,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -324,7 +354,7 @@ class _HistoryTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entry.title,
+                    _titleFor(entry, actions, code),
                     style: TextStyle(
                       color: pal.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -333,7 +363,7 @@ class _HistoryTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${entry.categoryLabel} · ${formatHistoryDate(entry.completedAt, code: code)}',
+                    '${_categoryFor(entry, actions, code)} · ${formatHistoryDate(entry.completedAt, code: code)}',
                     style: TextStyle(
                       color: pal.textSecondary,
                       fontSize: 12,

@@ -1,5 +1,35 @@
 # Changelog
 
+## v2.5.0
+
+Menutup empat masalah lama yang masih tersisa dari audit sebelumnya.
+Format penyimpanan tidak berubah, jadi semua simpanan dan cadangan lama
+tetap terbaca.
+
+### Ditambahkan
+- **Riwayat sekarang mengikuti bahasa aktif.** Entri dulu menampilkan
+  judul dan kategori versi Inggris yang dibekukan saat misi diselesaikan,
+  jadi pengguna Bahasa Indonesia mendapat daftar berbahasa Inggris. Judul
+  dan kategori kini diambil dari katalog sesuai bahasa aktif.
+- **Pencarian riwayat sesuai dengan yang tampil.** Sempat mencari teks
+  Inggris yang tersimpan, sehingga mencari kata berbahasa Indonesia tidak
+  menemukan apa pun yang terlihat di layar.
+
+### Ditingkatkan
+- **Misi buatan kini muncul di rincian statistik.** Sempat selalu
+  terhitung di total dan terekam per kategori, tapi barisnya disembunyikan,
+  sehingga jumlah batangnya tidak sama dengan angka "misi selesai" di atas
+  sana.
+- **Grafik aktivitas mewarnai ulang saat tema atau aksen diganti.**
+  Sempat hanya membandingkan jumlah batangnya, sehingga mengganti terang/
+  gelap atau aksen menyisakan warna lama di layar. Daftar juga dibandingkan
+  berdasarkan identitas, sehingga data yang identik tetap dianggap berubah.
+
+### Diperbaiki
+- **Kartu berbagi menampilkan XP akhir pekan yang terlalu kecil.** Misi
+  terbuka sebelum misi diterima, jadi kartu menampilkan nilai dasar:
+  separuh dari yang sebenarnya bernilai di akhir pekan.
+
 ## v2.4.3
 
 Audit ketiga, difokuskan pada sistem undo dan penghitung inbox.
