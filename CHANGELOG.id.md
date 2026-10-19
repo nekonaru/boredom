@@ -1,9 +1,52 @@
 # Changelog
 
-## v3.0.1
+## v3.0.2
 
-Tinjau ulang semua yang rilis antara v2.5.0 dan v3.0.0, khusus mencari
-cacat yang saya sebabkan sendiri.
+UI/UX dan optimasi setelah review v3.0.0–v3.0.1. Tidak ada perubahan
+format penyimpanan, jadi semua cadangan tetap kompatibel.
+
+### Ditingkatkan
+- **Design system bersama.** `AppKit` di `lib/widgets/kit.dart`
+  mengkonsolidasikan spasi, radius, kartu, tombol, dan kartu metrik
+  yang sebelumnya dicopy-paste antar layar. Tidak ada lagi angka ajaib
+  yang berserak.
+- **Home lebih rapi.** Tombol utama "Misi Bosan" dan "Acak
+  Sebebasnya" sekarang lebar penuh dengan warna yang membedakan.
+  Toggle Quick Wins dan Mode Chaos berbentuk bar yang konsisten.
+- **Mission Sheet lebih bersih.** Header tombol 4x, judul dan deskripsi
+  di tengah, serta grid hasil yang terbaca di layar kecil dan teks besar.
+- **Stats & Achievements pakai kartu metrik yang sama**, dan
+  Achievements sekarang pakai `SliverGrid` yang lebih efisien daripada
+  `GridView(shrinkWrap: true)`.
+- **History lookup O(1).** Resolusi judul dan kategori riwayat
+  sebelumnya memindai katalog (55 entri) per baris per build — sekarang
+  pakai `Map` langsung.
+- **Weekly Insights refresh saat hari berganti** melalui
+  `context.watch` provider, bukan hanya saat ada penyelesaian baru.
+- **Tidak ada spasi kosong mati** di bawah Home untuk pemain baru (spasi
+  dipindah ke dalam WeeklyInsights).
+
+### Diperbaiki
+- **Toast "+0 XP" untuk misi yang dilewati** — sekarang bilang dengan
+  jujur bahwa tidak ada XP dan streak tidak berubah.
+- **Ketuk ganda pada quest chain membayar dua kali** — langkah sekarang
+  diklaim sebelum proses async, dengan guard in-flight.
+- **Timer tengah malam tidak lagi menumpuk** setiap kali aplikasi
+  dibuka kembali (tidak ada lagi N timer hidup setelah N resume).
+- **ID tantangan harian dari cadangan divalidasi** — ID yang tidak ada
+  dalam katalog build ini dibuang alih-alih diam-diam menimpa arc lain.
+- **Riwayat di memori sekarang ikut mematuhi batas 1000 entri** seperti
+  penyimpanan, jadi laporan "menampilkan N dari M" tidak lagi melanggar.
+- **Filter riwayat dipindah ke modul murni** (`history_filter.dart`)
+  dengan 16 test — sebelumnya method privat di widget yang mustahil
+  diuji.
+
+### Optimasi
+- **Analyze bersih, 0 warning/error.** Semua perbaikan tipe dan
+  parameter dari review ulang v3.0.0 diterapkan.
+- **174 test hijau** (termasuk 16 test baru history filter).
+
+## v3.0.1
 
 ### Diperbaiki
 - **Melaporkan misi sebagai "tidak dikerjakan" menghukum dua kali.**

@@ -1,5 +1,50 @@
 # Changelog
 
+## v3.0.2
+
+UI/UX dan optimasi setelah review v3.0.0–v3.0.1. Tidak ada perubahan
+format penyimpanan, jadi semua cadangan tetap kompatibel.
+
+### Ditingkatkan
+- **Design system bersama.** `AppKit` di `lib/widgets/kit.dart` mengkonsolidasikan
+  spacing, radius, card, tombol, dan metrik card yang sebelumnya
+  dicopy-paste antara layar. Tidak ada lagi angka ajaib berserak.
+- **Home lebih rapi.** CTA "Misi Bosan" dan "Acak Sebebasnya" sekarang
+  lebar penuh dengan warna yang membedakan; toggle Quick Wins dan Mode
+  Chaos berbentuk bar konsisten.
+- **Mission Sheet lebih bersih.** Header tombol 4x, judul/deskripsi
+  tengah, dan grid outcomes yang terbaca di layar kecil & teks besar.
+- **Stats & Achievements pakai metrik card yang sama**, dan Achievements
+  sekarang pakai `SliverGrid` alih-alih `GridView(shrinkWrap: true)` yang
+  lebih efisien.
+- **History lookup O(1).** Resolusi judul/kategori riwayat sebelumnya
+  memindai katalog (55 entri) per baris per build — sekarang pakai `Map`
+  langsung.
+- **Weekly Insights refresh saat hari berganti** melalui `context.watch`
+  provider, bukan hanya saat ada penyelesaian baru.
+- **Tidak ada spasi kosong mati** di bawah Home untuk pemain baru (gap
+  pindah ke dalam WeeklyInsights).
+
+### Diperbaiki
+- **Toast "+0 XP" untuk misi yang dilewati** — sekarang bilang dengan
+  jujur bahwa tidak ada XP dan streak tidak berubah.
+- **Ketuk-ganda pada quest chain membayar dua kali** — langkah sekarang
+  diklaim sebelum proses async, dengan guard in-flight.
+- **Timer tengah malam tidak lagi menumpuk** setiap kali aplikasi
+  dibuka kembali (tidak ada lagi N timer hidup setelah N resume).
+- **ID tantangan harian dari cadangan divalidasi** — ID yang tidak ada
+  dalam katalog build ini dibuang alih-alih diam-diam menimpa arc lain.
+- **Riwayat di memori sekarang ikut mematuhi batas 1000 entri** seperti
+  penyimpanan, jadi laporan "menampilkan N dari M" tidak lagi melanggar.
+- **Filter riwayat dipindah ke modul murni** (`history_filter.dart`)
+  dengan 16 test — sebelumnya method privat di widget yang mustahil
+  diuji.
+
+### Optimasi
+- **Analyze bersih, 0 warning/error.** Semua perbaikan type dan tipe
+  parameter dari review ulang v3.0.0 diterapkan.
+- **174 test hijau** (termasuk 16 test baru history filter).
+
 ## v3.0.1
 
 Self-review of everything shipped between v2.5.0 and v3.0.0, looking
