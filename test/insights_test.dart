@@ -63,9 +63,10 @@ void main() {
     });
 
     test('measures growth against the previous 7 days', () {
+      // Current window is 09 Jun to 15 Jun, previous is 02 Jun to 08 Jun.
       final rows = [
         ...List.generate(4, (i) => at(DateTime(2026, 6, 15, 10, i))),
-        ...List.generate(2, (i) => at(DateTime(2026, 6, 10, 10, i))),
+        ...List.generate(2, (i) => at(DateTime(2026, 6, 5, 10, i))),
       ];
       expect(Insights.inLastWeek(rows, now), 4);
       expect(Insights.inPreviousWeek(rows, now), 2);
@@ -75,8 +76,10 @@ void main() {
     test('measures a decline too', () {
       final rows = [
         ...List.generate(1, (i) => at(DateTime(2026, 6, 15, 10, i))),
-        ...List.generate(4, (i) => at(DateTime(2026, 6, 10, 10, i))),
+        ...List.generate(4, (i) => at(DateTime(2026, 6, 5, 10, i))),
       ];
+      expect(Insights.inLastWeek(rows, now), 1);
+      expect(Insights.inPreviousWeek(rows, now), 4);
       expect(Insights.weekOverWeekChange(rows, now), -75);
     });
 
@@ -85,10 +88,21 @@ void main() {
         at(DateTime(2026, 6, 15, 10)),
         at(DateTime(2026, 6, 15, 11),
             outcome: MissionOutcome.skipped),
-        at(DateTime(2026, 6, 10, 10)),
+        at(DateTime(2026, 6, 5, 10)),
       ];
       expect(Insights.inLastWeek(rows, now), 1);
       expect(Insights.inPreviousWeek(rows, now), 1);
+    });
+
+    test('a future-dated row is not counted as this week', () {
+      // The rest of the statistics already reject these, so the insights
+      // must not quietly accept one either.
+      final rows = [
+        at(DateTime(2026, 6, 15, 10)),
+        at(DateTime(2026, 6, 20, 10)),
+      ];
+      expect(Insights.inLastWeek(rows, now), 1);
+      expect(Insights.avgXpLastWeek(rows, now), 30);
     });
   });
 
@@ -123,11 +137,23 @@ void main() {
             id: 'custom_123', outcome: MissionOutcome.skipped),
         at(DateTime(2026, 6, 13, 11),
             id: 'chain_qc_touch_grass', outcome: MissionOutcome.skipped),
-        at(DateTime(2026, 6, 12, 11),
+      ];
+      // Neither custom missions nor finished chains map to a category.
+      expect(Insights.mostSkippedCategory(rows), isNull);
+    });
+
+    test('a repeated daily-challenge skip is attributed to its category',
+        () {
+      final rows = [
+        at(DateTime(2026, 6, 14, 11),
+            id: 'dc_01', outcome: MissionOutcome.skipped),
+        at(DateTime(2026, 6, 13, 11),
             id: 'dc_01', outcome: MissionOutcome.skipped),
       ];
-      // dc_01 does resolve, to selfImprovement.
-      expect(Insights.mostSkippedCategory(rows), MissionCategory.selfImprovement);
+      expect(
+        Insights.mostSkippedCategory(rows),
+        MissionCategory.selfImprovement,
+      );
     });
   });
 

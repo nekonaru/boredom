@@ -68,13 +68,15 @@ class Insights {
     return counts[best] == 1 && counts.length == 1 ? null : best;
   }
 
-  /// Missions completed in the last 7 calendar days.
+  /// Missions completed in the last 7 calendar days, ending today.
+  ///
+  /// Bounded on both sides. Without the upper bound a clock skew that left
+  /// a future timestamp in the history would be counted as "this week",
+  /// which the rest of the statistics already reject.
   static int inLastWeek(List<CompletedMission> history, DateTime now) {
-    final cutoff = DateTime(now.year, now.month, now.day)
+    final start = DateTime(now.year, now.month, now.day)
         .subtract(const Duration(days: 6));
-    return _active(history)
-        .where((e) => !e.completedAt.isBefore(cutoff))
-        .length;
+    return _active(history).where((e) => _within(e, start, now)).length;
   }
 
   /// Missions completed in the 7 calendar days before that.
@@ -104,13 +106,21 @@ class Insights {
 
   /// Average XP earned per completion in the last 7 days.
   static int avgXpLastWeek(List<CompletedMission> history, DateTime now) {
-    final cutoff = DateTime(now.year, now.month, now.day)
+    final start = DateTime(now.year, now.month, now.day)
         .subtract(const Duration(days: 6));
     final rows =
-        _active(history).where((e) => !e.completedAt.isBefore(cutoff)).toList();
+        _active(history).where((e) => _within(e, start, now)).toList();
     if (rows.isEmpty) return 0;
     return rows.fold<int>(0, (sum, e) => sum + e.xpEarned) ~/ rows.length;
   }
+
+  /// Inclusive lower bound, and nothing later than [now].
+  static bool _within(
+    CompletedMission e,
+    DateTime start,
+    DateTime now,
+  ) =>
+      !e.completedAt.isBefore(start) && !e.completedAt.isAfter(now);
 
   /// Builds the insight cards to show, in a stable order. Returns fewer
   /// than [max] when there is not enough history to justify them.
