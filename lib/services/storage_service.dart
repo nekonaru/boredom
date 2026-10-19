@@ -73,12 +73,21 @@ class StorageService {
       ..sort((a, b) => b.completedAt.compareTo(a.completedAt));
   }
 
+  /// How many completion rows are kept on the device.
+  ///
+  /// Each row is roughly 200 bytes of JSON, so even 1000 stays well under
+  /// a megabyte. The History screen states the cap and shows the lifetime
+  /// total next to it, so a truncated list is never mistaken for the
+  /// whole record.
+  static const int kMaxHistoryEntries = 1000;
+
   Future<void> addHistoryEntry(CompletedMission entry) async {
     final p = await prefs;
     final raw = p.getStringList(_kHistory) ?? [];
     raw.add(jsonEncode(entry.toJson()));
-    // Keep at most 200 entries so prefs never bloat.
-    final trimmed = raw.length > 200 ? raw.sublist(raw.length - 200) : raw;
+    final trimmed = raw.length > kMaxHistoryEntries
+        ? raw.sublist(raw.length - kMaxHistoryEntries)
+        : raw;
     await p.setStringList(_kHistory, trimmed);
   }
 
@@ -92,8 +101,8 @@ class StorageService {
   Future<void> saveHistory(List<CompletedMission> history) async {
     final p = await prefs;
     final oldestFirst = history.reversed.toList();
-    final trimmed = oldestFirst.length > 200
-        ? oldestFirst.sublist(oldestFirst.length - 200)
+    final trimmed = oldestFirst.length > kMaxHistoryEntries
+        ? oldestFirst.sublist(oldestFirst.length - kMaxHistoryEntries)
         : oldestFirst;
     await p.setStringList(
       _kHistory,

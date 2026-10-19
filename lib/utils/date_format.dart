@@ -37,7 +37,10 @@ String formatHistoryDate(DateTime dt, {String code = 'en'}) {
   final month = months[dt.month - 1];
   final hour = dt.hour.toString().padLeft(2, '0');
   final minute = dt.minute.toString().padLeft(2, '0');
-  return '$day $month, $hour:$minute';
+  // The year is appended only when it differs from the current one, so
+  // an entry from last year cannot be mistaken for today's.
+  final year = dt.year == DateTime.now().year ? '' : ' ${dt.year}';
+  return '$day $month$year, $hour:$minute';
 }
 
 /// Short `d MMM yyyy` label for charts and backups.

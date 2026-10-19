@@ -1,5 +1,43 @@
 # Changelog
 
+## v2.8.0
+
+Data yang bisa dipercaya. Setiap angka yang ditampilkan aplikasi kini
+menyatakan apa yang sebenarnya diukur, dan memulihkan cadangan tidak
+lagi membuang sebagian pengaturanmu.
+
+### Ditambahkan
+- **Saring riwayat berdasarkan tanggal.** Hari ini, 7 hari, 30 hari,
+  atau semua waktu.
+- **Saring riwayat berdasarkan hasil.** Selesai, sebagian, dilewati,
+  atau entri dari sebelum pelacakan hasil ada, yang diberi label "Tanpa
+  nilai" alih-alih diam-diam dihitung sebagai keberhasilan.
+- **Daftar riwayat menyebutkan angkanya sendiri**, menampilkan berapa
+  banyak entri yang tersimpan dan berapa yang sedang kamu lihat, dan
+  mengatakannya terus terang begitu batasnya tercapai.
+- **Bersihkan favorit yang menunjuk misi yang hilang.** Sempat
+  menghilang dari daftar tapi tetap tersimpan di data, tanpa cara melihat
+  atau menghapusnya.
+
+### Ditingkatkan
+- **Cadangan sekarang ikut menyimpan pengaturan pengingat.** Memulihkan
+  di HP baru dulu kembali dengan pengingat mati dan jam pilihanmu
+  dibuang. Cadangan sebelum versi ini tidak punya bagian pengingat dan
+  tetap membersihkan jadwal, supaya pemulihan versi lama tidak
+  meninggalkan notifikasi yang tidak terlihat.
+- **Jam pengingat dari cadangan dikunci** ke jam dan menit yang nyata,
+  bukan dipercaya buta.
+- **Riwayat menyimpan 1000 entri, bukan 200.** Batasnya jadi konstanta
+  bernama, bukan angka yang tertanam di dua tempat.
+
+### Diperbaiki
+- **Tanggal riwayat sekarang menampilkan tahun** kalau bukan tahun
+  berjalan, supaya penyelesaian tahun lalu tidak terbaca sebagai hari
+  ini.
+- **"Rata-rata XP / Hari" jadi "XP / Hari Aktif".** Pembaginya dari
+  awal selalu hari kamu aktif, bukan hari kalender, jadi label lama
+  menggambarkan angka yang memang tidak pernah dihitung aplikasi.
+
 ## v2.7.0
 
 Pelacakan hasil misi. Sampai sekarang setiap penyelesaian terlihat

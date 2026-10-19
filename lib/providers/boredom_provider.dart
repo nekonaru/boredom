@@ -816,6 +816,22 @@ class BoredomProvider extends ChangeNotifier {
 
   bool isFavorite(String missionId) => favoriteIds.contains(missionId);
 
+  /// Drops favorites whose mission is no longer in the catalog.
+  ///
+  /// They are unreachable from the UI, so keeping them silently only
+  /// inflates the stored set. Left for the user to trigger rather than
+  /// pruned on load, because a later catalog update could bring the
+  /// mission back.
+  Future<int> pruneOrphanFavorites() async {
+    final orphans =
+        favoriteIds.where((id) => missionById(id) == null).toSet();
+    if (orphans.isEmpty) return 0;
+    favoriteIds = {...favoriteIds}..removeAll(orphans);
+    await StorageService.instance.saveFavorites(favoriteIds);
+    notifyListeners();
+    return orphans.length;
+  }
+
   /// Always publishes a new Set instance so `context.select` on
   /// favoriteIds rebuilds the Favorites list (an in-place mutation is
   /// invisible to DeepCollectionEquality).
@@ -981,6 +997,14 @@ class BoredomProvider extends ChangeNotifier {
       'disliked': dislikedIds.toList(),
       'saved': savedMissions.map((m) => m.toJson()).toList(),
       'mutedCategories': mutedCategories.toList(),
+      // Reminder settings were missing, so a restore on a new phone
+      // silently came back with reminders switched off and the old time
+      // thrown away.
+      'reminder': {
+        'enabled': reminderEnabled,
+        'hour': reminderHour,
+        'minute': reminderMinute,
+      },
     };
     return _encodeJson(data);
   }
@@ -1067,13 +1091,40 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveDisliked(dislikedIds);
       await storage.saveSavedMissions(savedMissions);
       await storage.saveMutedCategories(mutedCategories);
-      // A "reset everything" must also clear preferences that live outside
-      // progress, otherwise the UI still shows them as active.
-      await storage.saveReminder(enabled: false, hour: 19, minute: 0);
-      await ReminderService.instance.cancelDaily();
-      reminderEnabled = false;
-      reminderHour = 19;
-      reminderMinute = 0;
+      // Backups written before v2.8.0 carry no reminder block. Those keep
+      // the old "clear it" behaviour so a legacy restore never leaves a
+      // schedule the user cannot see.
+      final rm = data['reminder'] as Map?;
+      if (rm == null) {
+        await storage.saveReminder(enabled: false, hour: 19, minute: 0);
+        await ReminderService.instance.cancelDaily();
+        reminderEnabled = false;
+        reminderHour = 19;
+        reminderMinute = 0;
+      } else {
+        final h = (rm['hour'] as num?)?.toInt() ?? 19;
+        final mi = (rm['minute'] as num?)?.toInt() ?? 0;
+        final safeHour = h.clamp(0, 23);
+        final safeMinute = mi.clamp(0, 59);
+        final wantEnabled = rm['enabled'] == true;
+        await storage.saveReminder(
+          enabled: wantEnabled,
+          hour: safeHour,
+          minute: safeMinute,
+        );
+        if (wantEnabled) {
+          await ReminderService.instance.scheduleDaily(
+            safeHour,
+            safeMinute,
+            code: LanguageProvider.instance.code,
+          );
+        } else {
+          await ReminderService.instance.cancelDaily();
+        }
+        reminderEnabled = wantEnabled;
+        reminderHour = safeHour;
+        reminderMinute = safeMinute;
+      }
       _missionCounter = history.length;
       _clearUndo();
       notifyListeners();

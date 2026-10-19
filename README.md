@@ -39,7 +39,8 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | 📅 **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
 | ⭐ **Custom missions** | Create your own missions with your own XP rewards |
 | ❤️ **Favorites** | Pin catalog missions to find them again fast |
-| 🔍 **History search** | Filter completed missions by title or category |
+| 🔍 **History search** | Filter completed missions by title or category, then narrow by date (today, 7 days, 30 days, all) and by outcome |
+| 🧹 **Data transparency** | History states how many entries are stored and how many you are viewing, dates show the year when it differs, and orphaned favorites can be cleaned up |
 | ↩️ **Undo** | 5-minute window to restore the last completion |
 | 💾 **Backup and restore** | Export all local data as text, import it back (phone-switch friendly, no account needed) |
 | 📊 **Statistics** | Last-7-days and last-30-days charts drawn dependency-free, average XP per active day, busiest weekday, per-category distribution, reroll and chaos totals |

@@ -7,6 +7,7 @@ import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/mission_catalog.dart';
+import '../services/storage_service.dart';
 import '../utils/date_format.dart';
 import '../utils/feedback.dart';
 import '../widgets/inbox_section.dart';
@@ -21,6 +22,38 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   String _query = '';
+  _HistoryRange _range = _HistoryRange.all;
+  _OutcomeFilter _outcomeFilter = _OutcomeFilter.all;
+
+  bool _matchesRange(CompletedMission e, _HistoryRange range) {
+    if (range == _HistoryRange.all) return true;
+    final now = DateTime.now();
+    final day = DateTime(
+      e.completedAt.year,
+      e.completedAt.month,
+      e.completedAt.day,
+    );
+    final today = DateTime(now.year, now.month, now.day);
+    final diff = today.difference(day).inDays;
+    return switch (range) {
+      _HistoryRange.today => diff == 0,
+      _HistoryRange.week => diff >= 0 && diff < 7,
+      _HistoryRange.month => diff >= 0 && diff < 30,
+      _HistoryRange.all => true,
+    };
+  }
+
+  bool _matchesOutcome(CompletedMission e, _OutcomeFilter filter) {
+    return switch (filter) {
+      _OutcomeFilter.all => true,
+      // Rows with no outcome predate the feature, so they are neither
+      // shown as successes nor hidden as failures.
+      _OutcomeFilter.done => e.outcome == MissionOutcome.done,
+      _OutcomeFilter.partial => e.outcome == MissionOutcome.partial,
+      _OutcomeFilter.skipped => e.outcome == MissionOutcome.skipped,
+      _OutcomeFilter.untracked => e.outcome == null,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +72,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final actions = context.read<BoredomProvider>();
 
     final q = _query.trim().toLowerCase();
-    final filtered = q.isEmpty
-        ? history
-        : history
-            // Search what the row actually shows, otherwise an Indonesian
-            // search for "koding" would match nothing on screen.
-            .where((e) =>
-                _titleFor(e, actions, code).toLowerCase().contains(q) ||
-                _categoryFor(e, actions, code).toLowerCase().contains(q))
-            .toList();
+    final filtered = history
+        .where((e) => _matchesRange(e, _range))
+        .where((e) => _matchesOutcome(e, _outcomeFilter))
+        // Search what the row actually shows, otherwise an Indonesian
+        // search for "koding" would match nothing on screen.
+        .where((e) =>
+            q.isEmpty ||
+            _titleFor(e, actions, code).toLowerCase().contains(q) ||
+            _categoryFor(e, actions, code).toLowerCase().contains(q))
+        .toList();
     final favoriteMissions = MissionCatalog.all
         .where((m) => favorites.contains(m.id))
+        .toList();
+    // Favorites pointing at missions this build no longer ships. They
+    // used to vanish silently while still counting toward the stored set,
+    // with no way for the user to see or clear them.
+    final orphanFavorites = favorites
+        .where((id) => actions.missionById(id) == null)
         .toList();
 
     return SafeArea(
@@ -140,6 +180,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       onUnfavorite: () => actions.toggleFavorite(m.id),
                     ),
                   ),
+                if (orphanFavorites.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    s.favoriteOrphans(orphanFavorites.length),
+                    style: TextStyle(color: pal.textSecondary, fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => actions.pruneOrphanFavorites(),
+                    icon: const Icon(Icons.cleaning_services_outlined, size: 16),
+                    label: Text(s.favoritePruneAction),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 Text(
                   s.historyTitle,
@@ -180,6 +233,61 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final r in _HistoryRange.values)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(s.historyRangeLabel(r)),
+                            selected: _range == r,
+                            onSelected: (_) => setState(() => _range = r),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final o in _OutcomeFilter.values)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(s.outcomeFilterLabel(o)),
+                            selected: _outcomeFilter == o,
+                            onSelected: (_) =>
+                                setState(() => _outcomeFilter = o),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Says out loud how many rows are stored versus how many
+                // you have actually completed, so a capped list can never
+                // be mistaken for the whole record.
+                Text(
+                  s.historyCount(filtered.length, history.length),
+                  style: TextStyle(
+                    color: pal.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (history.length >= StorageService.kMaxHistoryEntries)
+                  Text(
+                    s.historyCapNotice(StorageService.kMaxHistoryEntries),
+                    style: TextStyle(
+                      color: pal.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -190,7 +298,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Text(
-                    q.isEmpty ? s.historyEmpty : s.searchEmpty,
+                    (q.isEmpty && _range == _HistoryRange.all &&
+                            _outcomeFilter == _OutcomeFilter.all)
+                        ? s.historyEmpty
+                        : s.searchEmpty,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: pal.textSecondary),
                   ),
@@ -312,6 +423,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     descCtrl.dispose();
   }
 }
+
+/// Date windows offered above the history list.
+enum _HistoryRange { today, week, month, all }
+
+/// Outcome filters offered above the history list.
+enum _OutcomeFilter { all, done, partial, skipped, untracked }
 
 /// Resolves a history entry's title in the active language.
 ///

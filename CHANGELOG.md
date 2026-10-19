@@ -1,5 +1,41 @@
 # Changelog
 
+## v2.8.0
+
+Data you can trust. Every number the app shows now says what it
+actually measures, and a backup restore no longer throws part of your
+setup away.
+
+### New features
+- **Filter your history by date.** Today, 7 days, 30 days, or all time.
+- **Filter your history by outcome.** Done, partly, skipped, or entries
+  from before outcome tracking existed, which are labelled "No rating"
+  rather than quietly counted as successes.
+- **The history list states its own numbers**, showing how many entries
+  are stored and how many you are looking at, and saying so out loud
+  once the cap is reached.
+- **Clean up favorites that point at missing missions.** They used to
+  vanish from the list while still sitting in your saved data, with no
+  way to see or remove them.
+
+### Optimizations
+- **A backup now carries your reminder settings.** Restoring on a new
+  phone used to come back with reminders switched off and the time you
+  had chosen thrown away. Backups written before this version have no
+  reminder block and still clear the schedule, so a legacy restore never
+  leaves a notification you cannot see.
+- **Reminder times coming out of a backup are clamped** to a real hour
+  and minute instead of being trusted blindly.
+- **History keeps 1000 entries instead of 200.** The cap is now a named
+  constant rather than a number buried in two places.
+
+### Bug fixes
+- **History dates now show the year** when it is not the current one, so
+  a completion from last year cannot be read as today's.
+- **"Avg XP / Day" is now "XP / Active Day".** The denominator was
+  always days you were active, never calendar days, so the old label
+  described a number the app never computed.
+
 ## v2.7.0
 
 Mission outcome tracking. Until now every completion looked identical:

@@ -86,6 +86,50 @@ class AppStrings {
       ? '$n reroll tersisa hari ini'
       : '$n reroll${n == 1 ? '' : 's'} left today';
 
+  // History filters and disclosure
+  String historyRangeLabel(Object range) {
+    final name = range.toString().split('.').last;
+    switch (name) {
+      case 'today':
+        return _pick('Today', 'Hari ini');
+      case 'week':
+        return _pick('7 days', '7 hari');
+      case 'month':
+        return _pick('30 days', '30 hari');
+      default:
+        return _pick('All time', 'Semua');
+    }
+  }
+
+  String outcomeFilterLabel(Object filter) {
+    final name = filter.toString().split('.').last;
+    switch (name) {
+      case 'done':
+        return _pick('Done', 'Selesai');
+      case 'partial':
+        return _pick('Partly', 'Sebagian');
+      case 'skipped':
+        return _pick('Skipped', 'Dilewati');
+      case 'untracked':
+        return _pick('No rating', 'Tanpa nilai');
+      default:
+        return _pick('Any result', 'Semua hasil');
+    }
+  }
+
+  String historyCount(int shown, int stored) {
+    if (shown == stored) {
+      return isId ? '$stored catatan tersimpan' : '$stored saved entries';
+    }
+    return isId
+        ? 'Menampilkan $shown dari $stored catatan'
+        : 'Showing $shown of $stored entries';
+  }
+
+  String historyCapNotice(int cap) => isId
+      ? 'Riwayat menyimpan $cap catatan terbaru. Ekspor cadangan untuk menyimpan semuanya.'
+      : 'History keeps the $cap most recent entries. Export a backup to keep everything.';
+
   // Outcome tracking
   String get outcomePartial => _pick('Partly done', 'Dikerjakan sebagian');
   String get outcomeSkipped => _pick("Didn't do it", 'Tidak dikerjakan');
@@ -93,6 +137,13 @@ class AppStrings {
   String get outcomePartialShort => _pick('Partly', 'Sebagian');
   String get outcomeQuestion =>
       _pick('Did you actually do it?', 'Beneran dikerjakan?');
+
+  // Favorites
+  String favoriteOrphans(int n) => isId
+      ? '$n favorit menunjuk misi yang sudah tidak ada di katalog.'
+      : '$n favorites point at missions that are no longer in the catalog.';
+  String get favoritePruneAction =>
+      _pick('Remove them', 'Hapus yang ini');
   String get outcomeSkippedShort => _pick('Skipped', 'Dilewati');
   String get outcomeDoneShort => _pick('Done', 'Selesai');
   String get mFollowThrough => _pick('Follow-through', 'Tuntas');
@@ -396,7 +447,9 @@ class AppStrings {
 
   // Monthly stats (v2.2)
   String get monthTitle => _pick('Last 30 Days', '30 Hari Terakhir');
-  String get mAvgXp => _pick('Avg XP / Day', 'Rata-rata XP / Hari');
+  // The denominator is days you were actually active, not calendar days,
+  // so the label says so. "Avg XP / Day" read as a calendar average.
+  String get mAvgXp => _pick('XP / Active Day', 'XP / Hari Aktif');
   String get mBestDay => _pick('Busiest Day', 'Hari Tersibuk');
 
   String weekdayName(int weekday) {
