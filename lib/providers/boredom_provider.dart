@@ -1082,7 +1082,7 @@ class BoredomProvider extends ChangeNotifier {
       // missing and let completeDailyChallenge null-check a missing
       // catalog entry. Drop it instead; init() mints today's challenge.
       if (importedChallenge != null &&
-          DailyChallengeCatalog.idExists(importedChallenge.challengeId)) {
+          !DailyChallengeCatalog.idExists(importedChallenge.challengeId)) {
         importedChallenge = null;
       }
       final qc = data['questChain'] as Map?;
@@ -1296,8 +1296,19 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// True while a chain step is being written, so a second tap cannot
+  /// advance the same step again.
+  ///
+  /// Mutating `questChainProgress` before the first await is enough to
+  /// stop a double payout on the final step, because that sets the chain
+  /// to null. It is not enough for a middle step: the second call would
+  /// read the already-advanced index and advance it a second time, so a
+  /// double tap skipped a step.
+  bool _chainStepInFlight = false;
+
   /// Returns newly unlocked achievements when the chain just finished.
   Future<List<Achievement>> completeCurrentChainStep() async {
+    if (_chainStepInFlight) return [];
     final qp = questChainProgress;
     if (qp == null) return [];
     final chain = QuestChainCatalog.byId(qp.chainId);
@@ -1305,6 +1316,7 @@ class BoredomProvider extends ChangeNotifier {
       // The arc no longer exists in this build. Drop it rather than
       // silently swapping the player onto a different chain mid-progress.
       await abandonChain();
+      _chainStepInFlight = false;
       return [];
     }
     // Snapshot before anything is claimed, so undo can restore this exact
@@ -1314,9 +1326,11 @@ class BoredomProvider extends ChangeNotifier {
     // paid the reward twice and wrote two history rows.
     _captureUndo();
     final claimedStep = qp.currentStepIndex;
+    _chainStepInFlight = true;
     if (chain.steps.isNotEmpty && claimedStep < chain.steps.length - 1) {
       questChainProgress = qp.copyWith(currentStepIndex: claimedStep + 1);
       await StorageService.instance.saveQuestChainProgress(questChainProgress);
+      _chainStepInFlight = false;
       notifyListeners();
       return [];
     }
@@ -1379,11 +1393,13 @@ class BoredomProvider extends ChangeNotifier {
         await StorageService.instance.saveAchievements(achievements);
       }
       lastUnlockedAchievements = newlyUnlocked;
+      _chainStepInFlight = false;
       notifyListeners();
       return newlyUnlocked;
     } else {
       questChainProgress = qp.copyWith(currentStepIndex: nextIndex);
       await StorageService.instance.saveQuestChainProgress(questChainProgress);
+      _chainStepInFlight = false;
       notifyListeners();
       return [];
     }
