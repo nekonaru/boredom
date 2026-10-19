@@ -1,5 +1,45 @@
 # Changelog
 
+## v3.0.0
+
+Retention and honesty. The app now tells you what your own history
+says about you, and stops showing stale numbers when the day turns over
+while you are still holding the phone.
+
+### New features
+- **Weekly insights on Home.** Observations derived from your history:
+  whether you are doing more or less than last week, the hour you
+  actually finish things, the category you walk away from most, and your
+  average XP per mission this week.
+- **The insights refuse to guess.** No cards at all below five
+  completions, no "best hour" unless the peak holds a quarter of your
+  data, no week-over-week percentage when there is no previous week to
+  compare against, and no "escape hatch" for a single isolated skip.
+  Every one of those cases previously would have produced a confident
+  number built on nothing.
+- **Replay the intro from Profile.** Existing players can rewatch the
+  walkthrough without it being marked unseen, so closing the app
+  mid-replay cannot bring the startup gate back.
+- **Named accents for screen readers.** The five colour swatches were
+  five anonymous buttons with no label and no selected state.
+
+### Optimizations
+- **Home now rolls the day over by itself.** Leaving the app open past
+  midnight kept yesterday's streak warning, reroll allowance, and daily
+  challenge on screen until you backgrounded and resumed the app.
+- **Insight calculations are pure functions** over the history list with
+  an injected clock, so they are unit-testable without a provider, a
+  widget tree, or a fake timer.
+
+### Bug fixes
+- **A quest chain this build no longer ships is no longer silently
+  swapped for a different one.** An unknown chain id used to fall back
+  to the first arc, quietly turning your mid-progress "Creator Arc"
+  into "Touch Grass Arc". Unknown ids now return null, and a stored one
+  is dropped on import.
+- **A chain step belonging to a vanished arc completes safely** instead
+  of paying out the wrong arc's reward.
+
 ## v2.8.0
 
 Data you can trust. Every number the app shows now says what it

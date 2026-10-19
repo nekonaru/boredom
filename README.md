@@ -54,6 +54,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | ⚡ **Quick wins** | Narrow rolls to missions of 15 minutes or less |
 | 🙈 **Mute categories** | Silence a whole category when you are not interested |
 | 📊 **Weekly recap** | Missions, XP, and streak visible straight on Home |
+| 🔍 **Weekly insights** | What your history says about you: week over week, your productive hour, the category you bail out of, average XP. Renders nothing rather than guessing |
 | 🎁 **Milestone bonus** | Extra XP every time you cross a 10-level boundary |
 | ↩️ **Full undo** | 5-minute undo for missions, daily challenges, chain steps, and custom missions |
 

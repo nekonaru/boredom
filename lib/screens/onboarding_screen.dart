@@ -4,10 +4,14 @@ import '../l10n/app_strings.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 
-/// First-run walkthrough: 3 pages, skippable, shown once.
-/// Existing users see it exactly once after updating.
+/// Walkthrough: 3 pages, skippable.
+///
+/// Shown automatically the first time only. Existing players can replay it
+/// from Profile, in which case [popOnFinish] pops back to wherever it was
+/// launched from instead of letting the startup gate swap the tree.
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final bool popOnFinish;
+  const OnboardingScreen({super.key, this.popOnFinish = false});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -104,6 +108,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _finish(BuildContext context) {
     context.read<BoredomProvider>().completeOnboarding();
+    // On a replay the startup gate is not driving this widget, so nothing
+    // else would take the user back.
+    if (widget.popOnFinish && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
   }
 }
 

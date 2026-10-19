@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
@@ -11,6 +13,7 @@ import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
 import '../widgets/daily_challenge_card.dart';
+import '../widgets/weekly_insights.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,16 +23,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  Timer? _midnightTimer;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _scheduleMidnight();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _midnightTimer?.cancel();
     super.dispose();
+  }
+
+  /// Wakes up just after midnight and rolls the day over.
+  ///
+  /// Without this, leaving the app open across midnight kept yesterday's
+  /// streak-at-risk banner, reroll allowance, and daily challenge on
+  /// screen until the app was backgrounded and resumed.
+  void _scheduleMidnight() {
+    final now = DateTime.now();
+    final nextMidnight = DateTime(now.year, now.month, now.day + 1);
+    final delay = nextMidnight.difference(now) + const Duration(seconds: 1);
+    _midnightTimer = Timer(delay, () {
+      if (!mounted) return;
+      context.read<BoredomProvider>().refreshIfDayChanged();
+      _scheduleMidnight();
+    });
   }
 
   /// Runs the provider's day-rollover check when the app resumes, so a
@@ -37,6 +60,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      // The timer can fire while backgrounded, or be an hour out of date
+      // after a long suspend, so resume is still the primary trigger.
+      _scheduleMidnight();
       context.read<BoredomProvider>().refreshIfDayChanged();
     }
   }
@@ -148,6 +174,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             const WeeklySummaryStrip(),
             const SizedBox(height: 16),
             const DailyChallengeCard(),
+            const SizedBox(height: 28),
+            const WeeklyInsights(),
             const SizedBox(height: 28),
 
             SelectorRow<Mood>(

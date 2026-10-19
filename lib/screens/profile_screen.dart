@@ -7,6 +7,7 @@ import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
+import 'onboarding_screen.dart';
 import '../utils/app_theme.dart';
 import '../widgets/xp_bar.dart';
 
@@ -175,26 +176,36 @@ class ProfileScreen extends StatelessWidget {
                       ThemeProvider.accents.length,
                       (i) => Padding(
                         padding: const EdgeInsets.only(right: 12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: () =>
-                              context.read<ThemeProvider>().setAccent(i),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: ThemeProvider.accents[i],
-                              border: Border.all(
-                                color: i == accentIndex
-                                    ? pal.textPrimary
-                                    : Colors.transparent,
-                                width: 2,
+                        child: Semantics(
+                          // The row is five unlabelled circles otherwise:
+                          // a screen reader announces five anonymous
+                          // buttons with no way to tell which one is
+                          // active or what the colours are called.
+                          label: s.accentName(i),
+                          selected: i == accentIndex,
+                          inMutuallyExclusiveGroup: true,
+                          button: true,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () =>
+                                context.read<ThemeProvider>().setAccent(i),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: ThemeProvider.accents[i],
+                                border: Border.all(
+                                  color: i == accentIndex
+                                      ? pal.textPrimary
+                                      : Colors.transparent,
+                                  width: 2,
+                                ),
                               ),
+                              child: i == accentIndex
+                                  ? const Icon(Icons.check, color: Colors.white, size: 18)
+                                  : null,
                             ),
-                            child: i == accentIndex
-                                ? const Icon(Icons.check, color: Colors.white, size: 18)
-                                : null,
                           ),
                         ),
                       ),
@@ -268,6 +279,21 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: () {
+                // Replay only. The persisted "seen" flag stays true, so
+                // closing the app mid-replay cannot make the startup gate
+                // show the intro again.
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const OnboardingScreen(popOnFinish: true),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.help_outline, size: 18),
+              label: Text(s.replayOnboarding),
             ),
             const SizedBox(height: 24),
             Text(

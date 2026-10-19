@@ -1056,10 +1056,18 @@ class BoredomProvider extends ChangeNotifier {
       // was longer cannot index past the end of today's step list.
       var importedChainSafe = importedChain;
       if (importedChain != null) {
-        final steps = QuestChainCatalog.byId(importedChain.chainId).steps.length;
+        final catalogChain = QuestChainCatalog.byId(importedChain.chainId);
+        // A chain id this build does not ship cannot be clamped against a
+        // step list that does not exist, so it is dropped rather than
+        // silently swapped for a different arc.
+        if (catalogChain == null) {
+          importedChainSafe = null;
+        }
+        final steps = catalogChain?.steps.length ?? 0;
         final maxIndex = steps < 1 ? 0 : steps - 1;
-        if (importedChain.currentStepIndex > maxIndex ||
-            importedChain.currentStepIndex < 0) {
+        if (catalogChain != null &&
+            (importedChain.currentStepIndex > maxIndex ||
+                importedChain.currentStepIndex < 0)) {
           importedChainSafe = QuestChainProgress(
             chainId: importedChain.chainId,
             currentStepIndex: maxIndex,
@@ -1243,6 +1251,12 @@ class BoredomProvider extends ChangeNotifier {
     final qp = questChainProgress;
     if (qp == null) return [];
     final chain = QuestChainCatalog.byId(qp.chainId);
+    if (chain == null) {
+      // The arc no longer exists in this build. Drop it rather than
+      // silently swapping the player onto a different chain mid-progress.
+      await abandonChain();
+      return [];
+    }
     final nextIndex = qp.currentStepIndex + 1;
     _captureUndo();
 

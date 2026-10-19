@@ -161,8 +161,16 @@ class QuestChainCatalog {
     ),
   ];
 
-  /// orElse falls back to the first entry, so an old stored chain id
-  /// never crashes the app when the catalog changes.
-  static QuestChain byId(String id) =>
-      all.firstWhere((c) => c.id == id, orElse: () => all.first);
+  /// Catalog lookup by id.
+  ///
+  /// Returns null for an unknown id rather than falling back to the first
+  /// entry. The old fallback silently swapped a player onto a different
+  /// arc at whatever step they had reached, so a chain id removed by a
+  /// catalog update quietly became "Touch Grass Arc".
+  static QuestChain? byId(String id) {
+    for (final c in all) {
+      if (c.id == id) return c;
+    }
+    return null;
+  }
 }

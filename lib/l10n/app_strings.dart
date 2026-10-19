@@ -144,6 +144,19 @@ class AppStrings {
       : '$n favorites point at missions that are no longer in the catalog.';
   String get favoritePruneAction =>
       _pick('Remove them', 'Hapus yang ini');
+
+  // Insights
+  String get insightsTitle =>
+      _pick('What your data says', 'Apa yang يقول datamu');
+  String get replayOnboarding => _pick('Replay the intro', 'Ulangi intro');
+
+  /// Names for the five accent swatches, for screen readers.
+  String accentName(int index) {
+    const en = ['Coral', 'Amber', 'Mint', 'Sky', 'Violet'];
+    const id = ['Koral', 'Kuning', 'Hijau', 'Biru', 'Ungu'];
+    if (index < 0 || index >= en.length) return _pick('Accent', 'Aksen');
+    return _pick(en[index], id[index]);
+  }
   String get outcomeSkippedShort => _pick('Skipped', 'Dilewati');
   String get outcomeDoneShort => _pick('Done', 'Selesai');
   String get mFollowThrough => _pick('Follow-through', 'Tuntas');

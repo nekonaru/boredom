@@ -1,5 +1,46 @@
 # Changelog
 
+## v3.0.0
+
+Retensi dan kejujuran. Aplikasi sekarang memberi tahu apa yang
+katakan riwayatmu tentangmu, dan berhenti menampilkan angka basi saat
+hari berganti sementara kamu masih memegang HP.
+
+### Ditambahkan
+- **Insight mingguan di Beranda.** Pengamatan dari riwayatmu: apakah
+  kamu mengerjakan lebih banyak atau lebih sedikit dari minggu lalu, jam
+  saat kamu benar-benar menyelesaikan sesuatu, kategori yang paling sering
+  kamu tinggalkan, dan rata-rata XP per misi minggu ini.
+- **Insight menolak menebak.** Tidak ada kartu sama sekali di bawah lima
+  penyelesaian, tidak ada "jam terbaik" kecuali puncaknya mencakup
+  seperempat datamu, tidak ada persentase mingguan kalau tidak ada
+  minggu sebelumnya untuk dibandingkan, dan tidak ada "pelarian" untuk
+  satu-satunya kegagalan yang terisolasi. Semua kasus itu sebelumnya akan
+  menghasilkan angka yang yakin padahal tidak berdasar.
+- **Ulangi intro dari Profil.** Pemain lama bisa menonton ulang
+  perkenalan tanpa ditandai belum pernah melihat, jadi menutup aplikasi
+  di tengah pengulangan tidak mengembalikan gerbang startup.
+- **Aksen bernama untuk pembaca layar.** Lima lingkaran warna
+  sebelumnya lima tombol tanpa nama dan tanpa status aktif.
+
+### Ditingkatkan
+- **Beranda sekarang berganti hari sendiri.** Membiarkan aplikasi
+  terbuka melewati tengah malam membuat peringatan streak, jatah
+  reroll, dan tantangan harian kemarin tetap tampil sampai kamu
+  memindahkan aplikasi lalu membukanya lagi.
+- **Perhitungan insight adalah fungsi murni** atas daftar riwayat dengan
+  jam yang di-inject, jadi bisa diuji tanpa provider, pohon widget, atau
+  timer palsu.
+
+### Diperbaiki
+- **Quest chain yang sudah tidak ada di build ini tidak lagi diam-diam
+  diganti dengan yang lain.** Id chain yang tidak dikenal dulu jatuh ke
+  arc pertama, diam-diam mengubah "Arc Kreator" yang sedang kamu
+  kerjakan jadi "Arc Keluar Rumah". Id yang tidak dikenal sekarang
+  mengembalikan null, dan yang tersimpan dibuang saat impor.
+- **Langkah chain dari arc yang hilang selesai dengan aman** tanpa
+  membayar hadiah arc yang salah.
+
 ## v2.8.0
 
 Data yang bisa dipercaya. Setiap angka yang ditampilkan aplikasi kini
