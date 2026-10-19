@@ -9,6 +9,7 @@ import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 import 'onboarding_screen.dart';
 import '../utils/app_theme.dart';
+import '../widgets/kit.dart';
 import '../widgets/xp_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -49,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        padding: const EdgeInsets.fromLTRB(AppKit.lg, AppKit.md, AppKit.lg, AppKit.xxl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -61,54 +62,56 @@ class ProfileScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: pal.surface,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            const SizedBox(height: AppKit.xl),
+            AppKit.card(
+              context: context,
+              padding: const EdgeInsets.all(AppKit.lg),
               child: XpBar(progress: progress),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppKit.lg),
             Row(
               children: [
                 Expanded(
-                  child: _StatCard(label: s.mTotalMissions, value: '${progress.totalMissionsCompleted}'),
+                  child: AppKit.metricCard(context,
+                    label: s.mTotalMissions,
+                    value: '${progress.totalMissionsCompleted}',
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppKit.md),
                 Expanded(
-                  child: _StatCard(label: s.mActiveStreak, value: s.days(progress.streakDays)),
+                  child: AppKit.metricCard(context,
+                    label: s.mActiveStreak,
+                    value: s.days(progress.streakDays),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.md),
             Row(
               children: [
                 Expanded(
-                  child: _StatCard(label: s.mTotalXp, value: '${progress.totalXp}'),
+                  child: AppKit.metricCard(context,
+                    label: s.mTotalXp,
+                    value: '${progress.totalXp}',
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppKit.md),
                 Expanded(
-                  child: _StatCard(
+                  child: AppKit.metricCard(context,
                     label: s.mRerollsToday,
                     value: '$rerollsLeft/$kMaxRerollsPerDay',
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: pal.surface,
-                borderRadius: BorderRadius.circular(16),
-              ),
+            const SizedBox(height: AppKit.lg),
+            AppKit.card(
+              context: context,
+              padding: const EdgeInsets.all(AppKit.lg),
               child: Row(
                 children: [
                   const Text('❄️', style: TextStyle(fontSize: 22)),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppKit.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: AppKit.xs),
                         Text(
                           s.freezeDesc(progress.freezeTokens),
                           style: TextStyle(
@@ -136,156 +139,25 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              s.appearanceTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            const SizedBox(height: AppKit.xxl),
+            _AppearanceSection(
+              s: s,
+              pal: pal,
+              isLight: isLight,
+              accentIndex: accentIndex,
+              hapticsEnabled: hapticsEnabled,
+              provider: provider,
             ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: pal.surface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SegmentedButton<bool>(
-                    segments: [
-                      ButtonSegment(value: false, label: Text(s.themeDark)),
-                      ButtonSegment(value: true, label: Text(s.themeLight)),
-                    ],
-                    selected: {isLight},
-                    onSelectionChanged: (selected) {
-                      context.read<ThemeProvider>().setLight(selected.first);
-                    },
-                    showSelectedIcon: false,
-                    style: SegmentedButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    s.accentTitle,
-                    style: TextStyle(color: pal.textSecondary, fontSize: 12),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: List.generate(
-                      ThemeProvider.accents.length,
-                      (i) => Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: Semantics(
-                          // The row is five unlabelled circles otherwise:
-                          // a screen reader announces five anonymous
-                          // buttons with no way to tell which one is
-                          // active or what the colours are called.
-                          label: s.accentName(i),
-                          selected: i == accentIndex,
-                          inMutuallyExclusiveGroup: true,
-                          button: true,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () =>
-                                context.read<ThemeProvider>().setAccent(i),
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: ThemeProvider.accents[i],
-                                border: Border.all(
-                                  color: i == accentIndex
-                                      ? pal.textPrimary
-                                      : Colors.transparent,
-                                  width: 2,
-                                ),
-                              ),
-                              child: i == accentIndex
-                                  ? const Icon(Icons.check, color: Colors.white, size: 18)
-                                  : null,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              s.hapticsTitle,
-                              style: TextStyle(color: pal.textPrimary, fontSize: 14),
-                            ),
-                            Text(
-                              s.hapticsDesc,
-                              style: TextStyle(color: pal.textSecondary, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch(
-                        value: hapticsEnabled,
-                        onChanged: provider.setHapticsEnabled,
-                        activeThumbColor: pal.accent,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            const SizedBox(height: AppKit.xxl),
+            _LanguageSection(
+              s: s,
+              pal: pal,
+              isIndonesian: isIndonesian,
+              provider: provider,
             ),
-            const SizedBox(height: 24),
-            Text(
-              s.languageTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: pal.surface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  const Text('🌍', style: TextStyle(fontSize: 20)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      isIndonesian ? s.languageIndonesian : s.languageEnglish,
-                      style: TextStyle(color: pal.textPrimary, fontSize: 14),
-                    ),
-                  ),
-                  SegmentedButton<bool>(
-                    segments: const [
-                      ButtonSegment(value: false, label: Text('EN')),
-                      ButtonSegment(value: true, label: Text('ID')),
-                    ],
-                    selected: {isIndonesian},
-                    onSelectionChanged: (selected) {
-                      context.read<LanguageProvider>().setLocale(
-                        Locale(selected.first ? 'id' : 'en'),
-                      );
-                    },
-                    showSelectedIcon: false,
-                    style: SegmentedButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppKit.xxl),
             OutlinedButton.icon(
               onPressed: () {
-                // Replay only. The persisted "seen" flag stays true, so
-                // closing the app mid-replay cannot make the startup gate
-                // show the intro again.
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const OnboardingScreen(popOnFinish: true),
@@ -294,199 +166,49 @@ class ProfileScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.help_outline, size: 18),
               label: Text(s.replayOnboarding),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              s.remindersTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: pal.surface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              s.remindersTitle,
-                              style: TextStyle(color: pal.textPrimary, fontSize: 14),
-                            ),
-                            Text(
-                              s.remindersDesc,
-                              style: TextStyle(color: pal.textSecondary, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch(
-                        value: reminderEnabled,
-                        onChanged: (v) async {
-                          final ok = await provider.setReminder(v);
-                          if (!context.mounted) return;
-                          if (v && !ok) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(s.reminderBlocked)),
-                            );
-                          }
-                        },
-                        activeThumbColor: pal.accent,
-                      ),
-                    ],
-                  ),
-                  if (reminderEnabled) ...[
-                    const SizedBox(height: 8),
-                    OutlinedButton.icon(
-                      onPressed: () => _pickReminderTime(context, s, provider),
-                      icon: const Icon(Icons.schedule, size: 18),
-                      label: Text(
-                        '${(reminderTime ~/ 60).toString().padLeft(2, '0')}:'
-                        '${(reminderTime % 60).toString().padLeft(2, '0')}',
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: pal.accent,
-                        side: BorderSide(color: pal.accent),
-                      ),
-                    ),
-                  ],
-                ],
+              style: OutlinedButton.styleFrom(
+                foregroundColor: pal.accent,
+                side: BorderSide(color: pal.accent),
+                padding: const EdgeInsets.symmetric(vertical: AppKit.md),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppKit.rPill),
+                ),
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              s.mutedCategories,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            const SizedBox(height: AppKit.xxl),
+            _ReminderSection(
+              s: s,
+              pal: pal,
+              reminderEnabled: reminderEnabled,
+              reminderTime: reminderTime,
+              provider: provider,
             ),
-            const SizedBox(height: 8),
-            Text(
-              s.mutedDesc,
-              style: TextStyle(color: pal.textSecondary, fontSize: 12),
+            const SizedBox(height: AppKit.xxl),
+            _MutedSection(
+              s: s,
+              pal: pal,
+              muted: muted,
+              provider: provider,
             ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: MissionCategory.values
-                  .where((c) => c != MissionCategory.chaos)
-                  .map((c) {
-                final isMuted = muted.contains(c.name);
-                return FilterChip(
-                  label: Text(c.labelFor(s.code)),
-                  selected: isMuted,
-                  showCheckmark: false,
-                  avatar: Icon(
-                    isMuted ? Icons.visibility_off : Icons.visibility,
-                    size: 16,
-                    color: isMuted ? pal.warning : pal.textSecondary,
-                  ),
-                  backgroundColor: pal.surface,
-                  selectedColor: pal.warning.withValues(alpha: 0.18),
-                  labelStyle: TextStyle(
-                    color: isMuted ? pal.warning : pal.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  onSelected: (v) async {
-                    final changed = await provider.toggleCategoryMuted(c);
-                    if (!changed && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(s.muteLastBlocked)),
-                      );
-                    }
-                  },
-                );
-              })
-              .toList(),
+            const SizedBox(height: AppKit.xxl),
+            _BackupSection(
+              s: s,
+              pal: pal,
+              provider: provider,
             ),
-            const SizedBox(height: 24),
-            Text(
-              s.backupTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+            const SizedBox(height: AppKit.xxl),
+            _AboutSection(
+              s: s,
+              pal: pal,
             ),
-            const SizedBox(height: 8),
-            Text(
-              s.backupDesc,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.outlineButton(
+              context: context,
+              label: s.resetBtn,
+              foregroundColor: pal.danger,
+              onPressed: () => _confirmReset(context, s, provider),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final text = await provider.exportBackup();
-                      await Clipboard.setData(ClipboardData(text: text));
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(s.backupCopied)),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.upload_outlined, size: 18),
-                    label: Text(s.backupExport),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: pal.accent,
-                      side: BorderSide(color: pal.accent),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showImportDialog(context, s, provider),
-                    icon: const Icon(Icons.download_outlined, size: 18),
-                    label: Text(s.backupImport),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: pal.accent,
-                      side: BorderSide(color: pal.accent),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              s.aboutTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              s.aboutBody,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => _confirmReset(context, s, provider),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: pal.danger,
-                  side: BorderSide(color: pal.danger),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Text(s.resetBtn),
-              ),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppKit.xxl),
             Center(
               child: Text(
                 '${s.versionFooter(kAppVersion)} · github.com/nekonaru/boredom',
@@ -573,7 +295,7 @@ class ProfileScreen extends StatelessWidget {
     final pal = context.palette;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: pal.surfaceElevated,
         title: Text(s.resetTitle, style: TextStyle(color: pal.textPrimary)),
         content: Text(
@@ -582,13 +304,13 @@ class ProfileScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(s.dialogCancel),
           ),
           TextButton(
             onPressed: () {
               provider.resetProgress();
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
             },
             child: Text(s.resetConfirm, style: TextStyle(color: pal.danger)),
           ),
@@ -598,30 +320,410 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String label;
-  final String value;
-  const _StatCard({required this.label, required this.value});
+/// Appearance: theme toggle, accent swatches, haptics.
+class _AppearanceSection extends StatelessWidget {
+  final AppStrings s;
+  final Color pal;
+  final bool isLight;
+  final int accentIndex;
+  final bool hapticsEnabled;
+  final BoredomProvider provider;
+
+  const _AppearanceSection({
+    required this.s,
+    required this.pal,
+    required this.isLight,
+    required this.accentIndex,
+    required this.hapticsEnabled,
+    required this.provider,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final pal = context.palette;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: pal.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(value,
-              style: TextStyle(
-                  color: pal.textPrimary, fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: pal.textSecondary, fontSize: 12)),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.appearanceTitle),
+        const SizedBox(height: AppKit.md),
+        AppKit.card(
+          context: context,
+          padding: const EdgeInsets.all(AppKit.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SegmentedButton<bool>(
+                segments: [
+                  ButtonSegment(value: false, label: Text(s.themeDark)),
+                  ButtonSegment(value: true, label: Text(s.themeLight)),
+                ],
+                selected: {isLight},
+                onSelectionChanged: (selected) {
+                  context.read<ThemeProvider>().setLight(selected.first);
+                },
+                showSelectedIcon: false,
+                style: SegmentedButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+              const SizedBox(height: AppKit.md),
+              Text(
+                s.accentTitle,
+                style: TextStyle(color: pal.textSecondary, fontSize: 12),
+              ),
+              const SizedBox(height: AppKit.sm),
+              Row(
+                children: List.generate(
+                  ThemeProvider.accents.length,
+                  (i) => Padding(
+                    padding: const EdgeInsets.only(right: AppKit.md),
+                    child: Semantics(
+                      label: s.accentName(i),
+                      selected: i == accentIndex,
+                      inMutuallyExclusiveGroup: true,
+                      button: true,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(AppKit.rLg),
+                        onTap: () =>
+                            context.read<ThemeProvider>().setAccent(i),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: ThemeProvider.accents[i],
+                            border: Border.all(
+                              color: i == accentIndex
+                                  ? pal.textPrimary
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          child: i == accentIndex
+                              ? const Icon(Icons.check, color: Colors.white, size: 18)
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppKit.lg),
+              AppKit.toggleRow(
+                context,
+                emoji: '📳',
+                title: s.hapticsTitle,
+                subtitle: s.hapticsDesc,
+                value: hapticsEnabled,
+                onChanged: () => provider.setHapticsEnabled(!hapticsEnabled),
+                activeColor: pal.accent,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Language toggle + replay onboarding.
+class _LanguageSection extends StatelessWidget {
+  final AppStrings s;
+  final Color pal;
+  final bool isIndonesian;
+  final BoredomProvider provider;
+
+  const _LanguageSection({
+    required this.s,
+    required this.pal,
+    required this.isIndonesian,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.languageTitle),
+        const SizedBox(height: AppKit.md),
+        AppKit.card(
+          context: context,
+          padding: const EdgeInsets.symmetric(horizontal: AppKit.lg, vertical: AppKit.xs),
+          child: Row(
+            children: [
+              const Text('🌍', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: AppKit.md),
+              Expanded(
+                child: Text(
+                  isIndonesian ? s.languageIndonesian : s.languageEnglish,
+                  style: TextStyle(color: pal.textPrimary, fontSize: 14),
+                ),
+              ),
+              SegmentedButton<bool>(
+                segments: const [
+                  ButtonSegment(value: false, label: Text('EN')),
+                  ButtonSegment(value: true, label: Text('ID')),
+                ],
+                selected: {isIndonesian},
+                onSelectionChanged: (selected) {
+                  context.read<LanguageProvider>().setLocale(
+                    Locale(selected.first ? 'id' : 'en'),
+                  );
+                },
+                showSelectedIcon: false,
+                style: SegmentedButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Reminder toggle + time picker.
+class _ReminderSection extends StatelessWidget {
+  final AppStrings s;
+  final Color pal;
+  final bool reminderEnabled;
+  final int reminderTime;
+  final BoredomProvider provider;
+
+  const _ReminderSection({
+    required this.s,
+    required this.pal,
+    required this.reminderEnabled,
+    required this.reminderTime,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.remindersTitle),
+        const SizedBox(height: AppKit.md),
+        AppKit.card(
+          context: context,
+          padding: const EdgeInsets.all(AppKit.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          s.remindersTitle,
+                          style: TextStyle(color: pal.textPrimary, fontSize: 14),
+                        ),
+                        Text(
+                          s.remindersDesc,
+                          style: TextStyle(color: pal.textSecondary, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: reminderEnabled,
+                    onChanged: (v) async {
+                      final ok = await provider.setReminder(v);
+                      if (!context.mounted) return;
+                      if (v && !ok) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(s.reminderBlocked)),
+                        );
+                      }
+                    },
+                    activeThumbColor: pal.accent,
+                  ),
+                ],
+              ),
+              if (reminderEnabled) ...[
+                const SizedBox(height: AppKit.sm),
+                OutlinedButton.icon(
+                  onPressed: () => _pickReminderTime(context, s, provider),
+                  icon: const Icon(Icons.schedule, size: 18),
+                  label: Text(
+                    '${(reminderTime ~/ 60).toString().padLeft(2, '0')}:' 
+                    '${(reminderTime % 60).toString().padLeft(2, '0')}',
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: pal.accent,
+                    side: BorderSide(color: pal.accent),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Muted categories filter chips.
+class _MutedSection extends StatelessWidget {
+  final AppStrings s;
+  final Color pal;
+  final Set<String> muted;
+  final BoredomProvider provider;
+
+  const _MutedSection({
+    required this.s,
+    required this.pal,
+    required this.muted,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.mutedCategories),
+        const SizedBox(height: AppKit.xs),
+        Text(
+          s.mutedDesc,
+          style: TextStyle(color: pal.textSecondary, fontSize: 12),
+        ),
+        const SizedBox(height: AppKit.md),
+        Wrap(
+          spacing: AppKit.sm,
+          runSpacing: AppKit.sm,
+          children: MissionCategory.values
+              .where((c) => c != MissionCategory.chaos)
+              .map((c) {
+            final isMuted = muted.contains(c.name);
+            return FilterChip(
+              label: Text(c.labelFor(s.code)),
+              selected: isMuted,
+              showCheckmark: false,
+              avatar: Icon(
+                isMuted ? Icons.visibility_off : Icons.visibility,
+                size: 16,
+                color: isMuted ? pal.warning : pal.textSecondary,
+              ),
+              backgroundColor: pal.surface,
+              selectedColor: pal.warning.withValues(alpha: 0.18),
+              labelStyle: TextStyle(
+                color: isMuted ? pal.warning : pal.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              onSelected: (v) async {
+                final changed = await provider.toggleCategoryMuted(c);
+                if (!changed && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(s.muteLastBlocked)),
+                  );
+                }
+              },
+            );
+          })
+          .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+/// Backup export / import.
+class _BackupSection extends StatelessWidget {
+  final AppStrings s;
+  final Color pal;
+  final BoredomProvider provider;
+
+  const _BackupSection({
+    required this.s,
+    required this.pal,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.backupTitle),
+        const SizedBox(height: AppKit.xs),
+        Text(
+          s.backupDesc,
+          style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
+        ),
+        const SizedBox(height: AppKit.md),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final text = await provider.exportBackup();
+                  await Clipboard.setData(ClipboardData(text: text));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(s.backupCopied)),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.upload_outlined, size: 18),
+                label: Text(s.backupExport),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: pal.accent,
+                  side: BorderSide(color: pal.accent),
+                  padding: const EdgeInsets.symmetric(vertical: AppKit.md),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppKit.rPill),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppKit.md),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _showImportDialog(context, s, provider),
+                icon: const Icon(Icons.download_outlined, size: 18),
+                label: Text(s.backupImport),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: pal.accent,
+                  side: BorderSide(color: pal.accent),
+                  padding: const EdgeInsets.symmetric(vertical: AppKit.md),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppKit.rPill),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// About text + version footer.
+class _AboutSection extends StatelessWidget {
+  final AppStrings s;
+  final Color pal;
+
+  const _AboutSection({required this.s, required this.pal});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.aboutTitle),
+        const SizedBox(height: AppKit.xs),
+        Text(
+          s.aboutBody,
+          style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
+        ),
+      ],
     );
   }
 }

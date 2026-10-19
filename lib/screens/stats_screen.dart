@@ -5,6 +5,7 @@ import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
+import '../widgets/kit.dart';
 import '../widgets/weekly_chart.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -55,7 +56,7 @@ class StatsScreen extends StatelessWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        padding: const EdgeInsets.fromLTRB(AppKit.lg, AppKit.md, AppKit.lg, AppKit.xxl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -63,37 +64,53 @@ class StatsScreen extends StatelessWidget {
               s.statsTitle,
               style: TextStyle(color: pal.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppKit.xl),
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(label: s.mTotalMissions, value: '${progress.totalMissionsCompleted}', emoji: '🎯'),
+                  child: AppKit.metricCard(context,
+                    label: s.mTotalMissions,
+                    value: '${progress.totalMissionsCompleted}',
+                    emoji: '🎯',
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppKit.md),
                 Expanded(
-                  child: _MetricCard(label: s.mLongestStreak, value: s.days(progress.longestStreak), emoji: '🔥'),
+                  child: AppKit.metricCard(context,
+                    label: s.mLongestStreak,
+                    value: s.days(progress.longestStreak),
+                    emoji: '🔥',
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.md),
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(label: s.mTotalRerolls, value: '${progress.totalRerollsAllTime}', emoji: '🎲'),
+                  child: AppKit.metricCard(context,
+                    label: s.mTotalRerolls,
+                    value: '${progress.totalRerollsAllTime}',
+                    emoji: '🎲',
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppKit.md),
                 Expanded(
-                  child: _MetricCard(label: s.mChaos, value: '${progress.chaosMissionsCompleted}', emoji: '☢️'),
+                  child: AppKit.metricCard(context,
+                    label: s.mChaos,
+                    value: '${progress.chaosMissionsCompleted}',
+                    emoji: '☢️',
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.md),
             // Null means nothing has been tracked yet, which is different
             // from a real 0 percent, so it renders as a dash.
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(
+                  child: AppKit.metricCard(context,
                     label: s.mFollowThrough,
                     value: rate == null
                         ? '—'
@@ -101,9 +118,9 @@ class StatsScreen extends StatelessWidget {
                     emoji: '🎖️',
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppKit.md),
                 Expanded(
-                  child: _MetricCard(
+                  child: AppKit.metricCard(context,
                     label: s.mFollowThroughDesc,
                     value: '$tracked',
                     emoji: '📋',
@@ -111,19 +128,19 @@ class StatsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.md),
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(
+                  child: AppKit.metricCard(context,
                     label: s.mAvgXp,
                     value: avgXp.toStringAsFixed(1),
                     emoji: '⚡',
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppKit.md),
                 Expanded(
-                  child: _MetricCard(
+                  child: AppKit.metricCard(context,
                     label: s.mBestDay,
                     value: bestDay == null ? '-' : s.weekdayName(bestDay),
                     emoji: '📅',
@@ -131,36 +148,29 @@ class StatsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 28),
-            Text(
-              s.weekTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.sectionHeader(context, s, title: s.weekTitle),
+            const SizedBox(height: AppKit.md),
             RepaintBoundary(
               child: WeeklyChart(counts: weekCounts),
             ),
-            const SizedBox(height: 28),
-            Text(
-              s.monthTitle,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.sectionHeader(context, s, title: s.monthTitle),
+            const SizedBox(height: AppKit.md),
             RepaintBoundary(
               child: MonthlyChart(counts: monthCounts),
             ),
-            const SizedBox(height: 28),
-            Text(
-              s.perCategory,
-              style: TextStyle(color: pal.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.sectionHeader(context, s, title: s.perCategory),
+            const SizedBox(height: AppKit.md),
             if (progress.totalMissionsCompleted == 0)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                  s.statsEmpty,
-                  style: TextStyle(color: pal.textSecondary),
+                padding: const EdgeInsets.symmetric(vertical: AppKit.xl),
+                child: Center(
+                  child: Text(
+                    s.statsEmpty,
+                    style: TextStyle(color: pal.textSecondary),
+                  ),
                 ),
               )
             else
@@ -168,7 +178,7 @@ class StatsScreen extends StatelessWidget {
                 final count = categoryCounts[cat.name] ?? 0;
                 final ratio = maxCount == 0 ? 0.0 : count / maxCount;
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: AppKit.md),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -181,12 +191,12 @@ class StatsScreen extends StatelessWidget {
                               style: TextStyle(color: pal.textSecondary, fontSize: 12)),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppKit.sm),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(AppKit.rSm),
                         child: LinearProgressIndicator(
                           value: ratio,
-                          minHeight: 10,
+                          minHeight: AppKit.md,
                           backgroundColor: pal.emptyBar,
                           valueColor: AlwaysStoppedAnimation(pal.accent),
                         ),
@@ -197,33 +207,6 @@ class StatsScreen extends StatelessWidget {
               }),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String emoji;
-  const _MetricCard({required this.label, required this.value, required this.emoji});
-
-  @override
-  Widget build(BuildContext context) {
-    final pal = context.palette;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: pal.surface, borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 8),
-          Text(value,
-              style: TextStyle(color: pal.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 2),
-          Text(label, style: TextStyle(color: pal.textSecondary, fontSize: 11)),
-        ],
       ),
     );
   }

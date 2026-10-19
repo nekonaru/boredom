@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../providers/theme_provider.dart';
+import '../widgets/kit.dart';
 
 /// Last-7-days activity bars, drawn with a CustomPainter instead of a
 /// chart package so the APK stays small. No animation, no dependencies.
@@ -10,12 +11,9 @@ class WeeklyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pal = context.palette;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: pal.surface,
-        borderRadius: BorderRadius.circular(18),
-      ),
+    return AppKit.card(
+      context: context,
+      padding: const EdgeInsets.all(AppKit.lg),
       child: SizedBox(
         height: 120,
         width: double.infinity,
@@ -40,12 +38,9 @@ class MonthlyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pal = context.palette;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: pal.surface,
-        borderRadius: BorderRadius.circular(18),
-      ),
+    return AppKit.card(
+      context: context,
+      padding: const EdgeInsets.all(AppKit.lg),
       child: SizedBox(
         height: 100,
         width: double.infinity,

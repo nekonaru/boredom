@@ -41,6 +41,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       (p) => p.customMissions,
     );
     final actions = context.read<BoredomProvider>();
+    // O(1) catalog lookup so resolving titles/categories for every history
+    // row is O(n) instead of O(n*m) per build (n = rows, m = catalog size).
+    final catalogMap = {for (final m in MissionCatalog.all) m.id: m};
 
     final filtered = HistoryFilters.apply(
       history,
@@ -48,8 +51,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       range: _range,
       outcome: _outcomeFilter,
       now: DateTime.now(),
-      titleOf: (e) => _titleFor(e, actions, code),
-      categoryOf: (e) => _categoryFor(e, actions, code),
+      titleOf: (e) => _titleFor(e, catalogMap, code),
+      categoryOf: (e) => _categoryFor(e, catalogMap, code),
     );
     final favoriteMissions = MissionCatalog.all
         .where((m) => favorites.contains(m.id))
@@ -290,7 +293,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   return _HistoryTile(
                     entry: entry,
                     code: code,
-                    actions: actions,
+                    catalog: catalogMap,
                   );
                 },
               ),
@@ -403,17 +406,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
 /// Indonesian. The catalog is the source of truth, and only entries that
 /// no longer resolve (custom missions, or missions dropped from the
 /// catalog) fall back to the stored string.
-String _titleFor(CompletedMission entry, BoredomProvider provider, String code) =>
-    provider.missionById(entry.missionId)?.titleFor(code) ?? entry.title;
+String _titleFor(
+  CompletedMission entry,
+  Map<String, Mission> catalog,
+  String code,
+) =>
+    catalog[entry.missionId]?.titleFor(code) ?? entry.title;
 
 /// Same resolution rule as [_titleFor], for the category line.
 String _categoryFor(
   CompletedMission entry,
-  BoredomProvider provider,
+  Map<String, Mission> catalog,
   String code,
 ) =>
-    provider.missionById(entry.missionId)?.category.labelFor(code) ??
-    entry.categoryLabel;
+    catalog[entry.missionId]?.category.labelFor(code) ?? entry.categoryLabel;
 
 /// One tappable outcome row in the custom-mission bottom sheet.
 class _OutcomeOption extends StatelessWidget {
@@ -500,11 +506,11 @@ class _OutcomeBadge extends StatelessWidget {
 class _HistoryTile extends StatelessWidget {
   final CompletedMission entry;
   final String code;
-  final BoredomProvider actions;
+  final Map<String, Mission> catalog;
   const _HistoryTile({
     required this.entry,
     required this.code,
-    required this.actions,
+    required this.catalog,
   });
 
   @override
@@ -527,7 +533,7 @@ class _HistoryTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _titleFor(entry, actions, code),
+                    _titleFor(entry, catalog, code),
                     style: TextStyle(
                       color: pal.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -536,7 +542,7 @@ class _HistoryTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${_categoryFor(entry, actions, code)} · ${formatHistoryDate(entry.completedAt, code: code)}',
+                    '${_categoryFor(entry, catalog, code)} · ${formatHistoryDate(entry.completedAt, code: code)}',
                     style: TextStyle(
                       color: pal.textSecondary,
                       fontSize: 12,

@@ -1,0 +1,293 @@
+import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
+import '../models/achievement.dart';
+import '../models/user_progress.dart';
+import '../providers/theme_provider.dart';
+
+/// Shared UI kit so every screen uses the same spacing, radius, and card
+/// shape instead of magic numbers copied between files.
+class AppKit {
+  AppKit._();
+
+  // ---------------- Spacing ----------------
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+  static const double xl = 24.0;
+  static const double xxl = 32.0;
+
+  // ---------------- Border radius ----------------
+  static const double rSm = 10.0;
+  static const double rMd = 14.0;
+  static const double rLg = 16.0;
+  static const double rXl = 18.0;
+  static const double rPill = 28.0;
+
+  // ---------------- Cards ----------------
+  /// Plain surface card used everywhere.
+  static Widget card({
+    required Widget child,
+    BuildContext? context,
+    Color? color,
+    double radius = rLg,
+    EdgeInsetsGeometry? padding,
+    Border? border,
+  }) {
+    final pal = context != null ? context.palette : null;
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: color ?? pal?.surface,
+        borderRadius: BorderRadius.circular(radius),
+        border: border,
+      ),
+      child: child,
+    );
+  }
+
+  /// Bordered surface card.
+  static Widget borderedCard({
+    required Widget child,
+    required BuildContext context,
+    double radius = rLg,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(AppKit.lg),
+    Color? borderColor,
+  }) {
+    final pal = context.palette;
+    return card(
+      child: child,
+      radius: radius,
+      padding: padding,
+      border: Border.all(
+        color: borderColor ?? pal.textSecondary.withValues(alpha: 0.25),
+      ),
+    );
+  }
+
+  // ---------------- Buttons ----------------
+  static Widget primaryButton({
+    required BuildContext context,
+    required String label,
+    required VoidCallback onPressed,
+    bool loading = false,
+    Color? backgroundColor,
+    double height = 56,
+  }) {
+    final pal = context.palette;
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: loading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor ?? pal.accent,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rPill)),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        child: loading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+              )
+            : Text(label),
+      ),
+    );
+  }
+
+  static Widget outlineButton({
+    required BuildContext context,
+    required String label,
+    required VoidCallback onPressed,
+    bool loading = false,
+    Color? foregroundColor,
+    double height = 56,
+  }) {
+    final pal = context.palette;
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: loading ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: foregroundColor ?? pal.accent,
+          side: BorderSide(color: foregroundColor ?? pal.accent),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rPill)),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        child: loading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+              )
+            : Text(label),
+      ),
+    );
+  }
+
+  // ---------------- Section header ----------------
+  static Widget sectionHeader(BuildContext context, AppStrings s,
+      {required String title, String? subtitle}) {
+    final pal = context.palette;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            color: pal.textSecondary,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.4,
+          ),
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: AppKit.xs),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: pal.textSecondary,
+              fontSize: 12,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // ---------------- Metric card (shared between Stats & Profile) ----------------
+  static Widget metricCard(BuildContext context,
+      {required String label, required String value, required String emoji}) {
+    final pal = context.palette;
+    return AppKit.card(
+      context: context,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(height: AppKit.sm),
+          Text(value,
+              style: TextStyle(
+                  color: pal.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: AppKit.xs),
+          Text(label, style: TextStyle(color: pal.textSecondary, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  // ---------------- Toggle row (quick wins / chaos / haptics) ----------------
+  static Widget toggleRow(BuildContext context,
+      {required String emoji,
+      required String title,
+      required String? subtitle,
+      required bool value,
+      required VoidCallback onChanged,
+      Color? activeColor}) {
+    final pal = context.palette;
+    final on = activeColor ?? pal.accent;
+    return AppKit.card(
+      context: context,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(rMd),
+        onTap: onChanged,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppKit.lg, vertical: AppKit.md),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: AppKit.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: pal.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: AppKit.xs),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: pal.textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Switch(
+                value: value,
+                onChanged: (_) => onChanged(),
+                activeThumbColor: on,
+                activeColor: on.withValues(alpha: 0.18),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------- SnackBar helpers ----------------
+  static void showXp(BuildContext context, AppStrings s,
+      {required int gained, bool usedFreeze = false, VoidCallback? onUndo}) {
+    final pal = context.palette;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          gained > 0 ? s.xpSnack(gained) : s.skippedSnack,
+        ),
+        backgroundColor: gained > 0 ? pal.success : pal.textSecondary,
+        action: onUndo != null
+            ? SnackBarAction(
+                label: s.undoAction,
+                textColor: Colors.white,
+                onPressed: (_) => onUndo(),
+              )
+            : null,
+      ),
+    );
+    if (usedFreeze) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❄️ ${s.freezeUsed}'),
+          backgroundColor: pal.accent,
+        ),
+      );
+    }
+  }
+
+  static void showAchievements(BuildContext context, AppStrings s,
+      List<Achievement> unlocked, String code) {
+    final pal = context.palette;
+    for (final a in unlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: code)}',
+          ),
+          backgroundColor: pal.accent,
+        ),
+      );
+    }
+  }
+}

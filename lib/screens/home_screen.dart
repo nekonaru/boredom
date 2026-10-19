@@ -8,6 +8,7 @@ import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/feedback.dart';
+import '../widgets/kit.dart';
 import '../widgets/weekly_summary.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
@@ -42,12 +43,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// Wakes up just after midnight and rolls the day over.
   ///
   /// Without this, leaving the app open across midnight kept yesterday's
-  /// streak-at-risk banner, reroll allowance, and daily challenge on
-  /// screen until the app was backgrounded and resumed.
+  /// streak warning, reroll allowance, and daily challenge on screen until
+  /// the app was backgrounded and resumed.
   void _scheduleMidnight() {
     // Cancel first. Resuming the app re-arms this, and without the cancel
-    // the previous chain kept re-arming itself: N background/resume
-    // cycles meant N independent timers and N redundant midnight writes.
+    // the previous chain kept re-arming itself: N background/resume cycles
+    // meant N independent timers and N redundant midnight writes.
     _midnightTimer?.cancel();
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
@@ -71,6 +72,35 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  void _handleCompletion(BuildContext context, AppStrings s,
+      BoredomProvider provider) {
+    final gained = provider.lastXpGained;
+    // A skipped mission sets lastXpGained to 0. Gating on null showed a
+    // green "+0 XP" celebration for the exact outcome the feature exists
+    // to discourage.
+    if (gained != null) {
+      AppKit.showXp(context, s,
+          gained: gained,
+          usedFreeze: provider.lastFreezeUsed,
+          onUndo: provider.canUndo
+              ? () async {
+                  final ok = await provider.undoLastComplete();
+                  if (context.mounted && ok) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(s.undoDone)));
+                  }
+                }
+              : null);
+      provider.clearLastXpGained();
+    }
+    final code = s.code;
+    for (final a in provider.lastUnlockedAchievements) {
+      if (!context.mounted) break;
+      AppKit.showAchievements(context, s, [a], code);
+    }
+    provider.clearLastUnlockedAchievements();
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = context.str;
@@ -80,8 +110,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final progress = context.select<BoredomProvider, UserProgress>((p) => p.progress);
     final selectedMood = context.select<BoredomProvider, Mood>((p) => p.selectedMood);
     final selectedTime = context.select<BoredomProvider, TimeBudget>((p) => p.selectedTime);
-    final selectedLocation = context.select<BoredomProvider, LocationType>((p) => p.selectedLocation);
-    final selectedEnergy = context.select<BoredomProvider, EnergyLevel>((p) => p.selectedEnergy);
+    final selectedLocation =
+        context.select<BoredomProvider, LocationType>((p) => p.selectedLocation);
+    final selectedEnergy =
+        context.select<BoredomProvider, EnergyLevel>((p) => p.selectedEnergy);
     final chaosMode = context.select<BoredomProvider, bool>((p) => p.chaosMode);
     final rerollsLeft = context.select<BoredomProvider, int>((p) => p.rerollsLeft);
     final streakAtRisk = context.select<BoredomProvider, bool>(
@@ -94,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        padding: const EdgeInsets.fromLTRB(AppKit.lg, AppKit.md, AppKit.lg, AppKit.xxl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -111,12 +143,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                 ),
                 if (progress.streakDays > 0)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: pal.warning.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  AppKit.card(
+                    context: context,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppKit.sm, vertical: AppKit.xs),
                     child: Text(
                       '🔥 ${s.streak(progress.streakDays)}',
                       style: TextStyle(
@@ -128,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppKit.xl),
             Text(
               s.headline,
               style: TextStyle(
@@ -138,28 +168,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 height: 1.1,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppKit.xs),
             Text(
               s.subhead,
               style: TextStyle(color: pal.textSecondary, fontSize: 16),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppKit.xl),
             XpBar(progress: progress),
             if (streakAtRisk) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: pal.warning.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: pal.warning.withValues(alpha: 0.4),
-                  ),
-                ),
+              const SizedBox(height: AppKit.md),
+              AppKit.borderedCard(
+                context: context,
+                borderColor: pal.warning.withValues(alpha: 0.4),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppKit.lg, vertical: AppKit.md),
                 child: Row(
                   children: [
                     const Text('⚠️', style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: AppKit.md),
                     Expanded(
                       child: Text(
                         s.streakRisk,
@@ -174,13 +200,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
               ),
             ],
-            const SizedBox(height: 16),
-            const WeeklySummaryStrip(),
-            const SizedBox(height: 16),
-            const DailyChallengeCard(),
-            const SizedBox(height: 28),
-            const WeeklyInsights(),
-
+            const SizedBox(height: AppKit.lg),
+            RepaintBoundary(
+              child: const WeeklySummaryStrip(),
+            ),
+            const SizedBox(height: AppKit.lg),
+            RepaintBoundary(
+              child: const DailyChallengeCard(),
+            ),
+            const SizedBox(height: AppKit.xl),
+            RepaintBoundary(
+              child: const WeeklyInsights(),
+            ),
+            const SizedBox(height: AppKit.xl),
             SelectorRow<Mood>(
               title: s.secMood,
               selected: selectedMood,
@@ -189,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   .map((m) => SelectorOption(m, m.emoji, s.moodLabel(m)))
                   .toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppKit.lg),
             SelectorRow<TimeBudget>(
               title: s.secTime,
               selected: selectedTime,
@@ -198,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   .map((t) => SelectorOption(t, '⏱️', s.timeLabel(t)))
                   .toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppKit.lg),
             SelectorRow<LocationType>(
               title: s.secLocation,
               selected: selectedLocation,
@@ -207,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   .map((l) => SelectorOption(l, l.emoji, s.locationLabel(l)))
                   .toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppKit.lg),
             SelectorRow<EnergyLevel>(
               title: s.secEnergy,
               selected: selectedEnergy,
@@ -216,192 +248,42 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   .map((e) => SelectorOption(e, e.emoji, s.energyLabel(e)))
                   .toList(),
             ),
-
-            // Quick wins toggle: narrows rolls to missions of 15 minutes or less.
-            InkWell(
-              onTap: () => actions.setQuickWins(!quickWins),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: quickWins
-                      ? pal.success.withValues(alpha: 0.12)
-                      : pal.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: quickWins
-                        ? pal.success
-                        : pal.textSecondary.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Text('⚡', style: TextStyle(fontSize: 20)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            s.quickWins,
-                            style: TextStyle(
-                              color: pal.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                          Text(
-                            s.quickWinsDesc,
-                            style: TextStyle(
-                              color: pal.textSecondary,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: quickWins,
-                      onChanged: actions.setQuickWins,
-                      activeThumbColor: pal.success,
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(height: AppKit.xl),
+            AppKit.toggleRow(
+              context,
+              emoji: '⚡',
+              title: s.quickWins,
+              subtitle: s.quickWinsDesc,
+              value: quickWins,
+              onChanged: () => actions.setQuickWins(!quickWins),
+              activeColor: pal.success,
             ),
-
-            const SizedBox(height: 28),
-
-            // Chaos mode toggle.
-            InkWell(
-              onTap: () => actions.setChaosMode(!chaosMode),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: chaosMode
-                      ? pal.danger.withValues(alpha: 0.15)
-                      : pal.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: chaosMode
-                        ? pal.danger
-                        : pal.textSecondary.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Text('☢️', style: TextStyle(fontSize: 20)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            s.chaosTitle,
-                            style: TextStyle(
-                              color: pal.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                          Text(
-                            s.chaosDesc,
-                            style: TextStyle(
-                              color: pal.textSecondary.withValues(alpha: 0.9),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: chaosMode,
-                      onChanged: actions.setChaosMode,
-                      activeThumbColor: pal.danger,
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(height: AppKit.xl),
+            AppKit.toggleRow(
+              context,
+              emoji: '☢️',
+              title: s.chaosTitle,
+              subtitle: s.chaosDesc,
+              value: chaosMode,
+              onChanged: () => actions.setChaosMode(!chaosMode),
+              activeColor: pal.danger,
             ),
-
-            const SizedBox(height: 32),
-
-            SizedBox(
-              width: double.infinity,
-              height: 64,
-              child: ElevatedButton(
-                onPressed: () async {
-                  buzzIfEnabled(context);
-                  actions.rollMission();
-                  if (!context.mounted) return;
-                  await showMissionSheet(context);
-                  if (!context.mounted) return;
-                  final provider = context.read<BoredomProvider>();
-                  final gained = provider.lastXpGained;
-                  // A skipped mission sets lastXpGained to 0. Gating on
-                  // null showed a green "+0 XP" celebration for the exact
-                  // outcome the feature exists to discourage.
-                  if (gained != null) {
-                    final usedFreeze = provider.lastFreezeUsed;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          gained > 0
-                              ? s.xpSnack(gained)
-                              : s.skippedSnack,
-                        ),
-                        backgroundColor:
-                            gained > 0 ? pal.success : pal.textSecondary,
-                        action: provider.canUndo
-                            ? SnackBarAction(
-                                label: s.undoAction,
-                                textColor: Colors.white,
-                                onPressed: () async {
-                                  final ok = await provider.undoLastComplete();
-                                  if (context.mounted && ok) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(s.undoDone)),
-                                    );
-                                  }
-                                },
-                              )
-                            : null,
-                      ),
-                    );
-                    if (usedFreeze) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('❄️ ${s.freezeUsed}'),
-                          backgroundColor: pal.accent,
-                        ),
-                      );
-                    }
-                    provider.clearLastXpGained();
-                  }
-                  final code = s.code;
-                  for (final a in provider.lastUnlockedAchievements) {
-                    if (!context.mounted) break;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '${s.achievementSnack} ${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: code)}',
-                        ),
-                        backgroundColor: pal.accent,
-                      ),
-                    );
-                  }
-                  provider.clearLastUnlockedAchievements();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      chaosMode ? pal.danger : pal.accent,
-                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
-                ),
-                child: Text(chaosMode ? '☢️ ${s.chaosButton}' : '🎲 ${s.boredButton}'),
-              ),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.primaryButton(
+              context: context,
+              label:
+                  '${chaosMode ? '☢️ ' : '🎲 '}${chaosMode ? s.chaosButton : s.boredButton}',
+              backgroundColor: chaosMode ? pal.danger : null,
+              onPressed: () async {
+                buzzIfEnabled(context);
+                actions.rollMission();
+                if (!context.mounted) return;
+                await showMissionSheet(context);
+                if (!context.mounted) return;
+                _handleCompletion(context, s, actions);
+              },
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppKit.sm),
             Center(
               child: Text(
                 s.rerollsLeft(rerollsLeft),
