@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
 import '../models/user_progress.dart';
-import '../models/achievement.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/share_card.dart';

@@ -177,9 +177,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             XpBar(progress: progress),
             if (streakAtRisk) ...[
               const SizedBox(height: AppKit.md),
-              AppKit.borderedCard(
-                context: context,
-                borderColor: pal.warning.withValues(alpha: 0.4),
+              AppKit.card(
+                color: pal.surface,
+                border: Border.all(
+                  color: pal.warning.withValues(alpha: 0.4),
+                ),
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppKit.lg, vertical: AppKit.md),
                 child: Row(

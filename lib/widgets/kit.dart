@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../models/achievement.dart';
-import '../models/user_progress.dart';
 import '../providers/theme_provider.dart';
 
 /// Shared UI kit so every screen uses the same spacing, radius, and card
@@ -173,12 +172,9 @@ class AppKit {
       required String title,
       required String? subtitle,
       required bool value,
-      required void Function()? onChanged,
-      Color? activeColor}) {
+      required void Function()? onChanged}) {
     final pal = context.palette;
-    final on = activeColor ?? pal.accent;
     return card(
-      context: null,
       color: pal.surface,
       child: InkWell(
         borderRadius: BorderRadius.circular(rMd),
@@ -216,9 +212,8 @@ class AppKit {
               ),
               Switch(
                 value: value,
-                onChanged: (_) => onChanged?.call(),
-                activeThumbColor: on,
-                activeColor: on.withValues(alpha: 0.18),
+                onChanged: () => onChanged?.call(),
+                activeThumbColor: pal.accent,
               ),
             ],
           ),
@@ -241,7 +236,7 @@ class AppKit {
             ? SnackBarAction(
                 label: s.undoAction,
                 textColor: Colors.white,
-                onPressed: (_) => onUndo(),
+                onPressed: onUndo,
               )
             : null,
       ),
