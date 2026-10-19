@@ -185,7 +185,7 @@ class Insights {
     return out.take(max).toList();
   }
 
-  static List<CompletedMission> _active(List<CompletedMission> history) =>
+  static Iterable<CompletedMission> _active(List<CompletedMission> history) =>
       history.where((e) => e.outcome == null || e.outcome!.countsAsActivity);
 
   /// Resolves a history row back to its catalog category. Null for custom
