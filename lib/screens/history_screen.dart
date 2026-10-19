@@ -6,6 +6,7 @@ import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/history_filter.dart';
 import '../services/mission_catalog.dart';
 import '../services/storage_service.dart';
 import '../utils/date_format.dart';
@@ -22,38 +23,8 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   String _query = '';
-  _HistoryRange _range = _HistoryRange.all;
-  _OutcomeFilter _outcomeFilter = _OutcomeFilter.all;
-
-  bool _matchesRange(CompletedMission e, _HistoryRange range) {
-    if (range == _HistoryRange.all) return true;
-    final now = DateTime.now();
-    final day = DateTime(
-      e.completedAt.year,
-      e.completedAt.month,
-      e.completedAt.day,
-    );
-    final today = DateTime(now.year, now.month, now.day);
-    final diff = today.difference(day).inDays;
-    return switch (range) {
-      _HistoryRange.today => diff == 0,
-      _HistoryRange.week => diff >= 0 && diff < 7,
-      _HistoryRange.month => diff >= 0 && diff < 30,
-      _HistoryRange.all => true,
-    };
-  }
-
-  bool _matchesOutcome(CompletedMission e, _OutcomeFilter filter) {
-    return switch (filter) {
-      _OutcomeFilter.all => true,
-      // Rows with no outcome predate the feature, so they are neither
-      // shown as successes nor hidden as failures.
-      _OutcomeFilter.done => e.outcome == MissionOutcome.done,
-      _OutcomeFilter.partial => e.outcome == MissionOutcome.partial,
-      _OutcomeFilter.skipped => e.outcome == MissionOutcome.skipped,
-      _OutcomeFilter.untracked => e.outcome == null,
-    };
-  }
+  HistoryRange _range = HistoryRange.all;
+  HistoryFilter _outcomeFilter = HistoryFilter.all;
 
   @override
   Widget build(BuildContext context) {
@@ -71,17 +42,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
     final actions = context.read<BoredomProvider>();
 
-    final q = _query.trim().toLowerCase();
-    final filtered = history
-        .where((e) => _matchesRange(e, _range))
-        .where((e) => _matchesOutcome(e, _outcomeFilter))
-        // Search what the row actually shows, otherwise an Indonesian
-        // search for "koding" would match nothing on screen.
-        .where((e) =>
-            q.isEmpty ||
-            _titleFor(e, actions, code).toLowerCase().contains(q) ||
-            _categoryFor(e, actions, code).toLowerCase().contains(q))
-        .toList();
+    final filtered = HistoryFilters.apply(
+      history,
+      query: _query,
+      range: _range,
+      outcome: _outcomeFilter,
+      now: DateTime.now(),
+      titleOf: (e) => _titleFor(e, actions, code),
+      categoryOf: (e) => _categoryFor(e, actions, code),
+    );
     final favoriteMissions = MissionCatalog.all
         .where((m) => favorites.contains(m.id))
         .toList();
@@ -237,7 +206,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      for (final r in _HistoryRange.values)
+                      for (final r in HistoryRange.values)
                         Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: ChoiceChip(
@@ -254,7 +223,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      for (final o in _OutcomeFilter.values)
+                      for (final o in HistoryFilter.values)
                         Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: ChoiceChip(
@@ -298,8 +267,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Text(
-                    (q.isEmpty && _range == _HistoryRange.all &&
-                            _outcomeFilter == _OutcomeFilter.all)
+                    HistoryFilters.isUnfiltered(
+                      query: _query,
+                      range: _range,
+                      outcome: _outcomeFilter,
+                    )
                         ? s.historyEmpty
                         : s.searchEmpty,
                     textAlign: TextAlign.center,
@@ -423,12 +395,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     descCtrl.dispose();
   }
 }
-
-/// Date windows offered above the history list.
-enum _HistoryRange { today, week, month, all }
-
-/// Outcome filters offered above the history list.
-enum _OutcomeFilter { all, done, partial, skipped, untracked }
 
 /// Resolves a history entry's title in the active language.
 ///
