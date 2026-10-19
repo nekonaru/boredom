@@ -20,16 +20,18 @@ class HistoryFilters {
     HistoryRange range, {
     required DateTime now,
   }) {
-    if (range == HistoryRange.all) return true;
     final day = DateTime(
       entry.completedAt.year,
       entry.completedAt.month,
       entry.completedAt.day,
     );
     final today = DateTime(now.year, now.month, now.day);
-    // Calendar days, not elapsed hours, and never negative: a row stamped
-    // in the future by a clock change must not appear as "yesterday".
+    // Calendar days, not elapsed hours.
     final diff = today.difference(day).inDays;
+    // Negative means the row is stamped in the future, which only happens
+    // when a device clock was wrong. Every other statistic in the app
+    // rejects those, so the list must not display them either, not even
+    // under "All time".
     if (diff < 0) return false;
     return switch (range) {
       HistoryRange.today => diff == 0,

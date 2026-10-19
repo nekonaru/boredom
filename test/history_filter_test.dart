@@ -53,8 +53,9 @@ void main() {
     });
 
     test('a future-dated row is never in any window', () {
-      // A clock change can leave a stamp in the future. It must not show
-      // up as "today", which would quietly rewrite the user's record.
+      // A clock change can leave a stamp in the future. Every other
+      // statistic in the app rejects those, so the list must too, not
+      // even under "All time".
       final future = at(DateTime(2026, 6, 20, 10));
       for (final r in HistoryRange.values) {
         expect(inRange(future, r), isFalse, reason: '$r should reject it');
@@ -143,8 +144,19 @@ void main() {
       expect(result.first.title, 'Coding');
     });
 
-    test('a skipped row is excluded by the activity filters', () {
+    test('a skipped row is listed, not hidden', () {
+      // The list is a record, so a skipped attempt stays visible. The
+      // activity filtering in the statistics is a different concern.
       final result = run(range: HistoryRange.today);
+      expect(result.length, 2);
+      expect(result.map((e) => e.title), contains('Gaming'));
+    });
+
+    test('a skipped row disappears under the done filter', () {
+      final result = run(
+        range: HistoryRange.today,
+        outcome: HistoryFilter.done,
+      );
       expect(result.length, 1);
       expect(result.first.title, 'Coding');
     });
