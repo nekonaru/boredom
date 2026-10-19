@@ -119,4 +119,14 @@ class DailyChallengeCatalog {
   /// never crashes the app when the catalog changes.
   static DailyChallenge byId(String id) =>
       all.firstWhere((c) => c.id == id, orElse: () => all.first);
+
+  /// True when [id] still resolves to a real catalog entry. Used to
+  /// validate stored ids instead of trusting them, matching the stricter
+  /// handling quest chains get.
+  static bool idExists(String id) {
+    for (final c in all) {
+      if (c.id == id) return true;
+    }
+    return false;
+  }
 }

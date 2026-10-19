@@ -21,6 +21,12 @@ class WeeklyInsights extends StatelessWidget {
     final history = context.select<BoredomProvider, List<CompletedMission>>(
       (p) => p.history,
     );
+    // Most insight cards are functions of the current date, but `history`
+    // only changes on a completion. Listening to the provider itself means
+    // the day rollover in refreshIfDayChanged() also refreshes them,
+    // instead of leaving yesterday's comparison on screen until the user
+    // next completes something.
+    context.watch<BoredomProvider>();
 
     if (history.length < 5) return const SizedBox.shrink();
     final items = Insights.build(history, DateTime.now());
@@ -39,6 +45,10 @@ class WeeklyInsights extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ...items.map((i) => _InsightTile(insight: i, code: code)),
+        // The gap lives in here, not in the caller. Sibling SizedBoxes in
+        // Home left ~56pt of dead space for exactly the new players this
+        // widget hides itself from.
+        const SizedBox(height: 28),
       ],
     );
   }

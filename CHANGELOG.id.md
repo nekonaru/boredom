@@ -1,5 +1,54 @@
 # Changelog
 
+## v3.0.1
+
+Tinjau ulang semua yang rilis antara v2.5.0 dan v3.0.0, khusus mencari
+cacat yang saya sebabkan sendiri.
+
+### Diperbaiki
+- **Melaporkan misi sebagai "tidak dikerjakan" menghukum dua kali.**
+  Kamu tidak dapat XP dan streak tidak bertambah, lalu pengundi
+  memperlakukannya sebagai penyelesaian terbaru dan menyembunyikan misi
+  itu selama tujuh hari. Menjawab jujur kini hanya harga yang hilang.
+- **Misi yang dilewati memunculkan toast hijau "+0 XP"** lengkap dengan
+  tombol undo, bertolak belakang dengan jawaban yang baru kamu pilih.
+  Sekarang toast-nya terang-tiba mengatakan tidak ada yang diberikan,
+  beserta alasannya.
+- **Melewati misi buatan melaporkan XP dasarnya sebagai hasil**, persis
+  kebalikan dari yang tercatat.
+- **Penyelesaian sebagian bisa membayar bonus level hantu.** Batasnya
+  dihitung dari nilai misi penuh padahal hanya 60 persen yang dibayar,
+  jadi di akhir pekan misi bernilai tinggi bisa mengambil bonus level
+  20 lalu tetap berhenti di bawah level 20. Batasnya kini dihitung dari
+  jumlah yang benar-benar diberikan.
+- **Ketuk dua kali "selesaikan langkah" di quest chain membayar dua
+  kali.** Langkah baru ditandai selesai beberapa await kemudian, jadi
+  ketukan kedua lolos dan menulis baris riwayat ganda. Langkah kini
+  diklaim sebelum await apa pun, seperti menerima misi sejak dulu.
+- **Setiap kali aplikasi dibuka kembali, timer tengah malam menumpuk.**
+  Tiap resume memasang rantai baru tanpa membatalkan yang lama, jadi
+  setelah N kali buka-tutup ada N timer aktif dan N penulisan tengah
+  malam yang sia-sia.
+
+### Ditingkatkan
+- **Riwayat di memori sekarang mengikuti batas yang sama dengan
+  penyimpanan.** Keduanya sebelumnya berbeda: penyimpanan memangkas
+  sampai batas, memori tumbuh terus, sehingga layar Riwayat melaporkan
+  total yang tidak benar-benar ada di perangkat dan angka hasil
+  menurun setelah restart.
+- **Insight diperbarui saat hari berganti**, tidak menampilkan
+  perbandingan kemarin sampai ada penyelesaian berikutnya.
+- **"Jam terbaik" kini mengabaikan upaya yang dilewati**, sama dengan
+  semua angka lain di layar itu.
+- **Label filter riwayat sudah type-check.** Sempat dicocokkan lewat
+  `toString()` dengan cabang `default:`, jadi mengganti nama enum akan
+  diam-diam mengganti semua label chip tanpa error build.
+- **Sheet hasil misi buatan tidak lagi terpotong** di layar pendek atau
+  ukuran teks besar.
+- **Pemain baru tidak lagi mendapat ruang kosong** di Beranda.
+- **Penyaringan riwayat dipindah ke modul murni yang bisa diuji.**
+  Sempat jadi method privat di dalam widget, sehingga mustahil diuji.
+
 ## v3.0.0
 
 Retensi dan kejujuran. Aplikasi sekarang memberi tahu apa yang

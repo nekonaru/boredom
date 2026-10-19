@@ -45,6 +45,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// streak-at-risk banner, reroll allowance, and daily challenge on
   /// screen until the app was backgrounded and resumed.
   void _scheduleMidnight() {
+    // Cancel first. Resuming the app re-arms this, and without the cancel
+    // the previous chain kept re-arming itself: N background/resume
+    // cycles meant N independent timers and N redundant midnight writes.
+    _midnightTimer?.cancel();
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
     final delay = nextMidnight.difference(now) + const Duration(seconds: 1);
@@ -176,7 +180,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             const DailyChallengeCard(),
             const SizedBox(height: 28),
             const WeeklyInsights(),
-            const SizedBox(height: 28),
 
             SelectorRow<Mood>(
               title: s.secMood,
@@ -335,13 +338,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   await showMissionSheet(context);
                   if (!context.mounted) return;
                   final provider = context.read<BoredomProvider>();
-                  if (provider.lastXpGained != null) {
-                    final gained = provider.lastXpGained!;
+                  final gained = provider.lastXpGained;
+                  // A skipped mission sets lastXpGained to 0. Gating on
+                  // null showed a green "+0 XP" celebration for the exact
+                  // outcome the feature exists to discourage.
+                  if (gained != null) {
                     final usedFreeze = provider.lastFreezeUsed;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(s.xpSnack(gained)),
-                        backgroundColor: pal.success,
+                        content: Text(
+                          gained > 0
+                              ? s.xpSnack(gained)
+                              : s.skippedSnack,
+                        ),
+                        backgroundColor:
+                            gained > 0 ? pal.success : pal.textSecondary,
                         action: provider.canUndo
                             ? SnackBarAction(
                                 label: s.undoAction,

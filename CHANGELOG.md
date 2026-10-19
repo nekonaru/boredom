@@ -1,5 +1,55 @@
 # Changelog
 
+## v3.0.1
+
+Self-review of everything shipped between v2.5.0 and v3.0.0, looking
+only for defects introduced along the way.
+
+### Bug fixes
+- **Reporting a mission as "didn't do it" punished you twice.** It paid
+  no XP and moved no streak, and then the roller treated it as a recent
+  completion and hid that mission from you for seven days. Answering
+  honestly now costs nothing but the XP.
+- **A skipped mission popped a green "+0 XP" celebration** with an undo
+  button, directly contradicting the outcome you had just chosen. It
+  now says plainly that nothing was awarded and why.
+- **Skipping a custom mission reported its full base XP as gained**, the
+  exact opposite of what was recorded.
+- **A partial completion could pay a phantom level-up bonus.** The
+  boundary was judged against the full mission value even though only 60
+  percent was paid out, so on a weekend a high-value mission could
+  collect a level 20 bonus and still finish below level 20. The boundary
+  is now judged against the amount actually awarded.
+- **Double-tapping "complete step" on a quest chain paid twice.** The
+  step was only marked done several awaits in, so a second tap slipped
+  through and wrote a duplicate history row. The step is now claimed
+  before any await, the way accepting a mission always has been.
+- **Resuming the app leaked a midnight timer every time.** Each resume
+  armed a fresh chain without cancelling the last, so N background and
+  resume cycles meant N live timers and N redundant midnight writes.
+
+### Optimizations
+- **In-memory history now respects the same cap as storage.** The two
+  used to drift: disk trimmed at the limit while memory grew forever, so
+  the History screen reported a total the device did not hold and
+  outcome numbers dropped after a restart.
+- **Insights refresh when the day rolls over** instead of leaving
+  yesterday's comparison on screen until the next completion.
+- **Your "best hour" now ignores skipped attempts**, matching every
+  other number on that screen. Previously a user whose only clustered
+  activity was bailing out was told when they finish things.
+- **History filter labels are type-checked.** They were resolved by
+  matching `toString()` output against a `default:` branch, so renaming
+  an enum member would have silently relabelled every chip with no build
+  error.
+- **The custom mission outcome sheet no longer clips** its third option
+  on short screens or at large text scales.
+- **New players no longer get a blank band** on Home. The insights hide
+  themselves below five completions, but the spacing around them did
+  not, leaving ~56pt of dead space on the first screen.
+- **History filtering moved into a testable pure module.** It lived as
+  private methods on a widget, which made it impossible to test at all.
+
 ## v3.0.0
 
 Retention and honesty. The app now tells you what your own history

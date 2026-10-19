@@ -675,40 +675,47 @@ class _CustomMissionTile extends StatelessWidget {
                 // missions are measured the same way.
                 final outcome = await showModalBottomSheet<MissionOutcome>(
                   context: context,
+                  // Without this the sheet caps at half the screen and the
+                  // third option is clipped on short devices or at large
+                  // text scales, which is where the longer Indonesian
+                  // labels matter most.
+                  isScrollControlled: true,
                   builder: (sheetContext) => SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            s.outcomeQuestion,
-                            style: TextStyle(
-                              color: context.palette.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              s.outcomeQuestion,
+                              style: TextStyle(
+                                color: context.palette.textPrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          _OutcomeOption(
-                            label: s.outcomeDone,
-                            emoji: '✅',
-                            onTap: () => Navigator.of(sheetContext)
-                                .pop(MissionOutcome.done),
-                          ),
-                          _OutcomeOption(
-                            label: s.outcomePartial,
-                            emoji: '🟡',
-                            onTap: () => Navigator.of(sheetContext)
-                                .pop(MissionOutcome.partial),
-                          ),
-                          _OutcomeOption(
-                            label: s.outcomeSkipped,
-                            emoji: '⭕️',
-                            onTap: () => Navigator.of(sheetContext)
-                                .pop(MissionOutcome.skipped),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            _OutcomeOption(
+                              label: s.outcomeDone,
+                              emoji: '✅',
+                              onTap: () => Navigator.of(sheetContext)
+                                  .pop(MissionOutcome.done),
+                            ),
+                            _OutcomeOption(
+                              label: s.outcomePartial,
+                              emoji: '🟡',
+                              onTap: () => Navigator.of(sheetContext)
+                                  .pop(MissionOutcome.partial),
+                            ),
+                            _OutcomeOption(
+                              label: s.outcomeSkipped,
+                              emoji: '⭕️',
+                              onTap: () => Navigator.of(sheetContext)
+                                  .pop(MissionOutcome.skipped),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -719,15 +726,21 @@ class _CustomMissionTile extends StatelessWidget {
                 final unlocked =
                     await actions.completeCustomMission(mission, outcome);
                 if (!context.mounted) return;
-                // Report what was actually awarded (weekend double XP and
-                // milestone bonuses included), not the base reward.
-                final gained = actions.lastXpGained ?? mission.baseXp;
+                // Report what was actually awarded (weekend double XP,
+                // partial scaling and milestone bonuses included). A skip
+                // awards 0, and the old base-value fallback would have
+                // claimed the full reward for a mission just reported as
+                // not done.
+                final gained = actions.lastXpGained ?? 0;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      s.customDone(mission.title, gained),
+                      gained > 0
+                          ? s.customDone(mission.title, gained)
+                          : s.skippedSnack,
                     ),
-                    backgroundColor: pal.success,
+                    backgroundColor:
+                        gained > 0 ? pal.success : pal.textSecondary,
                         action: actions.canUndo
                             ? SnackBarAction(
                                 label: s.undoAction,

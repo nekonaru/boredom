@@ -34,9 +34,13 @@ class Insights {
   /// worth claiming a pattern. Requires at least 5 completions so a single
   /// lucky roll does not become "you are a morning person".
   static int? bestHour(List<CompletedMission> history) {
-    if (history.length < 5) return null;
+    // Scoped to real activity like every other metric here. Counting
+    // skipped rows would let a user whose only clustered activity is
+    // bailing out be told when they finish things.
+    final rows = _active(history).toList();
+    if (rows.length < 5) return null;
     final counts = List<int>.filled(24, 0);
-    for (final e in history) {
+    for (final e in rows) {
       counts[e.completedAt.hour]++;
     }
     // The peak must hold at least a quarter of all completions, otherwise
@@ -45,7 +49,7 @@ class Insights {
     for (var i = 1; i < 24; i++) {
       if (counts[i] > counts[best]) best = i;
     }
-    if (counts[best] * 4 < history.length) return null;
+    if (counts[best] * 4 < rows.length) return null;
     return best;
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/mission.dart';
 import '../providers/language_provider.dart';
+import '../services/history_filter.dart';
 
 /// Hand-written EN/ID string table (English is the source of truth).
 ///
@@ -87,33 +88,33 @@ class AppStrings {
       : '$n reroll${n == 1 ? '' : 's'} left today';
 
   // History filters and disclosure
-  String historyRangeLabel(Object range) {
-    final name = range.toString().split('.').last;
-    switch (name) {
-      case 'today':
+  // Typed against the real enums so a rename is a compile error, rather
+  // than silently falling through to a `default:` branch on a string.
+  String historyRangeLabel(HistoryRange range) {
+    switch (range) {
+      case HistoryRange.today:
         return _pick('Today', 'Hari ini');
-      case 'week':
+      case HistoryRange.week:
         return _pick('7 days', '7 hari');
-      case 'month':
+      case HistoryRange.month:
         return _pick('30 days', '30 hari');
-      default:
+      case HistoryRange.all:
         return _pick('All time', 'Semua');
     }
   }
 
-  String outcomeFilterLabel(Object filter) {
-    final name = filter.toString().split('.').last;
-    switch (name) {
-      case 'done':
-        return _pick('Done', 'Selesai');
-      case 'partial':
-        return _pick('Partly', 'Sebagian');
-      case 'skipped':
-        return _pick('Skipped', 'Dilewati');
-      case 'untracked':
-        return _pick('No rating', 'Tanpa nilai');
-      default:
+  String outcomeFilterLabel(HistoryFilter filter) {
+    switch (filter) {
+      case HistoryFilter.all:
         return _pick('Any result', 'Semua hasil');
+      case HistoryFilter.done:
+        return _pick('Done', 'Selesai');
+      case HistoryFilter.partial:
+        return _pick('Partly', 'Sebagian');
+      case HistoryFilter.skipped:
+        return _pick('Skipped', 'Dilewati');
+      case HistoryFilter.untracked:
+        return _pick('No rating', 'Tanpa nilai');
     }
   }
 
@@ -137,6 +138,8 @@ class AppStrings {
   String get outcomePartialShort => _pick('Partly', 'Sebagian');
   String get outcomeQuestion =>
       _pick('Did you actually do it?', 'Beneran dikerjakan?');
+  String get skippedSnack =>
+      _pick('Logged as not done. No XP, streak untouched.', 'Dicatat tidak dikerjakan. Tanpa XP, streak tidak berubah.');
 
   // Favorites
   String favoriteOrphans(int n) => isId

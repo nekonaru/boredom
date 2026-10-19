@@ -286,20 +286,41 @@ class BoredomProvider extends ChangeNotifier {
     return level;
   }
 
-  /// Milestone XP for adding [baseXp] to [totalXp], or 0 when no 10-level
-  /// boundary is crossed. Passing the level before and after the gain
-  /// matters: paying whenever the resulting level is a multiple of ten
-  /// would repeat the bonus on every completion spent sitting there.
-  static int milestoneXpFor(int totalXp, int baseXp, DateTime now) {
-    if (baseXp <= 0) return 0;
-    final before = milestoneLevel(totalXp, 0, now);
-    final after = milestoneLevel(totalXp, baseXp, now);
+  /// Milestone XP for a gain that has *already* been settled, or 0 when no
+  /// 10-level boundary is crossed.
+  ///
+  /// Takes the final awarded amount rather than a base value, so the
+  /// weekend doubling and any partial-outcome scaling are applied exactly
+  /// once by the caller. Judging the boundary against XP the player did
+  /// not actually earn pays a phantom bonus: on a weekend a high-value
+  /// mission completed only partly could cross level 20 on paper, collect
+  /// the bonus, and still land below level 20 in total.
+  static int milestoneXpForAwarded(int totalXp, int awardedXp) {
+    if (awardedXp <= 0) return 0;
+    final before = _levelForXp(totalXp);
+    final after = _levelForXp(totalXp + awardedXp);
     if (after == before) return 0;
     var total = 0;
     for (var level = before + 1; level <= after; level++) {
       total += milestoneBonus(level);
     }
     return total;
+  }
+
+  /// Milestone XP for adding [baseXp] to [totalXp], weekend doubling
+  /// included.
+  ///
+  /// Prefer [milestoneXpForAwarded] whenever the awarded XP has already
+  /// been reduced or scaled.
+  static int milestoneXpFor(int totalXp, int baseXp, DateTime now) =>
+      milestoneXpForAwarded(totalXp, xpForDate(baseXp, now));
+
+  static int _levelForXp(int xp) {
+    var level = 1;
+    while (UserProgress.xpNeededForLevel(level + 1) <= xp) {
+      level++;
+    }
+    return level;
   }
 
   /// True when the user completed something yesterday or the day before
@@ -380,12 +401,32 @@ class BoredomProvider extends ChangeNotifier {
 
   // ---------------- Mission flow ----------------
 
+  /// Prepends a history row and keeps the in-memory list inside the same
+  /// cap the storage layer enforces.
+  ///
+  /// They used to diverge: disk trimmed at the cap while memory grew
+  /// without bound, so the History screen's "showing N of M" reported a
+  /// total the device did not hold, and outcome-derived numbers visibly
+  /// dropped after a restart.
+  List<CompletedMission> _appendHistory(CompletedMission entry) {
+    final next = [entry, ...history];
+    return next.length > StorageService.kMaxHistoryEntries
+        ? next.sublist(0, StorageService.kMaxHistoryEntries)
+        : next;
+  }
+
   /// Ids completed in the last 7 days, excluded from rolls so missions
   /// feel fresh instead of repeating.
+  ///
+  /// Skipped attempts are deliberately NOT excluded. Reporting a mission
+  /// as not done already means you did not want it; hiding it for a week
+  /// on top of that turns an honest answer into a punishment.
   Set<String> get recentMissionIds {
     final cutoff = DateTime.now().subtract(const Duration(days: 7));
     return history
-        .where((e) => e.completedAt.isAfter(cutoff))
+        .where((e) =>
+            e.completedAt.isAfter(cutoff) &&
+            e.outcome != MissionOutcome.skipped)
         .map((e) => e.missionId)
         .toSet();
   }
@@ -619,9 +660,10 @@ class BoredomProvider extends ChangeNotifier {
     final now = DateTime.now();
 
     final fullXp = xpForDate(mission.baseXp, now);
+    final baseXp = (fullXp * outcome.xpShare).round();
+    // Judged against what is actually paid out, not the full value.
     final gainedXp = outcome.countsAsActivity
-        ? (fullXp * outcome.xpShare).round() +
-            milestoneXpFor(progress.totalXp, mission.baseXp, now)
+        ? baseXp + milestoneXpForAwarded(progress.totalXp, baseXp)
         : 0;
 
     // A skipped mission is not an active day, so neither the streak nor
@@ -683,7 +725,7 @@ class BoredomProvider extends ChangeNotifier {
     // New list instance: `context.select((p) => p.history)` in HistoryScreen
     // compares with DeepCollectionEquality, which treats an in-place
     // mutation as unchanged and would skip the rebuild.
-    history = [entry, ...history];
+    history = _appendHistory(entry);
     await StorageService.instance.saveProgress(progress);
     await StorageService.instance.addHistoryEntry(entry);
 
@@ -898,9 +940,10 @@ class BoredomProvider extends ChangeNotifier {
   ]) async {
     final now = DateTime.now();
     final fullXp = xpForDate(mission.baseXp, now);
+    final baseXp = (fullXp * outcome.xpShare).round();
+    // Judged against what is actually paid out, not the full value.
     final gainedXp = outcome.countsAsActivity
-        ? (fullXp * outcome.xpShare).round() +
-            milestoneXpFor(progress.totalXp, mission.baseXp, now)
+        ? baseXp + milestoneXpForAwarded(progress.totalXp, baseXp)
         : 0;
     final resolved = outcome.countsAsActivity
         ? _resolveStreak(
@@ -952,7 +995,7 @@ class BoredomProvider extends ChangeNotifier {
     // New list instance: `context.select((p) => p.history)` in HistoryScreen
     // compares with DeepCollectionEquality, which treats an in-place
     // mutation as unchanged and would skip the rebuild.
-    history = [entry, ...history];
+    history = _appendHistory(entry);
 
     await StorageService.instance.saveProgress(progress);
     await StorageService.instance.addHistoryEntry(entry);
@@ -1032,9 +1075,16 @@ class BoredomProvider extends ChangeNotifier {
           .map((e) => UnlockedAchievement.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
       final dc = data['dailyChallenge'] as Map?;
-      final importedChallenge = dc == null
+      var importedChallenge = dc == null
           ? null
           : DailyChallengeState.fromJson(Map<String, dynamic>.from(dc));
+      // A challenge id this build does not ship would leave the card
+      // missing and let completeDailyChallenge null-check a missing
+      // catalog entry. Drop it instead; init() mints today's challenge.
+      if (importedChallenge != null &&
+          DailyChallengeCatalog.idExists(importedChallenge.challengeId)) {
+        importedChallenge = null;
+      }
       final qc = data['questChain'] as Map?;
       final importedChain = qc == null
           ? null
@@ -1203,7 +1253,7 @@ class BoredomProvider extends ChangeNotifier {
       xpEarned: gainedXp,
       completedAt: now,
     );
-    history = [entry, ...history];
+    history = _appendHistory(entry);
 
     await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
     await StorageService.instance.saveProgress(progress);
@@ -1257,8 +1307,22 @@ class BoredomProvider extends ChangeNotifier {
       await abandonChain();
       return [];
     }
-    final nextIndex = qp.currentStepIndex + 1;
+    // Snapshot before anything is claimed, so undo can restore this exact
+    // step. Then claim the step before the first await, the way
+    // completeMission nulls currentMission: without that the guard above
+    // only trips several awaits later, so a double tap on the final step
+    // paid the reward twice and wrote two history rows.
     _captureUndo();
+    final claimedStep = qp.currentStepIndex;
+    if (chain.steps.isNotEmpty && claimedStep < chain.steps.length - 1) {
+      questChainProgress = qp.copyWith(currentStepIndex: claimedStep + 1);
+      await StorageService.instance.saveQuestChainProgress(questChainProgress);
+      notifyListeners();
+      return [];
+    }
+    questChainProgress = null;
+
+    final nextIndex = claimedStep + 1;
 
     if (nextIndex >= chain.steps.length) {
       final now = DateTime.now();
@@ -1304,12 +1368,10 @@ class BoredomProvider extends ChangeNotifier {
         xpEarned: gainedXp,
         completedAt: now,
       );
-      history = [entry, ...history];
+      history = _appendHistory(entry);
 
       await StorageService.instance.saveProgress(progress);
       await StorageService.instance.addHistoryEntry(entry);
-
-      questChainProgress = null;
       await StorageService.instance.saveQuestChainProgress(null);
 
       final newlyUnlocked = _evaluateThresholdAchievements(now);
