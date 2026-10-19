@@ -64,7 +64,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppKit.xl),
             AppKit.card(
-              context: context,
+              color: pal.surface,
               padding: const EdgeInsets.all(AppKit.lg),
               child: XpBar(progress: progress),
             ),
@@ -106,7 +106,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppKit.lg),
             AppKit.card(
-              context: context,
+              color: pal.surface,
               padding: const EdgeInsets.all(AppKit.lg),
               child: Row(
                 children: [
@@ -323,7 +323,7 @@ class ProfileScreen extends StatelessWidget {
 /// Appearance: theme toggle, accent swatches, haptics.
 class _AppearanceSection extends StatelessWidget {
   final AppStrings s;
-  final Color pal;
+  final AppPalette pal;
   final bool isLight;
   final int accentIndex;
   final bool hapticsEnabled;
@@ -346,7 +346,7 @@ class _AppearanceSection extends StatelessWidget {
         AppKit.sectionHeader(context, s, title: s.appearanceTitle),
         const SizedBox(height: AppKit.md),
         AppKit.card(
-          context: context,
+          color: pal.surface,
           padding: const EdgeInsets.all(AppKit.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,7 +428,7 @@ class _AppearanceSection extends StatelessWidget {
 /// Language toggle + replay onboarding.
 class _LanguageSection extends StatelessWidget {
   final AppStrings s;
-  final Color pal;
+  final AppPalette pal;
   final bool isIndonesian;
   final BoredomProvider provider;
 
@@ -447,7 +447,7 @@ class _LanguageSection extends StatelessWidget {
         AppKit.sectionHeader(context, s, title: s.languageTitle),
         const SizedBox(height: AppKit.md),
         AppKit.card(
-          context: context,
+          color: pal.surface,
           padding: const EdgeInsets.symmetric(horizontal: AppKit.lg, vertical: AppKit.xs),
           child: Row(
             children: [
@@ -486,10 +486,11 @@ class _LanguageSection extends StatelessWidget {
 /// Reminder toggle + time picker.
 class _ReminderSection extends StatelessWidget {
   final AppStrings s;
-  final Color pal;
+  final AppPalette pal;
   final bool reminderEnabled;
   final int reminderTime;
   final BoredomProvider provider;
+  final VoidCallback onPickTime;
 
   const _ReminderSection({
     required this.s,
@@ -497,6 +498,7 @@ class _ReminderSection extends StatelessWidget {
     required this.reminderEnabled,
     required this.reminderTime,
     required this.provider,
+    required this.onPickTime,
   });
 
   @override
@@ -506,9 +508,12 @@ class _ReminderSection extends StatelessWidget {
       children: [
         AppKit.sectionHeader(context, s, title: s.remindersTitle),
         const SizedBox(height: AppKit.md),
-        AppKit.card(
-          context: context,
+        Container(
           padding: const EdgeInsets.all(AppKit.lg),
+          decoration: BoxDecoration(
+            color: pal.surface,
+            borderRadius: BorderRadius.circular(AppKit.rLg),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -547,7 +552,7 @@ class _ReminderSection extends StatelessWidget {
               if (reminderEnabled) ...[
                 const SizedBox(height: AppKit.sm),
                 OutlinedButton.icon(
-                  onPressed: () => _pickReminderTime(context, s, provider),
+                  onPressed: onPickTime,
                   icon: const Icon(Icons.schedule, size: 18),
                   label: Text(
                     '${(reminderTime ~/ 60).toString().padLeft(2, '0')}:' 
@@ -570,7 +575,7 @@ class _ReminderSection extends StatelessWidget {
 /// Muted categories filter chips.
 class _MutedSection extends StatelessWidget {
   final AppStrings s;
-  final Color pal;
+  final AppPalette pal;
   final Set<String> muted;
   final BoredomProvider provider;
 
@@ -636,7 +641,7 @@ class _MutedSection extends StatelessWidget {
 /// Backup export / import.
 class _BackupSection extends StatelessWidget {
   final AppStrings s;
-  final Color pal;
+  final AppPalette pal;
   final BoredomProvider provider;
 
   const _BackupSection({
@@ -708,7 +713,7 @@ class _BackupSection extends StatelessWidget {
 /// About text + version footer.
 class _AboutSection extends StatelessWidget {
   final AppStrings s;
-  final Color pal;
+  final AppPalette pal;
 
   const _AboutSection({required this.s, required this.pal});
 

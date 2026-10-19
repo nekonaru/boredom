@@ -392,9 +392,8 @@ class _InfoPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     return AppKit.card(
-      context: context,
-      padding: const EdgeInsets.symmetric(horizontal: AppKit.md, vertical: AppKit.xs),
       color: highlight ? pal.success.withValues(alpha: 0.18) : pal.emptyBar,
+      padding: const EdgeInsets.symmetric(horizontal: AppKit.md, vertical: AppKit.xs),
       child: Text(
         label,
         style: TextStyle(

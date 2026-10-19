@@ -42,9 +42,12 @@ class AchievementsScreen extends StatelessWidget {
                       s.achievementsTitle,
                       style: TextStyle(color: pal.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    AppKit.card(
-                      context: context,
+                    Container(
                       padding: const EdgeInsets.symmetric(horizontal: AppKit.sm, vertical: AppKit.xs),
+                      decoration: BoxDecoration(
+                        color: pal.accent.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Text(
                         '$unlockedCount/${all.length}',
                         style: TextStyle(color: pal.accent, fontWeight: FontWeight.bold, fontSize: 12),

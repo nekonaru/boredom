@@ -28,17 +28,15 @@ class AppKit {
   /// Plain surface card used everywhere.
   static Widget card({
     required Widget child,
-    BuildContext? context,
     Color? color,
     double radius = rLg,
     EdgeInsetsGeometry? padding,
     Border? border,
   }) {
-    final pal = context != null ? context.palette : null;
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? pal?.surface,
+        color: color,
         borderRadius: BorderRadius.circular(radius),
         border: border,
       ),

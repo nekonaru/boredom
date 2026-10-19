@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
                 if (progress.streakDays > 0)
                   AppKit.card(
-                    context: context,
+                    color: pal.warning.withValues(alpha: 0.15),
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppKit.sm, vertical: AppKit.xs),
                     child: Text(
