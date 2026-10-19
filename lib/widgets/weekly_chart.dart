@@ -12,7 +12,7 @@ class WeeklyChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     return AppKit.card(
-      context: context,
+      color: pal.surface,
       padding: const EdgeInsets.all(AppKit.lg),
       child: SizedBox(
         height: 120,
@@ -39,7 +39,7 @@ class MonthlyChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     return AppKit.card(
-      context: context,
+      color: pal.surface,
       padding: const EdgeInsets.all(AppKit.lg),
       child: SizedBox(
         height: 100,

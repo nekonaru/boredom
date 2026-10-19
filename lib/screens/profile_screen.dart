@@ -182,6 +182,7 @@ class ProfileScreen extends StatelessWidget {
               reminderEnabled: reminderEnabled,
               reminderTime: reminderTime,
               provider: provider,
+              onPickTime: () => _pickReminderTime(context, s, provider),
             ),
             const SizedBox(height: AppKit.xxl),
             _MutedSection(
@@ -195,6 +196,7 @@ class ProfileScreen extends StatelessWidget {
               s: s,
               pal: pal,
               provider: provider,
+              onImport: () => _showImportDialog(context, s, provider),
             ),
             const SizedBox(height: AppKit.xxl),
             _AboutSection(
@@ -643,11 +645,13 @@ class _BackupSection extends StatelessWidget {
   final AppStrings s;
   final AppPalette pal;
   final BoredomProvider provider;
+  final VoidCallback onImport;
 
   const _BackupSection({
     required this.s,
     required this.pal,
     required this.provider,
+    required this.onImport,
   });
 
   @override
@@ -690,7 +694,7 @@ class _BackupSection extends StatelessWidget {
             const SizedBox(width: AppKit.md),
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => _showImportDialog(context, s, provider),
+                onPressed: onImport,
                 icon: const Icon(Icons.download_outlined, size: 18),
                 label: Text(s.backupImport),
                 style: OutlinedButton.styleFrom(

@@ -44,30 +44,11 @@ class AppKit {
     );
   }
 
-  /// Bordered surface card.
-  static Widget borderedCard({
-    required Widget child,
-    required BuildContext context,
-    double radius = rLg,
-    EdgeInsetsGeometry padding = const EdgeInsets.all(AppKit.lg),
-    Color? borderColor,
-  }) {
-    final pal = context.palette;
-    return card(
-      child: child,
-      radius: radius,
-      padding: padding,
-      border: Border.all(
-        color: borderColor ?? pal.textSecondary.withValues(alpha: 0.25),
-      ),
-    );
-  }
-
   // ---------------- Buttons ----------------
   static Widget primaryButton({
     required BuildContext context,
     required String label,
-    required VoidCallback onPressed,
+    required Future<void> Function()? onPressed,
     bool loading = false,
     Color? backgroundColor,
     double height = 56,
@@ -77,7 +58,7 @@ class AppKit {
       height: height,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: loading ? null : onPressed,
+        onPressed: loading ? null : () => onPressed?.call(),
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? pal.accent,
           foregroundColor: Colors.white,
@@ -101,7 +82,7 @@ class AppKit {
   static Widget outlineButton({
     required BuildContext context,
     required String label,
-    required VoidCallback onPressed,
+    required Future<void> Function()? onPressed,
     bool loading = false,
     Color? foregroundColor,
     double height = 56,
@@ -111,7 +92,7 @@ class AppKit {
       height: height,
       width: double.infinity,
       child: OutlinedButton(
-        onPressed: loading ? null : onPressed,
+        onPressed: loading ? null : () => onPressed?.call(),
         style: OutlinedButton.styleFrom(
           foregroundColor: foregroundColor ?? pal.accent,
           side: BorderSide(color: foregroundColor ?? pal.accent),
@@ -149,7 +130,7 @@ class AppKit {
           ),
         ),
         if (subtitle != null) ...[
-          const SizedBox(height: AppKit.xs),
+          const SizedBox(height: xs),
           Text(
             subtitle,
             style: TextStyle(
@@ -167,19 +148,19 @@ class AppKit {
   static Widget metricCard(BuildContext context,
       {required String label, required String value, required String emoji}) {
     final pal = context.palette;
-    return AppKit.card(
-      context: context,
+    return card(
+      color: pal.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: AppKit.sm),
+          const SizedBox(height: sm),
           Text(value,
               style: TextStyle(
                   color: pal.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold)),
-          const SizedBox(height: AppKit.xs),
+          const SizedBox(height: xs),
           Text(label, style: TextStyle(color: pal.textSecondary, fontSize: 12)),
         ],
       ),
@@ -192,21 +173,22 @@ class AppKit {
       required String title,
       required String? subtitle,
       required bool value,
-      required VoidCallback onChanged,
+      required void Function()? onChanged,
       Color? activeColor}) {
     final pal = context.palette;
     final on = activeColor ?? pal.accent;
-    return AppKit.card(
-      context: context,
+    return card(
+      context: null,
+      color: pal.surface,
       child: InkWell(
         borderRadius: BorderRadius.circular(rMd),
-        onTap: onChanged,
+        onTap: () => onChanged?.call(),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppKit.lg, vertical: AppKit.md),
+          padding: const EdgeInsets.symmetric(horizontal: lg, vertical: md),
           child: Row(
             children: [
               Text(emoji, style: const TextStyle(fontSize: 20)),
-              const SizedBox(width: AppKit.md),
+              const SizedBox(width: md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +202,7 @@ class AppKit {
                       ),
                     ),
                     if (subtitle != null) ...[
-                      const SizedBox(height: AppKit.xs),
+                      const SizedBox(height: xs),
                       Text(
                         subtitle,
                         style: TextStyle(
@@ -234,7 +216,7 @@ class AppKit {
               ),
               Switch(
                 value: value,
-                onChanged: (_) => onChanged(),
+                onChanged: (_) => onChanged?.call(),
                 activeThumbColor: on,
                 activeColor: on.withValues(alpha: 0.18),
               ),
