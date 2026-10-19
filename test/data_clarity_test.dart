@@ -13,6 +13,26 @@ void main() {
     StorageService.instance.clearCache();
   });
 
+  /// Seeds reminder state without going through [BoredomProvider.setReminder]:
+  /// that asks the notification plugin for permission, which a unit test
+  /// cannot grant, so the switch would always stay off. What is under test
+  /// here is the export and import of the values, not the permission flow.
+  Future<void> seedReminder(
+    BoredomProvider p, {
+    required bool enabled,
+    required int hour,
+    required int minute,
+  }) async {
+    p.reminderEnabled = enabled;
+    p.reminderHour = hour;
+    p.reminderMinute = minute;
+    await StorageService.instance.saveReminder(
+      enabled: enabled,
+      hour: hour,
+      minute: minute,
+    );
+  }
+
   MissionInstance armed(BoredomProvider p) {
     p.currentMission = MissionInstance(
       mission: MissionCatalog.all.first,
@@ -25,9 +45,7 @@ void main() {
     test('a restore brings the schedule back instead of dropping it',
         () async {
       final source = BoredomProvider();
-      await source.setReminder(true, hour: 7, minute: 45);
-      expect(source.reminderEnabled, isTrue);
-      expect(source.reminderHour, 7);
+      await seedReminder(source, enabled: true, hour: 7, minute: 45);
 
       final fresh = BoredomProvider();
       expect(await fresh.importBackup(await source.exportBackup()), isTrue);
@@ -41,7 +59,7 @@ void main() {
 
     test('a backup with reminders off restores as off', () async {
       final source = BoredomProvider();
-      await source.setReminder(false, hour: 9, minute: 0);
+      await seedReminder(source, enabled: false, hour: 9, minute: 0);
 
       final fresh = BoredomProvider();
       await fresh.importBackup(await source.exportBackup());
@@ -61,8 +79,7 @@ void main() {
           );
 
       final fresh = BoredomProvider();
-      await fresh.setReminder(true, hour: 6, minute: 0);
-      expect(fresh.reminderEnabled, isTrue);
+      await seedReminder(fresh, enabled: true, hour: 6, minute: 0);
 
       expect(await fresh.importBackup(stripped), isTrue);
       expect(fresh.reminderEnabled, isFalse,
@@ -71,7 +88,7 @@ void main() {
 
     test('an out-of-range hour is clamped, not trusted', () async {
       final source = BoredomProvider();
-      await source.setReminder(true, hour: 8, minute: 0);
+      await seedReminder(source, enabled: true, hour: 8, minute: 0);
       final tampered = (await source.exportBackup()).replaceFirst(
             '"hour":8',
             '"hour":99',

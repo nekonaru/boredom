@@ -159,9 +159,10 @@ void main() {
   group('Regressions: history persistence', () {
     test('saveHistory keeps the newest entries oldest-first', () async {
       final storage = StorageService.instance;
-      // 205 entries, newest first, as the provider holds them.
+      final cap = StorageService.kMaxHistoryEntries;
+      // Five more than the cap, newest first, as the provider holds them.
       final newestFirst = List.generate(
-        205,
+        cap + 5,
         (i) => CompletedMission(
           missionId: 'm$i',
           title: 'Mission $i',
@@ -169,25 +170,26 @@ void main() {
           categoryLabel: 'Test',
           xpEarned: 10,
           // Index 0 gets the latest timestamp, so m0 is the newest.
-          completedAt: DateTime(2026, 1, 1).add(Duration(minutes: 205 - i)),
+          completedAt: DateTime(2026, 1, 1).add(Duration(minutes: cap + 5 - i)),
         ),
       );
 
       await storage.saveHistory(newestFirst);
       final loaded = await storage.loadHistory();
 
-      expect(loaded.length, 200);
-      // m0 has the newest timestamp, so the newest 200 are m0..m199 and
-      // the 5 oldest (m200..m204) are dropped.
+      expect(loaded.length, cap);
+      // m0 has the newest timestamp, so the newest `cap` are m0..m(cap-1)
+      // and the 5 oldest are dropped.
       expect(loaded.first.missionId, 'm0');
-      expect(loaded.last.missionId, 'm199');
-      expect(loaded.map((e) => e.missionId), isNot(contains('m204')));
+      expect(loaded.last.missionId, 'm${cap - 1}');
+      expect(loaded.map((e) => e.missionId), isNot(contains('m${cap + 4}')));
     });
 
     test('history stays ordered after appending past the cap', () async {
       final storage = StorageService.instance;
+      final cap = StorageService.kMaxHistoryEntries;
       final list = List.generate(
-        199,
+        cap - 1,
         (i) => CompletedMission(
           missionId: 'm$i',
           title: 'Mission $i',
@@ -214,7 +216,7 @@ void main() {
       }
 
       final loaded = await storage.loadHistory();
-      expect(loaded.length, 200);
+      expect(loaded.length, cap);
       // Both appends survived and the newest is on top, which is what the
       // old trim order broke.
       expect(loaded.first.missionId, 'new1');
