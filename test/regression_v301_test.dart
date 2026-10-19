@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:boredom/models/mission.dart';
 import 'package:boredom/models/user_progress.dart';
 import 'package:boredom/providers/boredom_provider.dart';
 import 'package:boredom/services/mission_catalog.dart';
@@ -11,6 +12,14 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     StorageService.instance.clearCache();
   });
+
+  int levelOf(int xp) {
+    var level = 1;
+    while (UserProgress.xpNeededForLevel(level + 1) <= xp) {
+      level++;
+    }
+    return level;
+  }
 
   void armed(BoredomProvider p) {
     p.currentMission = MissionInstance(
@@ -117,14 +126,6 @@ void main() {
       }
     });
   });
-
-  int levelOf(int xp) {
-    var level = 1;
-    while (UserProgress.xpNeededForLevel(level + 1) <= xp) {
-      level++;
-    }
-    return level;
-  }
 
   group('Quest chain steps cannot be claimed twice', () {
     test('a double tap on the final step pays once', () async {
