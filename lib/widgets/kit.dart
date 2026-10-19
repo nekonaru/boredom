@@ -212,7 +212,7 @@ class AppKit {
               ),
               Switch(
                 value: value,
-                onChanged: () => onChanged?.call(),
+                onChanged: (_) => onChanged?.call(),
                 activeThumbColor: pal.accent,
               ),
             ],

@@ -258,7 +258,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               subtitle: s.quickWinsDesc,
               value: quickWins,
               onChanged: () => actions.setQuickWins(!quickWins),
-              activeColor: pal.success,
             ),
             const SizedBox(height: AppKit.xl),
             AppKit.toggleRow(
@@ -268,7 +267,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               subtitle: s.chaosDesc,
               value: chaosMode,
               onChanged: () => actions.setChaosMode(!chaosMode),
-              activeColor: pal.danger,
             ),
             const SizedBox(height: AppKit.xxl),
             AppKit.primaryButton(

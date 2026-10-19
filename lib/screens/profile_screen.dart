@@ -421,7 +421,6 @@ class _AppearanceSection extends StatelessWidget {
                 subtitle: s.hapticsDesc,
                 value: hapticsEnabled,
                 onChanged: () => provider.setHapticsEnabled(!hapticsEnabled),
-                activeColor: pal.accent,
               ),
             ],
           ),
