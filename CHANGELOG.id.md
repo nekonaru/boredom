@@ -1,6 +1,41 @@
 # Changelog
 
-## v3.0.2
+## v3.1.0
+
+## ✨ Fitur baru
+
+- **Pilihan hasil tantangan harian.** Tantangan harian kini menawarkan
+  "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan" di samping
+  tombol terima, sama seperti sheet misi. Tantangan harian yang
+  dilewati tidak lagi memajukan streak atau memberikan XP — kejujuran
+  diberi獎賞, bukan dihukum.
+- **Empat achievement baru.** Capai level 100 (Beyond Boredom), jaga
+  streak 60 hari (Iron Streak), roll 10 misi Chaos Mode (Chaos
+  Connoisseur), dan reroll 50 kali secara total (Serial Reroller).
+
+## ⚙️ Optimisasi
+
+- **Milestone XP dihitung pada XP yang benar-benar diterima.** Tantangan
+  harian dan langkah quest chain kini menghitung bonus milestone
+  terhadap XP yang benar-benar Anda terima (double akhir pekan +
+  penskalaan sebagian), sehingga Anda tidak lagi menerima bonus level
+  hampa saat misi parsial di akhir pekan tidak benar-benar mencapai
+  level tersebut.
+
+## 🐛 Perbaikan bug
+
+- **Milestone XP tantangan harian dibayar pada nilai penuh.** Bonus
+  milestone dihitung terhadap nilai XP penuh yang difold di akhir pekan
+  meski hasil parsial hanya membayar 60%, jadi Anda bisa mengumpulkan
+  bonus level tanpa sebenarnya mencapai level tersebut dalam total XP.
+- **Milestone XP langkah quest chain dibayar pada nilai penuh.** Perbaiki
+  yang sama seperti tantangan harian: bonus milestone kini dihitung
+  terhadap XP yang benar-benar diterima.
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
 
 UI/UX dan optimasi setelah review v3.0.0–v3.0.1. Tidak ada perubahan
 format penyimpanan, jadi semua cadangan tetap kompatibel.
@@ -608,3 +643,4 @@ fungsional nyata plus beberapa item polish.
 
 Tidak ada perubahan format data tersimpan, jadi progres yang sudah ada
 di HP tetap terbaca normal setelah update.
+

@@ -1,6 +1,81 @@
 # Changelog
 
-## v3.0.2
+## v3.1.0
+
+## ✨ New features
+
+- **Daily challenge outcome selection.** The daily challenge now offers
+  "Done", "Partly done", and "Didn't do it" alongside the accept button,
+  matching the mission sheet. A skipped challenge no longer advances your
+  streak or counts as XP — honesty is rewarded instead of punished.
+- **Four new achievements.** Reach level 100 (Beyond Boredom), keep a
+  60-day streak (Iron Streak), roll 10 chaos missions (Chaos Connoisseur),
+  and reroll 50 times total (Serial Reroller).
+
+## ⚙️ Optimizations
+
+- **Milestone XP judged on actual award.** Daily challenge and quest chain
+  completions now calculate milestone bonus against the XP you really
+  receive (weekend double + partial scaling), so you no longer receive a
+  phantom level bonus on a partial weekend mission.
+
+## 🐛 Bug fixes
+
+- **Daily challenge milestone paid on full value.** The milestone bonus
+  was computed against the full weekend-doubled XP even when a partial
+  outcome paid only 60%, so you could collect a level bonus without
+  actually reaching that level in total XP.
+- **Quest chain milestone paid on full value.** Same fix as the daily
+  challenge: milestone bonus is now judged on the actual awarded XP.
+
+## 📦 Install / Update
+
+Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+<br>
+
+---
+
+<br>
+
+# Bahasa Indonesia
+
+## Boredom v3.1.0
+
+## ✨ Fitur baru
+
+- **Pilihan hasil tantangan harian.** Tantangan harian kini menawarkan
+  "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan" di samping
+  tombol terima, sama seperti sheet misi. Tantangan harian yang
+  dilewati tidak lagi memajukan streak atau memberi XP — kejujuran
+  diberi reward, bukan dihukum.
+- **Empat achievement baru.** Capai level 100 (Beyond Boredom), jaga
+  streak 60 hari (Iron Streak), roll 10 misi Chaos Mode (Chaos
+  Connoisseur), dan reroll 50 kali secara total (Serial Reroller).
+
+## ⚙️ Optimisasi
+
+- **Milestone XP dihitung pada XP yang benar-benar diterima.**
+  Tantangan harian dan langkah quest chain kini menghitung bonus
+  milestone berdasarkan XP yang benar-benar Anda terima (double akhir
+  pekan + penskalaan sebagian), sehingga Anda tidak lagi menerima bonus
+  level hampa saat misi parsial di akhir pekan tidak benar-benar
+  mencapai level tersebut.
+
+## 🐛 Perbaikan bug
+
+- **Milestone XP tantangan harian dibayar pada nilai penuh.** Bonus
+  milestone dihitung terhadap nilai XP penuh yang difold di akhir pekan
+  meski hasil parsial hanya membayar 60%, jadi Anda bisa mengumpulkan
+  bonus level tanpa sebenarnya mencapai level tersebut dalam total XP.
+- **Milestone XP langkah quest chain dibayar pada nilai penuh.** Perbaiki
+  yang sama seperti tantangan harian: bonus milestone kini dihitung
+  terhadap XP yang benar-benar diterima.
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
 
 UI/UX dan optimasi setelah review v3.0.0–v3.0.1. Tidak ada perubahan
 format penyimpanan, jadi semua cadangan tetap kompatibel.

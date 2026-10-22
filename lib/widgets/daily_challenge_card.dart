@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/daily_challenge.dart';
+import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/feedback.dart';
@@ -78,34 +79,80 @@ class DailyChallengeCard extends StatelessWidget {
               : ElevatedButton(
                   onPressed: () async {
                     buzzIfEnabled(context);
-                    final provider = context.read<BoredomProvider>();
-                    await provider.completeDailyChallenge();
-                    if (context.mounted) {
-                      final gained =
-                          provider.lastXpGained ?? challenge.rewardXp;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(s.challengeDone(gained)),
-                          backgroundColor: pal.success,
-                          action: provider.canUndo
-                              ? SnackBarAction(
-                                  label: s.undoAction,
-                                  textColor: Colors.white,
-                                  onPressed: () async {
-                                    // Undo restores the challenge state itself.
-                                    final ok = await provider.undoLastAction();
-                                    if (context.mounted && ok) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(s.undoDone)),
-                                      );
-                                    }
-                                  },
-                                )
-                              : null,
+                    final outcome = await showModalBottomSheet<MissionOutcome>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (sheetContext) => SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                s.outcomeQuestion,
+                                style: TextStyle(
+                                  color: pal.textPrimary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _OutcomeOption(
+                                label: s.outcomeDone,
+                                emoji: '✅',
+                                onTap: () => Navigator.of(sheetContext)
+                                    .pop(MissionOutcome.done),
+                              ),
+                              _OutcomeOption(
+                                label: s.outcomePartial,
+                                emoji: '🟡',
+                                onTap: () => Navigator.of(sheetContext)
+                                    .pop(MissionOutcome.partial),
+                              ),
+                              _OutcomeOption(
+                                label: s.outcomeSkipped,
+                                emoji: '⭕️',
+                                onTap: () => Navigator.of(sheetContext)
+                                    .pop(MissionOutcome.skipped),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                      provider.clearLastXpGained();
-                    }
+                      ),
+                    );
+                    // Dismissed without answering: record nothing rather than
+                    // assuming a success.
+                    if (outcome == null || !context.mounted) return;
+                    final provider = context.read<BoredomProvider>();
+                    await provider.completeDailyChallenge(outcome);
+                    if (!context.mounted) return;
+                    final gained = provider.lastXpGained ?? 0;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          gained > 0
+                              ? s.challengeDone(gained)
+                              : s.skippedSnack,
+                        ),
+                        backgroundColor:
+                            gained > 0 ? pal.success : pal.textSecondary,
+                        action: provider.canUndo
+                            ? SnackBarAction(
+                                label: s.undoAction,
+                                textColor: Colors.white,
+                                onPressed: () async {
+                                  final ok = await provider.undoLastAction();
+                                  if (context.mounted && ok) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(s.undoDone)),
+                                    );
+                                  }
+                                },
+                              )
+                            : null,
+                      ),
+                    );
+                    provider.clearLastXpGained();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -114,6 +161,51 @@ class DailyChallengeCard extends StatelessWidget {
                   child: Text('+${challenge.rewardXp}'),
                 ),
         ],
+      ),
+    );
+  }
+}
+
+/// One tappable outcome row in the daily-challenge bottom sheet.
+class _OutcomeOption extends StatelessWidget {
+  final String label;
+  final String emoji;
+  final VoidCallback onTap;
+  const _OutcomeOption({
+    required this.label,
+    required this.emoji,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: pal.surface,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  color: pal.textPrimary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

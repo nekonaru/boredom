@@ -1201,7 +1201,11 @@ class BoredomProvider extends ChangeNotifier {
 
   bool get dailyChallengeCompleted => dailyChallengeState?.completed ?? false;
 
-  Future<List<Achievement>> completeDailyChallenge() async {
+  /// Records completion of the day's challenge with an [outcome], same
+  /// honest accounting as catalog missions (done/partial/skipped).
+  Future<List<Achievement>> completeDailyChallenge([
+    MissionOutcome outcome = MissionOutcome.done,
+  ]) async {
     if (dailyChallengeState == null || dailyChallengeState!.completed) {
       return const [];
     }
@@ -1210,8 +1214,12 @@ class BoredomProvider extends ChangeNotifier {
     _captureUndo();
     dailyChallengeState = dailyChallengeState!.copyWith(completed: true);
 
-    final gainedXp = xpForDate(challenge.rewardXp, now) +
-        milestoneXpFor(progress.totalXp, challenge.rewardXp, now);
+    final fullXp = xpForDate(challenge.rewardXp, now);
+    final baseXp = (fullXp * outcome.xpShare).round();
+    // Judged against what is actually paid out, not the full value.
+    final gainedXp = outcome.countsAsActivity
+        ? baseXp + milestoneXpForAwarded(progress.totalXp, baseXp)
+        : 0;
 
     // The challenge used to grant XP and nothing else. That meant a player
     // who levelled up here did not unlock the level achievements until
@@ -1219,29 +1227,47 @@ class BoredomProvider extends ChangeNotifier {
     // blank in every stat: weekly chart, active-day average, busiest
     // weekday, and the streak. It now goes through the same streak,
     // history, and achievement handling as a catalog mission.
-    final resolved = _resolveStreak(
-      last: progress.lastCompletedDate,
-      now: now,
-      streakDays: progress.streakDays,
-      tokens: progress.freezeTokens,
-    );
-    final newStreak = resolved.streak;
-    lastFreezeUsed = resolved.usedFreeze;
+    // A skipped challenge is not an active day, so neither the streak nor
+    // the completion counters move.
+    var streakDays = progress.streakDays;
+    var longestStreak = progress.longestStreak;
+    var lastCompletedDate = progress.lastCompletedDate;
+    var freezeTokens = progress.freezeTokens;
+    var freezeTokensEarned = progress.freezeTokensEarned;
+    lastFreezeUsed = false;
+    if (outcome.countsAsActivity) {
+      final resolved = _resolveStreak(
+        last: progress.lastCompletedDate,
+        now: now,
+        streakDays: progress.streakDays,
+        tokens: progress.freezeTokens,
+      );
+      streakDays = resolved.streak;
+      lastFreezeUsed = resolved.usedFreeze;
+      lastCompletedDate = now;
+      longestStreak =
+          resolved.streak > progress.longestStreak ? resolved.streak : progress.longestStreak;
+      freezeTokens = resolved.tokens;
+      freezeTokensEarned = resolved.tokensEarned;
+    }
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
-    newCategoryCounts[challenge.category.name] =
-        (newCategoryCounts[challenge.category.name] ?? 0) + 1;
+    if (outcome.countsAsActivity) {
+      newCategoryCounts[challenge.category.name] =
+          (newCategoryCounts[challenge.category.name] ?? 0) + 1;
+    }
 
     progress = progress.copyWith(
       totalXp: progress.totalXp + gainedXp,
-      streakDays: newStreak,
-      longestStreak:
-          newStreak > progress.longestStreak ? newStreak : progress.longestStreak,
-      lastCompletedDate: now,
-      totalMissionsCompleted: progress.totalMissionsCompleted + 1,
+      streakDays: streakDays,
+      longestStreak: longestStreak,
+      lastCompletedDate: lastCompletedDate,
+      totalMissionsCompleted: outcome.countsAsActivity
+          ? progress.totalMissionsCompleted + 1
+          : progress.totalMissionsCompleted,
       categoryCounts: newCategoryCounts,
-      freezeTokens: resolved.tokens,
-      freezeTokensEarned: resolved.tokensEarned,
+      freezeTokens: freezeTokens,
+      freezeTokensEarned: freezeTokensEarned,
     );
     lastXpGained = gainedXp;
 
@@ -1252,6 +1278,7 @@ class BoredomProvider extends ChangeNotifier {
       categoryLabel: challenge.category.label,
       xpEarned: gainedXp,
       completedAt: now,
+      outcome: outcome,
     );
     history = _appendHistory(entry);
 
@@ -1340,8 +1367,9 @@ class BoredomProvider extends ChangeNotifier {
 
     if (nextIndex >= chain.steps.length) {
       final now = DateTime.now();
-      final gainedXp = xpForDate(chain.rewardXp, now) +
-          milestoneXpFor(progress.totalXp, chain.rewardXp, now);
+      final fullXp = xpForDate(chain.rewardXp, now);
+      final gainedXp = fullXp +
+          milestoneXpForAwarded(progress.totalXp, fullXp);
 
       // Same reasoning as the daily challenge: finishing a chain paid out
       // XP, but the day went unrecorded, so the weekly chart, the

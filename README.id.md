@@ -27,7 +27,7 @@ Ada juga **Chaos Mode** yang mengabaikan semua filter, jadi misi apa pun bisa ke
 
 | Fitur | Deskripsi |
 |---------|-------------|
-| 🎲 **Generator misi** | Misi acak dari 60+ katalog, disesuaikan dengan mood, waktu, lokasi, dan energi, dibobot ke kategori yang paling jarang dimainkan, plus misi musiman dan fallback pintar supaya selalu dapat misi |
+| 🎲 **Generator misi** | Misi acak dari 55 katalog, disesuaikan dengan mood, waktu, lokasi, dan energi, dibobot ke kategori yang paling jarang dimainkan, plus misi musiman dan fallback pintar supaya selalu dapat misi |
 | ☢️ **Chaos Mode** | Mengabaikan semua filter, membuka misi khusus chaos |
 | ✅ **Terima / reroll** | Terima misi untuk XP, reroll sampai 3x sehari |
 | ⭐ **XP dan level** | Kurva progresif dengan judul level yang absurd, XP ganda setiap akhir pekan |
