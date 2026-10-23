@@ -5,7 +5,6 @@ import '../models/achievement.dart';
 import '../models/daily_challenge.dart';
 import '../models/quest_chain.dart';
 import '../models/custom_mission.dart';
-import '../models/custom_mission.dart' show CustomCategory;
 import '../models/saved_mission.dart';
 import '../services/mission_service.dart';
 import '../services/mission_catalog.dart';
@@ -947,6 +946,7 @@ class BoredomProvider extends ChangeNotifier {
     String? description,
     int? baseXp,
     String? category,
+    bool? archived,
   }) async {
     final index = customMissions.indexWhere((m) => m.id == id);
     if (index < 0) return;
@@ -956,6 +956,7 @@ class BoredomProvider extends ChangeNotifier {
       description: description,
       baseXp: baseXp,
       category: category,
+      archived: archived,
     );
     customMissions = [...customMissions]..[index] = updated;
     await StorageService.instance.saveCustomMissions(customMissions);
@@ -1019,8 +1020,8 @@ class BoredomProvider extends ChangeNotifier {
 
     final newCategoryCounts = Map<String, int>.from(progress.categoryCounts);
     if (outcome.countsAsActivity) {
-      newCategoryCounts[mission.category.name] =
-          (newCategoryCounts[mission.category.name] ?? 0) + 1;
+      newCategoryCounts[MissionCategory.custom.name] =
+          (newCategoryCounts[MissionCategory.custom.name] ?? 0) + 1;
     }
 
     _captureUndo();
@@ -1043,7 +1044,7 @@ class BoredomProvider extends ChangeNotifier {
       missionId: mission.id,
       title: mission.title,
       emoji: '⭐',
-      categoryLabel: mission.category.label,
+      categoryLabel: MissionCategory.custom.label,
       xpEarned: gainedXp,
       completedAt: now,
       outcome: outcome,

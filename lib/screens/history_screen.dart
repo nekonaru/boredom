@@ -125,7 +125,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 else
                   ...customMissions
                       .where((m) => !m.archived)
-                      .map((m) => _CustomMissionTile(mission: m)),
+                      .map((m) => _CustomMissionTile(
+                            mission: m,
+                            onEdit: () => _showEditCustomDialog(context, s, actions, m),
+                          )),
                 if (customMissions.any((m) => m.archived)) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -139,7 +142,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(height: 8),
                   ...customMissions
                       .where((m) => m.archived)
-                      .map((m) => _CustomMissionTile(mission: m)),
+                      .map((m) => _CustomMissionTile(
+                            mission: m,
+                            onEdit: () => _showEditCustomDialog(context, s, actions, m),
+                          )),
                 ],
                 const SizedBox(height: 24),
                 Text(
@@ -490,13 +496,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     );
                     return;
                   }
+                  final navigator = Navigator.of(context);
                   await actions.updateCustomMission(
                     mission.id,
                     title: titleCtrl.text,
                     description: descCtrl.text,
                     baseXp: xp.toInt(),
                   );
-                  Navigator.of(context).pop();
+                  navigator.pop();
                 },
                 child: Text(s.customSave),
               ),
@@ -741,7 +748,11 @@ class _FavoriteTile extends StatelessWidget {
 
 class _CustomMissionTile extends StatelessWidget {
   final CustomMission mission;
-  const _CustomMissionTile({required this.mission});
+  final VoidCallback onEdit;
+  const _CustomMissionTile({
+    required this.mission,
+    required this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -783,6 +794,14 @@ class _CustomMissionTile extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            IconButton(
+              onPressed: onEdit,
+              icon: Icon(
+                Icons.edit_outlined,
+                color: pal.textSecondary,
+                size: 20,
               ),
             ),
             TextButton(
