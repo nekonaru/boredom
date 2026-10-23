@@ -339,6 +339,26 @@ class AchievementCatalog {
       metric: AchievementMetric.level,
       target: 100,
     ),
+    Achievement(
+      id: 'chaos_25',
+      title: 'Chaos Master',
+      titleId: 'Master Chaos',
+      emoji: '☢️',
+      description: 'Complete 25 missions in Chaos Mode.',
+      descriptionId: 'Selesaikan 25 misi lewat Chaos Mode.',
+      metric: AchievementMetric.chaosMissions,
+      target: 25,
+    ),
+    Achievement(
+      id: 'reroll_100',
+      title: 'Serial Reroller',
+      titleId: 'Reroll Hampir Setiap Kali',
+      emoji: '🔄',
+      description: 'Reroll missions 100 times (all time).',
+      descriptionId: 'Reroll misi sebanyak 100 kali (total).',
+      metric: AchievementMetric.rerollsAllTime,
+      target: 100,
+    ),
   ];
 
   /// orElse falls back to the first entry, so the app never crashes when

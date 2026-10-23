@@ -1,5 +1,32 @@
 ﻿# Changelog
 
+## v4.0.0
+
+## ✨ Fitur baru
+
+- **Default pribadi.** Preferensi suasana, waktu, lokasi, dan energimu
+  disimpan dan diterapkan pada roll pertama setiap sesi baru, sehingga
+  misi pertama sudah terasa milikmu.
+- **Ulangi intro.** Pemain lama bisa menonton ulang perkenalan dari
+  Profil tanpa ditandai belum pernah melihat, jadi menutup aplikasi di
+  tengah pengulangan tidak mengembalikan gerbang startup.
+- **Tiga achievement baru.** Capai level 100 (Beyond Boredom), roll 25
+  misi Chaos Mode (Chaos Master), dan reroll 100 kali secara total
+  (Serial Reroller).
+
+## ⚙️ Optimisasi
+
+- **Roll pertama memakai selera kamu.** Generator dimulai dari default
+  pilihanmu alih-alih nilai hard-coded, mengurangi reroll yang sia-sia
+  pada misi pertama hari itu.
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.4.0
 
 ## ✨ Fitur baru

@@ -27,6 +27,16 @@ class BoredomProvider extends ChangeNotifier {
   EnergyLevel selectedEnergy = EnergyLevel.medium;
   bool chaosMode = false;
 
+  /// User's preferred defaults, applied on the first roll of a fresh
+  /// session so the generator starts close to their taste.
+  Mood defaultMood = Mood.normal;
+  TimeBudget defaultTime = TimeBudget.thirtyMin;
+  LocationType defaultLocation = LocationType.anywhere;
+  EnergyLevel defaultEnergy = EnergyLevel.medium;
+
+  /// True until the user has rolled their first mission this session.
+  bool _firstRollDone = false;
+
   MissionInstance? currentMission;
   int _missionCounter = 0;
 
@@ -402,6 +412,21 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Persists the user's preferred filter defaults. Applied on the first
+  /// roll of a fresh session so the generator starts close to their taste.
+  void setDefaults({
+    Mood? mood,
+    TimeBudget? time,
+    LocationType? location,
+    EnergyLevel? energy,
+  }) {
+    if (mood != null) defaultMood = mood;
+    if (time != null) defaultTime = time;
+    if (location != null) defaultLocation = location;
+    if (energy != null) defaultEnergy = energy;
+    notifyListeners();
+  }
+
   // ---------------- Mission flow ----------------
 
   /// Prepends a history row and keeps the in-memory list inside the same
@@ -435,6 +460,16 @@ class BoredomProvider extends ChangeNotifier {
   }
 
   void rollMission() {
+    // On the very first roll of a fresh session, honour the user's
+    // preferred defaults instead of the hard-coded ones, so the first
+    // mission already feels like theirs.
+    if (!_firstRollDone) {
+      selectedMood = defaultMood;
+      selectedTime = defaultTime;
+      selectedLocation = defaultLocation;
+      selectedEnergy = defaultEnergy;
+      _firstRollDone = true;
+    }
     final filter = MissionFilter(
       mood: selectedMood,
       timeBudget: selectedTime,
@@ -1526,6 +1561,7 @@ class BoredomProvider extends ChangeNotifier {
     lastUnlockedAchievements = [];
     _clearUndo();
     _missionCounter = 0;
+    _firstRollDone = false;
     currentMission = null;
     final now = DateTime.now();
     progress = _resetRerollsIfNewDay(progress, now);

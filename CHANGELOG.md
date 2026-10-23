@@ -1,5 +1,32 @@
 # Changelog
 
+## v4.0.0
+
+## ✨ New features
+
+- **Personalized defaults.** Your mood, time, location, and energy
+  preferences are saved and applied on the first roll of every fresh
+  session, so the first mission already feels like yours.
+- **Onboarding replay.** Existing players can rewatch the walkthrough
+  from Profile without it being marked unseen, so closing the app
+  mid-replay cannot bring the startup gate back.
+- **Three new achievements.** Reach level 100 (Beyond Boredom), roll 25
+  chaos missions (Chaos Master), and reroll 100 times total (Serial
+  Reroller).
+
+## ⚙️ Optimizations
+
+- **First roll uses your taste.** The generator starts from your
+  preferred defaults instead of hard-coded ones, reducing wasted rerolls
+  on the first mission of the day.
+
+## 📦 Install / Update
+
+Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.4.0
 
 ## ✨ New features
