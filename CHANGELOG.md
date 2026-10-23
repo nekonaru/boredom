@@ -1,5 +1,28 @@
 # Changelog
 
+## v3.2.0
+
+## ✨ New features
+
+- **Freeze token display on Home.** Your saved freeze tokens now show at the
+  top of Home so you always know how many streak-savers you have left.
+- **History sort options.** History can now be sorted newest-first,
+  oldest-first, or by XP earned (highest first) — tap the sort chip above
+  the list.
+
+## 🐛 Bug fixes
+
+- **Undo after saving to inbox no longer desyncs the counter.** Saving a
+  mission to the inbox now captures an undo snapshot, so undoing restores
+  both the inbox list and the `missionsSaved` counter together.
+
+## 📦 Install / Update
+
+Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.1.0
 
 ## ✨ New features
@@ -7,7 +30,7 @@
 - **Daily challenge outcome selection.** The daily challenge now offers
   "Done", "Partly done", and "Didn't do it" alongside the accept button,
   matching the mission sheet. A skipped challenge no longer advances your
-  streak or counts as XP — honesty is rewarded instead of punished.
+  streak or counts as XP. Honesty is rewarded instead of punished.
 - **Four new achievements.** Reach level 100 (Beyond Boredom), keep a
   60-day streak (Iron Streak), roll 10 chaos missions (Chaos Connoisseur),
   and reroll 50 times total (Serial Reroller).

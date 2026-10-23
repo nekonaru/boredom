@@ -6,6 +6,9 @@ enum HistoryRange { today, week, month, all }
 /// Outcome filters offered above the history list.
 enum HistoryFilter { all, done, partial, skipped, untracked }
 
+/// Sort orders offered above the history list.
+enum HistorySort { newestFirst, oldestFirst, xpHighest }
+
 /// Pure predicates behind the History screen filters.
 ///
 /// Extracted out of the widget on purpose: as private methods on a

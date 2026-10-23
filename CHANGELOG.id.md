@@ -1,19 +1,43 @@
-# Changelog
+﻿# Changelog
+
+## v3.2.0
+
+## ✨ Fitur baru
+
+- **Token beku ditampilkan di Beranda.** Jumlah token beku sekarang
+  ditampilkan di layar Beranda sehingga kamu selalu tahu berapa banyak
+  pelindung streak yang tersisa.
+- **Urutan riwayat dapat diubah.** Riwayat sekarang dapat diurutkan
+  terbaru-dulu, terlama-dulu, atau berdasarkan XP tertinggi — tekan chip
+  urutan di atas daftar.
+
+## 🐛 Perbaikan bug
+
+- **Undo setelah menyimpan ke inbox tidak lagi merusak penghitung.**
+  Menyimpan misi ke inbox kini mengambil snapshot undo, sehingga undo
+  memulihkan daftar inbox dan penghitung missionsSaved secara bersamaan.
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
+
+
 
 ## v3.1.0
 
-## ✨ Fitur baru
+## âœ¨ Fitur baru
 
 - **Pilihan hasil tantangan harian.** Tantangan harian kini menawarkan
   "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan" di samping
   tombol terima, sama seperti sheet misi. Tantangan harian yang
-  dilewati tidak lagi memajukan streak atau memberikan XP — kejujuran
-  diberi獎賞, bukan dihukum.
+  dilewati tidak lagi memajukan streak atau memberikan XP â€” kejujuran
+  dihargai, bukan dihukum.
 - **Empat achievement baru.** Capai level 100 (Beyond Boredom), jaga
   streak 60 hari (Iron Streak), roll 10 misi Chaos Mode (Chaos
   Connoisseur), dan reroll 50 kali secara total (Serial Reroller).
 
-## ⚙️ Optimisasi
+## âš™ï¸ Optimisasi
 
 - **Milestone XP dihitung pada XP yang benar-benar diterima.** Tantangan
   harian dan langkah quest chain kini menghitung bonus milestone
@@ -22,7 +46,7 @@
   hampa saat misi parsial di akhir pekan tidak benar-benar mencapai
   level tersebut.
 
-## 🐛 Perbaikan bug
+## ðŸ› Perbaikan bug
 
 - **Milestone XP tantangan harian dibayar pada nilai penuh.** Bonus
   milestone dihitung terhadap nilai XP penuh yang difold di akhir pekan
@@ -32,12 +56,12 @@
   yang sama seperti tantangan harian: bonus milestone kini dihitung
   terhadap XP yang benar-benar diterima.
 
-## 📦 Instalasi / Update
+## ðŸ“¦ Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
 
-UI/UX dan optimasi setelah review v3.0.0–v3.0.1. Tidak ada perubahan
+UI/UX dan optimasi setelah review v3.0.0â€“v3.0.1. Tidak ada perubahan
 format penyimpanan, jadi semua cadangan tetap kompatibel.
 
 ### Ditingkatkan
@@ -54,7 +78,7 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
   Achievements sekarang pakai `SliverGrid` yang lebih efisien daripada
   `GridView(shrinkWrap: true)`.
 - **History lookup O(1).** Resolusi judul dan kategori riwayat
-  sebelumnya memindai katalog (55 entri) per baris per build — sekarang
+  sebelumnya memindai katalog (55 entri) per baris per build â€” sekarang
   pakai `Map` langsung.
 - **Weekly Insights refresh saat hari berganti** melalui
   `context.watch` provider, bukan hanya saat ada penyelesaian baru.
@@ -62,18 +86,18 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
   dipindah ke dalam WeeklyInsights).
 
 ### Diperbaiki
-- **Toast "+0 XP" untuk misi yang dilewati** — sekarang bilang dengan
+- **Toast "+0 XP" untuk misi yang dilewati** â€” sekarang bilang dengan
   jujur bahwa tidak ada XP dan streak tidak berubah.
-- **Ketuk ganda pada quest chain membayar dua kali** — langkah sekarang
+- **Ketuk ganda pada quest chain membayar dua kali** â€” langkah sekarang
   diklaim sebelum proses async, dengan guard in-flight.
 - **Timer tengah malam tidak lagi menumpuk** setiap kali aplikasi
   dibuka kembali (tidak ada lagi N timer hidup setelah N resume).
-- **ID tantangan harian dari cadangan divalidasi** — ID yang tidak ada
+- **ID tantangan harian dari cadangan divalidasi** â€” ID yang tidak ada
   dalam katalog build ini dibuang alih-alih diam-diam menimpa arc lain.
 - **Riwayat di memori sekarang ikut mematuhi batas 1000 entri** seperti
   penyimpanan, jadi laporan "menampilkan N dari M" tidak lagi melanggar.
 - **Filter riwayat dipindah ke modul murni** (`history_filter.dart`)
-  dengan 16 test — sebelumnya method privat di widget yang mustahil
+  dengan 16 test â€” sebelumnya method privat di widget yang mustahil
   diuji.
 
 ### Optimasi
@@ -643,4 +667,7 @@ fungsional nyata plus beberapa item polish.
 
 Tidak ada perubahan format data tersimpan, jadi progres yang sudah ada
 di HP tetap terbaca normal setelah update.
+
+
+
 

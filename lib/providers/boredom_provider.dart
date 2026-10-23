@@ -505,6 +505,7 @@ class BoredomProvider extends ChangeNotifier {
 
   Future<void> saveForLater(String missionId) async {
     if (isSavedForLater(missionId)) return;
+    _captureUndo();
     savedMissions = [
       SavedMission(missionId: missionId, savedAt: DateTime.now()),
       ...savedMissions,

@@ -122,6 +122,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final quickWins = context.select<BoredomProvider, bool>(
       (p) => p.quickWinsOnly,
     );
+    final freezeTokens = context.select<BoredomProvider, int>(
+      (p) => p.progress.freezeTokens,
+    );
     final actions = context.read<BoredomProvider>();
 
     return SafeArea(
@@ -196,6 +199,45 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           fontSize: 12,
                           height: 1.4,
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            if (freezeTokens > 0) ...[
+              const SizedBox(height: AppKit.md),
+              AppKit.card(
+                color: pal.success.withValues(alpha: 0.15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppKit.lg,
+                  vertical: AppKit.md,
+                ),
+                child: Row(
+                  children: [
+                    const Text('❄️', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: AppKit.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.freezeTokens,
+                            style: TextStyle(
+                              color: pal.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: AppKit.xs),
+                          Text(
+                            s.freezeTokensDesc(freezeTokens),
+                            style: TextStyle(
+                              color: pal.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
