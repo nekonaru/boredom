@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:boredom/models/mission.dart';
-import 'package:boredom/models/mission_catalog.dart';
+import 'package:boredom/services/mission_catalog.dart';
 import 'package:boredom/models/user_progress.dart';
 import 'package:boredom/providers/boredom_provider.dart';
 import 'package:boredom/services/storage_service.dart';

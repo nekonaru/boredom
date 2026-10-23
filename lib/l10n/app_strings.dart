@@ -455,6 +455,10 @@ class AppStrings {
   String freezeDesc(int n) => isId
       ? '$n token. Satu token menyelamatkan streak yang terputus 2 hari. Dapat 1 token tiap streak kelipatan 7.'
       : '$n token${n == 1 ? '' : 's'}. One token saves a streak broken for 2 days. Earn 1 token every 7-day streak.';
+  String get freezeTokens => _pick('Streak Freeze Tokens', 'Token Beku Streak');
+  String freezeTokensDesc(int n) => isId
+      ? 'Kamu punya $n token beku. Satu token menyelamatkan streak yang terputus 2 hari.'
+      : 'You have $n freeze token${n == 1 ? '' : 's'}. One token saves a streak broken for 2 days.';
   String get freezeUsed => _pick(
         'Freeze token used: streak saved!',
         'Token beku dipakai: streak selamat!',
