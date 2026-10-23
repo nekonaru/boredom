@@ -900,9 +900,7 @@ class _CustomMissionTile extends StatelessWidget {
               child: Text('+${mission.baseXp} XP'),
             ),
             IconButton(
-              onPressed: () async {
-                await _showEditCustomDialog(context, s, actions, mission);
-              },
+              onPressed: onEdit,
               icon: Icon(
                 Icons.edit_outlined,
                 color: pal.textSecondary,
