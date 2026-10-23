@@ -5,6 +5,7 @@ import '../models/achievement.dart';
 import '../models/daily_challenge.dart';
 import '../models/quest_chain.dart';
 import '../models/custom_mission.dart';
+import '../models/custom_mission.dart' show CustomCategory;
 import '../models/saved_mission.dart';
 import '../services/mission_service.dart';
 import '../services/mission_catalog.dart';
@@ -36,6 +37,7 @@ class BoredomProvider extends ChangeNotifier {
   DailyChallengeState? dailyChallengeState;
   QuestChainProgress? questChainProgress;
   List<CustomMission> customMissions = [];
+  List<CustomCategory> customCategories = [];
   Set<String> favoriteIds = {};
   Set<String> dislikedIds = {};
   Set<String> mutedCategories = {};
@@ -96,6 +98,7 @@ class BoredomProvider extends ChangeNotifier {
       storage.loadAchievements(),
       storage.loadQuestChainProgress(),
       storage.loadCustomMissions(),
+      storage.loadCustomCategories(),
       storage.loadFavorites(),
       storage.loadDailyChallengeState(),
       storage.isOnboardingDone(),
@@ -112,16 +115,17 @@ class BoredomProvider extends ChangeNotifier {
     achievements = results[2] as List<UnlockedAchievement>;
     questChainProgress = results[3] as QuestChainProgress?;
     customMissions = results[4] as List<CustomMission>;
-    favoriteIds = results[5] as Set<String>;
-    final storedChallenge = results[6] as DailyChallengeState?;
-    onboardingDone = results[7] as bool;
-    hapticsEnabled = results[8] as bool;
-    dislikedIds = results[9] as Set<String>;
-    savedMissions = results[10] as List<SavedMission>;
-    mutedCategories = results[11] as Set<String>;
-    reminderEnabled = results[12] as bool;
-    reminderHour = results[13] as int;
-    reminderMinute = results[14] as int;
+    customCategories = results[5] as List<CustomCategory>;
+    favoriteIds = results[6] as Set<String>;
+    final storedChallenge = results[7] as DailyChallengeState?;
+    onboardingDone = results[8] as bool;
+    hapticsEnabled = results[9] as bool;
+    dislikedIds = results[10] as Set<String>;
+    savedMissions = results[11] as List<SavedMission>;
+    mutedCategories = results[12] as Set<String>;
+    reminderEnabled = results[13] as bool;
+    reminderHour = results[14] as int;
+    reminderMinute = results[15] as int;
     _missionCounter = history.length;
 
     final now = DateTime.now();
@@ -937,6 +941,53 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateCustomMission(
+    String id, {
+    String? title,
+    String? description,
+    int? baseXp,
+    String? category,
+  }) async {
+    final index = customMissions.indexWhere((m) => m.id == id);
+    if (index < 0) return;
+    final old = customMissions[index];
+    final updated = old.copyWith(
+      title: title,
+      description: description,
+      baseXp: baseXp,
+      category: category,
+    );
+    customMissions = [...customMissions]..[index] = updated;
+    await StorageService.instance.saveCustomMissions(customMissions);
+    notifyListeners();
+  }
+
+  Future<void> archiveCustomMission(String id) async {
+    await updateCustomMission(id, archived: true);
+  }
+
+  Future<void> unarchiveCustomMission(String id) async {
+    await updateCustomMission(id, archived: false);
+  }
+
+  Future<void> addCustomCategory(String name, {String emoji = '⭐'}) async {
+    final category = CustomCategory(
+      id: 'cat_${DateTime.now().millisecondsSinceEpoch}',
+      name: name.trim(),
+      emoji: emoji,
+      createdAt: DateTime.now(),
+    );
+    customCategories = [...customCategories, category];
+    await StorageService.instance.saveCustomCategories(customCategories);
+    notifyListeners();
+  }
+
+  Future<void> deleteCustomCategory(String id) async {
+    customCategories = customCategories.where((c) => c.id != id).toList();
+    await StorageService.instance.saveCustomCategories(customCategories);
+    notifyListeners();
+  }
+
   /// Completes a custom mission for XP, with the same streak and
   /// achievement handling as catalog missions.
   Future<List<Achievement>> completeCustomMission(
@@ -1041,6 +1092,7 @@ class BoredomProvider extends ChangeNotifier {
               'currentStepIndex': questChainProgress!.currentStepIndex,
             },
       'customMissions': customMissions.map((m) => m.toJson()).toList(),
+      'customCategories': customCategories.map((c) => c.toJson()).toList(),
       'favorites': favoriteIds.toList(),
       'disliked': dislikedIds.toList(),
       'saved': savedMissions.map((m) => m.toJson()).toList(),
@@ -1097,6 +1149,9 @@ class BoredomProvider extends ChangeNotifier {
       final importedCustom = ((data['customMissions'] as List?) ?? [])
           .map((e) => CustomMission.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
+      final importedCustomCategories = ((data['customCategories'] as List?) ?? [])
+          .map((e) => CustomCategory.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
       final importedFavorites =
           ((data['favorites'] as List?) ?? []).map((e) => '$e').toSet();
       final importedDisliked =
@@ -1136,6 +1191,7 @@ class BoredomProvider extends ChangeNotifier {
       dailyChallengeState = importedChallenge;
       questChainProgress = importedChainSafe;
       customMissions = importedCustom;
+      customCategories = importedCustomCategories;
       favoriteIds = importedFavorites;
       dislikedIds = importedDisliked;
       savedMissions = importedSaved;
@@ -1150,6 +1206,7 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveDailyChallengeState(dailyChallengeState);
       await storage.saveQuestChainProgress(questChainProgress);
       await storage.saveCustomMissions(customMissions);
+      await storage.saveCustomCategories(customCategories);
       await storage.saveFavorites(favoriteIds);
       await storage.saveDisliked(dislikedIds);
       await storage.saveSavedMissions(savedMissions);
@@ -1444,6 +1501,7 @@ class BoredomProvider extends ChangeNotifier {
     final storage = StorageService.instance;
     await storage.resetAll();
     await storage.saveCustomMissions(const []);
+    await storage.saveCustomCategories(const []);
     await storage.saveFavorites(const {});
     await storage.saveDisliked(const {});
     await storage.saveSavedMissions(const []);
@@ -1455,6 +1513,7 @@ class BoredomProvider extends ChangeNotifier {
     achievements = [];
     questChainProgress = null;
     customMissions = [];
+    customCategories = [];
     favoriteIds = {};
     dislikedIds = {};
     mutedCategories = {};

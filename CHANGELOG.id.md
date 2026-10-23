@@ -1,5 +1,39 @@
 ﻿# Changelog
 
+## v3.3.0
+
+## ✨ Fitur baru
+
+- **Ubah misi buatan sendiri.** Ketuk ikon edit pada misi buatanmu untuk
+  mengubah judul, deskripsi, dan hadiah XP tanpa menghapus dan membuat
+  ulang.
+- **Arsipkan misi buatan.** Soft-delete misi buatan alih-alih
+  menghapusnya permanen — misi yang diarsipkan disembunyikan dari daftar
+  utama tapi tetap tersimpan agar riwayatnya tetap bermakna. Batalkan
+  arsip kapan saja.
+- **Kategori buatan pengguna.** Buat kategorimu sendiri (dengan emoji)
+  dan categorikan misi buatan ke dalamnya. Kelola kategori dari Profil.
+- **Bagian arsip** di Riwayat menampilkan misi buatan yang diarsipkan
+  secara terpisah, dengan tombol unarchive.
+
+## ⚙️ Optimisasi
+
+- **Penyimpanan misi buatan bersifat aditif.** Field `category` dan
+  `archived` baru default ke kosong/false, jadi simpanan lama terbaca
+  tanpa migrasi.
+
+## 🐛 Perbaikan bug
+
+- **Penghitung misi buatan tidak lagi drifting** saat edit atau arsip
+  (keduanya sekarang langsung persist).
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.2.0
 
 ### Ditambahkan

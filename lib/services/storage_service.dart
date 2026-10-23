@@ -18,6 +18,7 @@ class StorageService {
   static const _kDailyChallenge = 'boredom_daily_challenge';
   static const _kQuestChain = 'boredom_quest_chain';
   static const _kCustomMissions = 'boredom_custom_missions';
+  static const _kCustomCategories = 'boredom_custom_categories';
   static const _kFavorites = 'boredom_favorites';
   static const _kDisliked = 'boredom_disliked';
   static const _kHaptics = 'boredom_haptics';
@@ -207,6 +208,29 @@ class StorageService {
     await p.setStringList(
       _kCustomMissions,
       missions.map((m) => jsonEncode(m.toJson())).toList(),
+    );
+  }
+
+  Future<List<CustomCategory>> loadCustomCategories() async {
+    final p = await prefs;
+    final raw = p.getStringList(_kCustomCategories) ?? [];
+    return raw
+        .map((e) {
+          try {
+            return CustomCategory.fromJson(jsonDecode(e));
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<CustomCategory>()
+        .toList();
+  }
+
+  Future<void> saveCustomCategories(List<CustomCategory> categories) async {
+    final p = await prefs;
+    await p.setStringList(
+      _kCustomCategories,
+      categories.map((c) => jsonEncode(c.toJson())).toList(),
     );
   }
 

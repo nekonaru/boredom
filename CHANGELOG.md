@@ -1,5 +1,39 @@
 # Changelog
 
+## v3.3.0
+
+## ✨ New features
+
+- **Edit custom missions.** Tap the edit icon on any custom mission to
+  change its title, description, and XP reward without deleting and
+  recreating it.
+- **Archive custom missions.** Soft-delete a custom mission instead of
+  removing it permanently — archived missions are hidden from the main
+  list but kept in storage so their history still makes sense. Unarchive
+  anytime.
+- **Custom mission categories.** Create your own categories (with an
+  emoji) and assign custom missions to them. Manage categories from
+  Profile.
+- **Archived section** in History shows archived custom missions
+  separately, with an unarchive button.
+
+## ⚙️ Optimizations
+
+- **Custom mission storage is additive.** New `category` and `archived`
+  fields default to empty/false, so old saves load without migration.
+
+## 🐛 Bug fixes
+
+- **Custom mission counter no longer drifts** on edit or archive (both
+  now persist immediately).
+
+## 📦 Install / Update
+
+Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.2.0
 
 ### Added

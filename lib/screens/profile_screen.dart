@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
+import '../models/custom_mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/language_provider.dart';
@@ -193,6 +194,12 @@ class ProfileScreen extends StatelessWidget {
               s: s,
               pal: pal,
               muted: muted,
+              provider: provider,
+            ),
+            const SizedBox(height: AppKit.xxl),
+            _CustomCategoriesSection(
+              s: s,
+              pal: pal,
               provider: provider,
             ),
             const SizedBox(height: AppKit.xxl),
@@ -637,6 +644,90 @@ class _MutedSection extends StatelessWidget {
             );
           })
           .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom categories management.
+class _CustomCategoriesSection extends StatelessWidget {
+  final AppStrings s;
+  final AppPalette pal;
+  final BoredomProvider provider;
+
+  const _CustomCategoriesSection({
+    required this.s,
+    required this.pal,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = context.select<BoredomProvider, List<CustomCategory>>(
+      (p) => p.customCategories,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.customCategoriesTitle),
+        const SizedBox(height: AppKit.xs),
+        Text(
+          s.customCategoriesDesc,
+          style: TextStyle(color: pal.textSecondary, fontSize: 12),
+        ),
+        const SizedBox(height: AppKit.md),
+        if (categories.isEmpty)
+          Text(
+            s.customCategoriesEmpty,
+            style: TextStyle(color: pal.textSecondary, fontSize: 12),
+          )
+        else
+          Wrap(
+            spacing: AppKit.sm,
+            runSpacing: AppKit.sm,
+            children: categories.map((c) {
+              return Chip(
+                avatar: Text(c.emoji, style: const TextStyle(fontSize: 14)),
+                label: Text(c.name),
+                deleteIcon: const Icon(Icons.close, size: 16),
+                onDeleted: () => provider.deleteCustomCategory(c.id),
+              );
+            }).toList(),
+          ),
+        const SizedBox(height: AppKit.md),
+        OutlinedButton.icon(
+          onPressed: () async {
+            final ctrl = TextEditingController();
+            final ok = await showDialog<String>(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                title: Text(s.customCategoriesAdd),
+                content: TextField(
+                  controller: ctrl,
+                  decoration: InputDecoration(
+                    hintText: 'Category name',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(null),
+                    child: Text(s.dialogCancel),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(ctrl.text),
+                    child: Text(s.dialogSave),
+                  ),
+                ],
+              ),
+            );
+            if (ok != null && ok.trim().isNotEmpty) {
+              await provider.addCustomCategory(ok.trim());
+            }
+            ctrl.dispose();
+          },
+          icon: const Icon(Icons.add, size: 18),
+          label: Text(s.customCategoriesAdd),
         ),
       ],
     );

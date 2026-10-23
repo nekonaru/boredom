@@ -306,6 +306,7 @@ class AppStrings {
         'Level, XP, streak, pencapaian, rantai misi, dan riwayat akan terhapus semua. Tidak bisa dikembalikan.',
       );
   String get dialogCancel => _pick('Cancel', 'Batal');
+  String get dialogSave => _pick('Save', 'Simpan');
   String get resetConfirm => _pick('Reset', 'Hapus');
   String versionFooter(String v) => 'Boredom v$v';
 
@@ -351,6 +352,18 @@ class AppStrings {
         'Misi yang kamu buat sendiri. Selesaikan untuk XP seperti misi biasa.',
       );
   String get customAdd => _pick('Add custom mission', 'Tambah misi sendiri');
+  String get customEdit => _pick('Edit custom mission', 'Ubah misi buatanmu');
+  String get archivedTitle => _pick('Archived', 'Diarsipkan');
+  String get customCategoriesTitle => _pick('Custom categories', 'Kategori buatanmu');
+  String get customCategoriesDesc => _pick(
+        'Categories for your custom missions. Create as many as you want.',
+        'Kategori buat misi buatanmu. Buat sebanyak yang kamu mau.',
+      );
+  String get customCategoriesAdd => _pick('Add category', 'Tambah kategori');
+  String get customCategoriesEmpty => _pick(
+        'No custom categories yet.',
+        'Belum ada kategori buatanmu.',
+      );
   String get customNameHint => _pick('Mission title', 'Judul misi');
   String get customDescHint => _pick('What should you do?', 'Apa yang harus dilakukan?');
   String get customXp => _pick('XP reward', 'Hadiah XP');

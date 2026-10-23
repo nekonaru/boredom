@@ -114,7 +114,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                if (customMissions.isEmpty)
+                if (customMissions.where((m) => !m.archived).isEmpty)
                   Text(
                     s.customEmpty,
                     style: TextStyle(
@@ -123,9 +123,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   )
                 else
-                  ...customMissions.map(
-                    (m) => _CustomMissionTile(mission: m),
+                  ...customMissions
+                      .where((m) => !m.archived)
+                      .map((m) => _CustomMissionTile(mission: m)),
+                if (customMissions.any((m) => m.archived)) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    s.archivedTitle,
+                    style: TextStyle(
+                      color: pal.textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  const SizedBox(height: 8),
+                  ...customMissions
+                      .where((m) => m.archived)
+                      .map((m) => _CustomMissionTile(mission: m)),
+                ],
                 const SizedBox(height: 24),
                 Text(
                   s.favoritesTitle,
@@ -394,6 +409,102 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     );
     // Both controllers used to be leaked on every open.
+    titleCtrl.dispose();
+    descCtrl.dispose();
+  }
+
+  Future<void> _showEditCustomDialog(
+    BuildContext context,
+    AppStrings s,
+    BoredomProvider actions,
+    CustomMission mission,
+  ) async {
+    final titleCtrl = TextEditingController(text: mission.title);
+    final descCtrl = TextEditingController(text: mission.description);
+    double xp = mission.baseXp.toDouble();
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final pal = context.palette;
+          return AlertDialog(
+            backgroundColor: pal.surfaceElevated,
+            title: Text(
+              s.customEdit,
+              style: TextStyle(color: pal.textPrimary, fontSize: 17),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: titleCtrl,
+                    decoration: InputDecoration(
+                      hintText: s.customNameHint,
+                      hintStyle: TextStyle(color: pal.textSecondary),
+                    ),
+                    style: TextStyle(color: pal.textPrimary),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: descCtrl,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: s.customDescHint,
+                      hintStyle: TextStyle(color: pal.textSecondary),
+                    ),
+                    style: TextStyle(color: pal.textPrimary),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${s.customXp}: ${xp.toInt()}',
+                    style: TextStyle(
+                      color: pal.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Slider(
+                    value: xp,
+                    min: 5,
+                    max: 200,
+                    divisions: 39,
+                    label: '${xp.toInt()} XP',
+                    onChanged: (v) => setDialogState(() => xp = v),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(s.dialogCancel),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (titleCtrl.text.trim().isEmpty ||
+                      descCtrl.text.trim().isEmpty) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(content: Text(s.customInvalid)),
+                    );
+                    return;
+                  }
+                  await actions.updateCustomMission(
+                    mission.id,
+                    title: titleCtrl.text,
+                    description: descCtrl.text,
+                    baseXp: xp.toInt(),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: Text(s.customSave),
+              ),
+            ],
+          );
+        },
+      ),
+    );
     titleCtrl.dispose();
     descCtrl.dispose();
   }
@@ -681,10 +792,6 @@ class _CustomMissionTile extends StatelessWidget {
                 // missions are measured the same way.
                 final outcome = await showModalBottomSheet<MissionOutcome>(
                   context: context,
-                  // Without this the sheet caps at half the screen and the
-                  // third option is clipped on short devices or at large
-                  // text scales, which is where the longer Indonesian
-                  // labels matter most.
                   isScrollControlled: true,
                   builder: (sheetContext) => SafeArea(
                     child: SingleChildScrollView(
@@ -732,11 +839,6 @@ class _CustomMissionTile extends StatelessWidget {
                 final unlocked =
                     await actions.completeCustomMission(mission, outcome);
                 if (!context.mounted) return;
-                // Report what was actually awarded (weekend double XP,
-                // partial scaling and milestone bonuses included). A skip
-                // awards 0, and the old base-value fallback would have
-                // claimed the full reward for a mission just reported as
-                // not done.
                 final gained = actions.lastXpGained ?? 0;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -747,22 +849,22 @@ class _CustomMissionTile extends StatelessWidget {
                     ),
                     backgroundColor:
                         gained > 0 ? pal.success : pal.textSecondary,
-                        action: actions.canUndo
-                            ? SnackBarAction(
-                                label: s.undoAction,
-                                textColor: Colors.white,
-                                onPressed: () async {
-                                  final ok = await actions.undoLastAction();
-                                  if (context.mounted && ok) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(s.undoDone)),
-                                    );
-                                  }
-                                },
-                              )
-                            : null,
-                      ),
-                    );
+                    action: actions.canUndo
+                        ? SnackBarAction(
+                            label: s.undoAction,
+                            textColor: Colors.white,
+                            onPressed: () async {
+                              final ok = await actions.undoLastAction();
+                              if (context.mounted && ok) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(s.undoDone)),
+                                );
+                              }
+                            },
+                          )
+                        : null,
+                  ),
+                );
                 for (final a in unlocked) {
                   if (!context.mounted) break;
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -777,6 +879,30 @@ class _CustomMissionTile extends StatelessWidget {
                 actions.clearLastUnlockedAchievements();
               },
               child: Text('+${mission.baseXp} XP'),
+            ),
+            IconButton(
+              onPressed: () async {
+                await _showEditCustomDialog(context, s, actions, mission);
+              },
+              icon: Icon(
+                Icons.edit_outlined,
+                color: pal.textSecondary,
+                size: 20,
+              ),
+            ),
+            IconButton(
+              onPressed: () async {
+                if (mission.archived) {
+                  await actions.unarchiveCustomMission(mission.id);
+                } else {
+                  await actions.archiveCustomMission(mission.id);
+                }
+              },
+              icon: Icon(
+                mission.archived ? Icons.unarchive_outlined : Icons.archive_outlined,
+                color: pal.textSecondary,
+                size: 20,
+              ),
             ),
             IconButton(
               onPressed: () => _confirmDelete(context, s, actions),
