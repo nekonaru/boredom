@@ -2,8 +2,7 @@
 
 ## v3.2.0
 
-## ✨ Fitur baru
-
+### Ditambahkan
 - **Token beku ditampilkan di Beranda.** Jumlah token beku sekarang
   ditampilkan di layar Beranda sehingga kamu selalu tahu berapa banyak
   pelindung streak yang tersisa.
@@ -11,15 +10,14 @@
   terbaru-dulu, terlama-dulu, atau berdasarkan XP tertinggi — tekan chip
   urutan di atas daftar.
 
-## 🐛 Perbaikan bug
-
+### Diperbaiki
 - **Undo setelah menyimpan ke inbox tidak lagi merusak penghitung.**
   Menyimpan misi ke inbox kini mengambil snapshot undo, sehingga undo
   memulihkan daftar inbox dan penghitung missionsSaved secara bersamaan.
 
-## 📦 Instalasi / Update
-
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+### Ditingkatkan
+- **UI urutan riwayat.** Chip urutan di atas daftar riwayat memudahkan
+  menemukan entri lama atau penyelesaian dengan XP tertinggi.
 
 
 

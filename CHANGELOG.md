@@ -2,23 +2,21 @@
 
 ## v3.2.0
 
-## ✨ New features
-
+### Added
 - **Freeze token display on Home.** Your saved freeze tokens now show at the
   top of Home so you always know how many streak-savers you have left.
 - **History sort options.** History can now be sorted newest-first,
   oldest-first, or by XP earned (highest first) — tap the sort chip above
   the list.
 
-## 🐛 Bug fixes
-
+### Fixed
 - **Undo after saving to inbox no longer desyncs the counter.** Saving a
   mission to the inbox now captures an undo snapshot, so undoing restores
   both the inbox list and the `missionsSaved` counter together.
 
-## 📦 Install / Update
-
-Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+### Improved
+- **History sort UI.** The sort chips above the history list make it easy
+  to find old entries or high-XP completions quickly.
 
 
 
