@@ -1,5 +1,24 @@
 # Changelog
 
+## v4.1.0
+
+## ✨ New features
+
+- **Preferred defaults in Profile.** Pick your usual mood, time budget,
+  location, and energy level from a new section in Profile. They are
+  applied automatically on the first roll of every fresh session.
+
+## ⚙️ Optimizations
+
+- **Defaults persist across restarts.** Your preferred filters are saved
+  to local storage, so they survive app restarts and device reboots.
+
+## 📦 Install / Update
+
+Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+
+
 ## v4.0.0
 
 ## ✨ New features

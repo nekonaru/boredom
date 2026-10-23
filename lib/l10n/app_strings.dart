@@ -354,6 +354,11 @@ class AppStrings {
   String get customAdd => _pick('Add custom mission', 'Tambah misi sendiri');
   String get customEdit => _pick('Edit custom mission', 'Ubah misi buatanmu');
   String get archivedTitle => _pick('Archived', 'Diarsipkan');
+  String get defaultsTitle => _pick('Preferred defaults', 'Default pilihanmu');
+  String get defaultsDesc => _pick(
+        'Applied on the first roll of every fresh session.',
+        'Diterapkan pada roll pertama setiap sesi baru.',
+      );
   String get customCategoriesTitle => _pick('Custom categories', 'Kategori buatanmu');
   String get customCategoriesDesc => _pick(
         'Categories for your custom missions. Create as many as you want.',

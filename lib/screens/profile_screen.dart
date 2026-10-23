@@ -196,6 +196,12 @@ class ProfileScreen extends StatelessWidget {
               onPickTime: () => _pickReminderTime(context, s, provider),
             ),
             const SizedBox(height: AppKit.xxl),
+            _DefaultsSection(
+              s: s,
+              pal: pal,
+              provider: provider,
+            ),
+            const SizedBox(height: AppKit.xxl),
             _MutedSection(
               s: s,
               pal: pal,
@@ -591,6 +597,128 @@ class _ReminderSection extends StatelessWidget {
 }
 
 /// Muted categories filter chips.
+class _DefaultsSection extends StatelessWidget {
+  final AppStrings s;
+  final AppPalette pal;
+  final BoredomProvider provider;
+
+  const _DefaultsSection({
+    required this.s,
+    required this.pal,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultMood = context.select<BoredomProvider, Mood>((p) => p.defaultMood);
+    final defaultTime = context.select<BoredomProvider, TimeBudget>((p) => p.defaultTime);
+    final defaultLocation = context.select<BoredomProvider, LocationType>((p) => p.defaultLocation);
+    final defaultEnergy = context.select<BoredomProvider, EnergyLevel>((p) => p.defaultEnergy);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppKit.sectionHeader(context, s, title: s.defaultsTitle),
+        const SizedBox(height: AppKit.xs),
+        Text(
+          s.defaultsDesc,
+          style: TextStyle(color: pal.textSecondary, fontSize: 12),
+        ),
+        const SizedBox(height: AppKit.md),
+        AppKit.card(
+          color: pal.surface,
+          padding: const EdgeInsets.all(AppKit.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _DefaultRow(
+                label: 'Mood',
+                child: Wrap(
+                  spacing: AppKit.xs,
+                  children: Mood.values.map((m) {
+                    return ChoiceChip(
+                      label: Text('${m.emoji} ${m.label}'),
+                      selected: defaultMood == m,
+                      onSelected: (_) => provider.setDefaults(mood: m),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: AppKit.md),
+              _DefaultRow(
+                label: 'Time',
+                child: Wrap(
+                  spacing: AppKit.xs,
+                  children: TimeBudget.values.map((t) {
+                    return ChoiceChip(
+                      label: Text(t.label),
+                      selected: defaultTime == t,
+                      onSelected: (_) => provider.setDefaults(time: t),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: AppKit.md),
+              _DefaultRow(
+                label: 'Location',
+                child: Wrap(
+                  spacing: AppKit.xs,
+                  children: LocationType.values.map((l) {
+                    return ChoiceChip(
+                      label: Text('${l.emoji} ${l.label}'),
+                      selected: defaultLocation == l,
+                      onSelected: (_) => provider.setDefaults(location: l),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: AppKit.md),
+              _DefaultRow(
+                label: 'Energy',
+                child: Wrap(
+                  spacing: AppKit.xs,
+                  children: EnergyLevel.values.map((e) {
+                    return ChoiceChip(
+                      label: Text('${e.emoji} ${e.label}'),
+                      selected: defaultEnergy == e,
+                      onSelected: (_) => provider.setDefaults(energy: e),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DefaultRow extends StatelessWidget {
+  final String label;
+  final Widget child;
+  const _DefaultRow({required this.label, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: context.palette.textSecondary,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: AppKit.xs),
+        child,
+      ],
+    );
+  }
+}
+
 class _MutedSection extends StatelessWidget {
   final AppStrings s;
   final AppPalette pal;

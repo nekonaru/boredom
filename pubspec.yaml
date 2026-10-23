@@ -1,7 +1,7 @@
 name: boredom
 description: Boredom, a tiny game for humans who do not know what to do with themselves.
 publish_to: 'none'
-version: 4.0.0+26
+version: 4.1.0+27
 
 environment:
   sdk: '>=3.10.0 <4.0.0'

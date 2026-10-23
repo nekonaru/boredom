@@ -28,6 +28,10 @@ class StorageService {
   static const _kReminderEnabled = 'boredom_reminder_enabled';
   static const _kReminderHour = 'boredom_reminder_hour';
   static const _kReminderMinute = 'boredom_reminder_minute';
+  static const _kDefaultMood = 'boredom_default_mood';
+  static const _kDefaultTime = 'boredom_default_time';
+  static const _kDefaultLocation = 'boredom_default_location';
+  static const _kDefaultEnergy = 'boredom_default_energy';
 
   SharedPreferences? _cache;
 
@@ -307,6 +311,46 @@ class StorageService {
   Future<void> saveMutedCategories(Set<String> names) async {
     final p = await prefs;
     await p.setStringList(_kMuted, names.toList());
+  }
+
+  Future<String?> loadDefaultMood() async {
+    final p = await prefs;
+    return p.getString(_kDefaultMood);
+  }
+
+  Future<void> saveDefaultMood(String value) async {
+    final p = await prefs;
+    await p.setString(_kDefaultMood, value);
+  }
+
+  Future<String?> loadDefaultTime() async {
+    final p = await prefs;
+    return p.getString(_kDefaultTime);
+  }
+
+  Future<void> saveDefaultTime(String value) async {
+    final p = await prefs;
+    await p.setString(_kDefaultTime, value);
+  }
+
+  Future<String?> loadDefaultLocation() async {
+    final p = await prefs;
+    return p.getString(_kDefaultLocation);
+  }
+
+  Future<void> saveDefaultLocation(String value) async {
+    final p = await prefs;
+    await p.setString(_kDefaultLocation, value);
+  }
+
+  Future<String?> loadDefaultEnergy() async {
+    final p = await prefs;
+    return p.getString(_kDefaultEnergy);
+  }
+
+  Future<void> saveDefaultEnergy(String value) async {
+    final p = await prefs;
+    await p.setString(_kDefaultEnergy, value);
   }
 
   Future<bool> loadReminderEnabled() async {

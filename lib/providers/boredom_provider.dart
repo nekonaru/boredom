@@ -118,6 +118,10 @@ class BoredomProvider extends ChangeNotifier {
       storage.loadReminderEnabled(),
       storage.loadReminderHour(),
       storage.loadReminderMinute(),
+      storage.loadDefaultMood(),
+      storage.loadDefaultTime(),
+      storage.loadDefaultLocation(),
+      storage.loadDefaultEnergy(),
     ]);
     progress = results[0] as UserProgress;
     history = results[1] as List<CompletedMission>;
@@ -135,6 +139,34 @@ class BoredomProvider extends ChangeNotifier {
     reminderEnabled = results[13] as bool;
     reminderHour = results[14] as int;
     reminderMinute = results[15] as int;
+    final loadedMood = results[16] as String?;
+    final loadedTime = results[17] as String?;
+    final loadedLocation = results[18] as String?;
+    final loadedEnergy = results[19] as String?;
+    if (loadedMood != null) {
+      defaultMood = Mood.values.firstWhere(
+        (m) => m.name == loadedMood,
+        orElse: () => Mood.normal,
+      );
+    }
+    if (loadedTime != null) {
+      defaultTime = TimeBudget.values.firstWhere(
+        (t) => t.name == loadedTime,
+        orElse: () => TimeBudget.thirtyMin,
+      );
+    }
+    if (loadedLocation != null) {
+      defaultLocation = LocationType.values.firstWhere(
+        (l) => l.name == loadedLocation,
+        orElse: () => LocationType.anywhere,
+      );
+    }
+    if (loadedEnergy != null) {
+      defaultEnergy = EnergyLevel.values.firstWhere(
+        (e) => e.name == loadedEnergy,
+        orElse: () => EnergyLevel.medium,
+      );
+    }
     _missionCounter = history.length;
 
     final now = DateTime.now();
@@ -420,10 +452,22 @@ class BoredomProvider extends ChangeNotifier {
     LocationType? location,
     EnergyLevel? energy,
   }) {
-    if (mood != null) defaultMood = mood;
-    if (time != null) defaultTime = time;
-    if (location != null) defaultLocation = location;
-    if (energy != null) defaultEnergy = energy;
+    if (mood != null) {
+      defaultMood = mood;
+      StorageService.instance.saveDefaultMood(mood.name);
+    }
+    if (time != null) {
+      defaultTime = time;
+      StorageService.instance.saveDefaultTime(time.name);
+    }
+    if (location != null) {
+      defaultLocation = location;
+      StorageService.instance.saveDefaultLocation(location.name);
+    }
+    if (energy != null) {
+      defaultEnergy = energy;
+      StorageService.instance.saveDefaultEnergy(energy.name);
+    }
     notifyListeners();
   }
 
@@ -1543,6 +1587,10 @@ class BoredomProvider extends ChangeNotifier {
     await storage.saveSavedMissions(const []);
     await storage.saveMutedCategories(const {});
     await storage.saveReminder(enabled: false, hour: 19, minute: 0);
+    await storage.saveDefaultMood(Mood.normal.name);
+    await storage.saveDefaultTime(TimeBudget.thirtyMin.name);
+    await storage.saveDefaultLocation(LocationType.anywhere.name);
+    await storage.saveDefaultEnergy(EnergyLevel.medium.name);
     await ReminderService.instance.cancelDaily();
     progress = const UserProgress();
     history = [];

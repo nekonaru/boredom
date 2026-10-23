@@ -1,5 +1,25 @@
 ﻿# Changelog
 
+## v4.1.0
+
+## ✨ Fitur baru
+
+- **Default pilihan di Profil.** Pilih suasana, anggaran waktu, lokasi,
+  dan tingkat energi biasamu dari bagian baru di Profil. Otomatis
+  diterapkan pada roll pertama setiap sesi baru.
+
+## ⚙️ Optimisasi
+
+- **Default tersimpan lintas restart.** Filter pilihanmu disimpan ke
+  penyimpanan lokal, sehingga bertahan saat aplikasi di-restart dan
+  perangkat di-reboot.
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
+
+
 ## v4.0.0
 
 ## ✨ Fitur baru

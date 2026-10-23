@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// App version shown in the Profile footer. Keep in sync with `version:`
 /// in pubspec.yaml on every release.
-const String kAppVersion = '4.0.0';
+const String kAppVersion = '4.1.0';
 
 /// Semantic color set. Widgets must read these through `context.palette`
 /// (never hardcode AppPalette.dark/light) so Dark/Light mode and the
