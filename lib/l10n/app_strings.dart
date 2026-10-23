@@ -484,6 +484,8 @@ class AppStrings {
   // so the label says so. "Avg XP / Day" read as a calendar average.
   String get mAvgXp => _pick('XP / Active Day', 'XP / Hari Aktif');
   String get mBestDay => _pick('Busiest Day', 'Hari Tersibuk');
+  String get streakCalendarTitle => _pick('Streak Calendar', 'Kalender Streak');
+  String get xpPerCategoryTitle => _pick('XP per Category', 'XP per Kategori');
 
   String weekdayName(int weekday) {
     // 1=Monday .. 7=Sunday.

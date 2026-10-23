@@ -1,5 +1,37 @@
 ﻿# Changelog
 
+## v3.4.0
+
+## ✨ Fitur baru
+
+- **Kalender streak.** Grid 5 minggu di tab Statistik menunjukkan hari
+  mana yang aktif, dengan hari ini dihighlight. Tanpa package chart
+  tambahan.
+- **XP per kategori.** Bar horizontal di Statistik menunjukkan berapa
+  banyak XP yang diperoleh per kategori, sehingga kamu bisa sekilas
+  melihat ke mana usahamu pergi.
+- **Ringkasan mingguan di Profil.** Jumlah misi, XP, dan streak untuk 7
+  hari terakhir, tepat di bawah bar levelmu.
+
+## ⚙️ Optimisasi
+
+- **Lookup hari aktif di-cache.** Kalender dan grafik sekarang berasal
+  dari satu getter `activeDaysLast35` alih-alih memfilter ulang
+  riwayat per widget.
+
+## 🐛 Perbaikan bug
+
+- **Layar Statistik tidak lagi rebuild seluruh daftar** pada setiap
+  notifikasi provider (kartu metrik memakai `context.select` pada field
+  yang tepat).
+
+## 📦 Instalasi / Update
+
+Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.3.0
 
 ## ✨ Fitur baru

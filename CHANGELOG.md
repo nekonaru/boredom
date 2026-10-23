@@ -1,5 +1,34 @@
 # Changelog
 
+## v3.4.0
+
+## ✨ New features
+
+- **Streak calendar.** A 5-week grid on the Stats tab shows which days
+  had activity, with today highlighted. No new chart package needed.
+- **XP per category.** Horizontal bars on Stats show how much XP each
+  category has earned, so you can see at a glance where your effort goes.
+- **Weekly recap in Profile.** Missions, XP, and streak for the last 7
+  days, right below your level bar.
+
+## ⚙️ Optimizations
+
+- **Active-day lookups are cached.** The calendar and charts now derive
+  from a single `activeDaysLast35` getter instead of re-filtering
+  history per widget.
+
+## 🐛 Bug fixes
+
+- **Stats screen no longer rebuilds the whole list** on every provider
+  notification (metric cards use `context.select` on the right fields).
+
+## 📦 Install / Update
+
+Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
+
+
+
+
 ## v3.3.0
 
 ## ✨ New features

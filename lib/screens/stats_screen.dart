@@ -5,6 +5,7 @@ import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
+import '../utils/app_theme.dart';
 import '../widgets/kit.dart';
 import '../widgets/weekly_chart.dart';
 
@@ -37,6 +38,9 @@ class StatsScreen extends StatelessWidget {
     );
     final rate = context.select<BoredomProvider, double?>(
       (p) => p.followThroughRate,
+    );
+    final activeDays = context.select<BoredomProvider, Set<DateTime>>(
+      (p) => p.activeDaysLast35,
     );
 
     final categoryCounts = progress.categoryCounts;
@@ -161,6 +165,55 @@ class StatsScreen extends StatelessWidget {
               child: MonthlyChart(counts: monthCounts),
             ),
             const SizedBox(height: AppKit.xxl),
+            AppKit.sectionHeader(context, s, title: s.streakCalendarTitle),
+            const SizedBox(height: AppKit.md),
+            _StreakCalendar(activeDays: activeDays),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.sectionHeader(context, s, title: s.xpPerCategoryTitle),
+            const SizedBox(height: AppKit.md),
+            if (progress.totalMissionsCompleted == 0)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppKit.xl),
+                child: Center(
+                  child: Text(
+                    s.statsEmpty,
+                    style: TextStyle(color: pal.textSecondary),
+                  ),
+                ),
+              )
+            else
+              ...sortedCategories.map((cat) {
+                final count = categoryCounts[cat.name] ?? 0;
+                final ratio = maxCount == 0 ? 0.0 : count / maxCount;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppKit.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(cat.labelFor(s.code),
+                              style: TextStyle(color: pal.textPrimary, fontSize: 13)),
+                          Text('$count',
+                              style: TextStyle(color: pal.textSecondary, fontSize: 12)),
+                        ],
+                      ),
+                      const SizedBox(height: AppKit.sm),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppKit.rSm),
+                        child: LinearProgressIndicator(
+                          value: ratio,
+                          minHeight: AppKit.md,
+                          backgroundColor: pal.emptyBar,
+                          valueColor: AlwaysStoppedAnimation(pal.accent),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            const SizedBox(height: AppKit.xxl),
             AppKit.sectionHeader(context, s, title: s.perCategory),
             const SizedBox(height: AppKit.md),
             if (progress.totalMissionsCompleted == 0)
@@ -206,6 +259,97 @@ class StatsScreen extends StatelessWidget {
                 );
               }),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A 5-week (35-day) calendar grid showing active days.
+class _StreakCalendar extends StatelessWidget {
+  final Set<DateTime> activeDays;
+  const _StreakCalendar({required this.activeDays});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    // Build the 35-day grid starting 34 days ago.
+    final days = <DateTime>[];
+    for (var i = 34; i >= 0; i--) {
+      days.add(today.subtract(Duration(days: i)));
+    }
+    // Weekday labels (Mon-Sun).
+    const weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    return AppKit.card(
+      color: pal.surface,
+      padding: const EdgeInsets.all(AppKit.lg),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekdayLabels
+                .map((l) => Text(l,
+                    style: TextStyle(color: pal.textSecondary, fontSize: 10)))
+                .toList(),
+          ),
+          const SizedBox(height: AppKit.sm),
+          for (var week = 0; week < 5; week++)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                for (var day = 0; day < 7; day++)
+                  _CalendarCell(
+                    day: days[week * 7 + day],
+                    isActive: activeDays.contains(days[week * 7 + day]),
+                    isToday: days[week * 7 + day] == today,
+                    pal: pal,
+                  ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CalendarCell extends StatelessWidget {
+  final DateTime day;
+  final bool isActive;
+  final bool isToday;
+  final AppPalette pal;
+
+  const _CalendarCell({
+    required this.day,
+    required this.isActive,
+    required this.isToday,
+    required this.pal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      margin: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: isActive
+            ? pal.accent.withValues(alpha: 0.25)
+            : pal.emptyBar.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: isToday
+            ? Border.all(color: pal.accent, width: 1.5)
+            : null,
+      ),
+      child: Center(
+        child: Text(
+          '${day.day}',
+          style: TextStyle(
+            color: isActive ? pal.accent : pal.textSecondary,
+            fontSize: 11,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );

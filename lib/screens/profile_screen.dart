@@ -110,6 +110,12 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppKit.lg),
+            _WeeklyRecapCard(
+              s: s,
+              pal: pal,
+              provider: provider,
+            ),
+            const SizedBox(height: AppKit.lg),
             AppKit.card(
               color: pal.surface,
               padding: const EdgeInsets.all(AppKit.lg),
@@ -804,6 +810,117 @@ class _BackupSection extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Weekly recap card for Profile.
+class _WeeklyRecapCard extends StatelessWidget {
+  final AppStrings s;
+  final AppPalette pal;
+  final BoredomProvider provider;
+
+  const _WeeklyRecapCard({
+    required this.s,
+    required this.pal,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = context.select<BoredomProvider, ({int missions, int xp})>(
+      (p) => p.last7DaysSummary,
+    );
+    final streak = context.select<BoredomProvider, int>(
+      (p) => p.progress.streakDays,
+    );
+    return AppKit.card(
+      color: pal.surface,
+      padding: const EdgeInsets.all(AppKit.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            s.weeklySummary,
+            style: TextStyle(
+              color: pal.textPrimary,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: AppKit.md),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${summary.missions}',
+                      style: TextStyle(
+                        color: pal.accent,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      s.missionsWord,
+                      style: TextStyle(
+                        color: pal.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '+${summary.xp}',
+                      style: TextStyle(
+                        color: pal.success,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'XP',
+                      style: TextStyle(
+                        color: pal.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$streak',
+                      style: TextStyle(
+                        color: pal.warning,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      s.days(streak),
+                      style: TextStyle(
+                        color: pal.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

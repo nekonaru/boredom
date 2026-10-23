@@ -1628,6 +1628,26 @@ class BoredomProvider extends ChangeNotifier {
     return best + 1;
   }
 
+  /// Set of active days (day-level) in the last 35 days, for the streak
+  /// calendar on the Stats tab.
+  Set<DateTime> get activeDaysLast35 {
+    final now = DateTime.now();
+    final cutoff = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 34));
+    final result = <DateTime>{};
+    for (final e in history) {
+      final day = DateTime(
+        e.completedAt.year,
+        e.completedAt.month,
+        e.completedAt.day,
+      );
+      if (!day.isBefore(cutoff) && !day.isAfter(DateTime(now.year, now.month, now.day))) {
+        result.add(day);
+      }
+    }
+    return result;
+  }
+
   /// Weekly recap used by the Home summary strip.
   ({int missions, int xp}) get last7DaysSummary {
     final cutoff = DateTime.now().subtract(const Duration(days: 7));
