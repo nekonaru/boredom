@@ -505,7 +505,11 @@ class BoredomProvider extends ChangeNotifier {
 
   Future<void> saveForLater(String missionId) async {
     if (isSavedForLater(missionId)) return;
-    _captureUndo();
+    // Deliberately no _captureUndo(): saveForLater is not an XP-granting
+    // action, so it must not overwrite the undo snapshot of the last
+    // completion. Undo already restores savedMissions from the snapshot's
+    // _undoSavedMissions value (captured at the last XP-granting action),
+    // which keeps the counter and the list in step.
     savedMissions = [
       SavedMission(missionId: missionId, savedAt: DateTime.now()),
       ...savedMissions,
