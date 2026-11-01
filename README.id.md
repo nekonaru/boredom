@@ -1,91 +1,156 @@
 <div align="center">
+  <h1>Boredom: Ubah Rasa Bosan Jadi Misi</h1>
+  <p><b>Ketuk satu tombol, dapat satu misi dunia nyata, raih XP, naik level.<br/>
+  Game mungil untuk kehidupan sehari-hari, sepenuhnya offline.</b></p>
 
-# 🎲 Boredom: Ubah Rasa Bosan Jadi Misi
-
-**Tekan satu tombol, dapat satu misi nyata, kumpulkan XP, naik level. Game kecil untuk kehidupan sehari-hari, sepenuhnya offline.**
-
-![Flutter](https://img.shields.io/badge/Flutter-3.35-02569B?style=flat-square&logo=flutter&logoColor=white)
-![Release](https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
-![CI](https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg)
-
+  <a href="https://github.com/nekonaru/boredom/releases"><img src="https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue" alt="Release" /></a>
+  <a href="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml"><img src="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg" alt="CI" /></a>
+  <img src="https://img.shields.io/badge/Flutter-3.35-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square" alt="Status" />
 </div>
+
+<br />
 
 [English](README.md) | **Bahasa Indonesia**
 
-## ✨ Tentang
+> [!NOTE]
+> Boredom berjalan sepenuhnya offline. Semuanya (XP, level, streak, riwayat, achievement, misi kustom, favorit) disimpan secara lokal di ponselmu, dan cadangan bekerja dengan menyalin teks, tidak pernah dengan mengunggah.
 
-**Boredom** adalah game kecil Flutter untuk kehidupan sehari-hari, bukan aplikasi produktivitas. Pilih **mood**, **waktu luang**, **lokasi**, dan **energi** kamu, tekan **I'M BORED**, dan dapatkan satu misi konkret yang bisa langsung dikerjakan (bukan saran generik). **Terima** misi untuk dapat XP, atau **reroll** (3x sehari) kalau tidak cocok. XP menaikkan level lewat judul absurd, dari "Bored" sampai "The Final Boss of Boredom".
+---
 
-Ada juga **Chaos Mode** yang mengabaikan semua filter, jadi misi apa pun bisa keluar.
+## Daftar Isi
 
-> _"Kamu bosan. Jadi... mau ngapain?"_
+- [Tentang](#tentang)
+- [Fitur](#fitur)
+- [Persyaratan](#persyaratan)
+- [Instalasi](#instalasi)
+- [Penggunaan](#penggunaan)
+- [Bahasa Tampilan](#bahasa-tampilan)
+- [Struktur Proyek](#struktur-proyek)
+- [Pengembangan](#pengembangan)
+- [Pengujian](#pengujian)
+- [Continuous Integration](#continuous-integration)
+- [FAQ](#faq)
+- [Penulis](#penulis)
+- [Lisensi](#lisensi)
 
-## 🎯 Fitur
+---
+
+## Tentang
+
+**Boredom** adalah game Flutter mungil untuk kehidupan sehari-hari, bukan aplikasi produktivitas. Pilih **mood**, **waktu luang**, **lokasi**, dan **energi**, ketuk **I'M BORED**, dan dapatkan satu misi konkret yang bisa kamu lakukan sekarang juga (bukan nasihat umum). **Terima** misinya untuk XP, atau **reroll** (3x per hari) kalau tidak cocok. XP menaikkan levelmu lewat gelar-gelar absurd, dari "Bored" sampai "The Final Boss of Boredom".
+
+Ada juga **Chaos Mode**, yang mengabaikan semua filter sehingga apa pun bisa muncul.
+
+> _"Kamu lagi bosan. Jadi... sekarang ngapain?"_
+
+---
+
+## Fitur
+
+### Misi
 
 | Fitur | Deskripsi |
-|---------|-------------|
-| 🎲 **Generator misi** | Misi acak dari 55 katalog, disesuaikan dengan mood, waktu, lokasi, dan energi, dibobot ke kategori yang paling jarang dimainkan, plus misi musiman dan fallback pintar supaya selalu dapat misi |
-| ☢️ **Chaos Mode** | Mengabaikan semua filter, membuka misi khusus chaos |
-| ✅ **Terima / reroll** | Terima misi untuk XP, reroll sampai 3x sehari |
-| ⭐ **XP dan level** | Kurva progresif dengan judul level yang absurd, XP ganda setiap akhir pekan |
-| 🔥 **Streak** | Streak harian plus streak terpanjang, dengan toleransi 1 hari libur, token beku, dan peringatan saat terancam putus |
-| 📜 **Quest chain** | 4 arc bertahap ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") dengan hadiah besar di akhir |
-| 🏆 **Pencapaian** | 25 pencapaian, berbasis progres dan event (seperti "Night Owl") |
-| 📅 **Tantangan harian** | Satu tantangan spesial per hari, sama untuk semua orang di tanggal yang sama, hadiah XP besar |
-| ⭐ **Misi buatanmu** | Buat misi sendiri dengan hadiah XP pilihanmu |
-| ❤️ **Favorit** | Tandai misi katalog agar mudah ditemukan lagi |
-| 🔍 **Pencarian riwayat** | Saring misi yang selesai berdasarkan judul atau kategori |
-| ↩️ **Urungkan** | Jendela 5 menit untuk mengembalikan misi terakhir yang diselesaikan |
-| 💾 **Cadangan dan pulihkan** | Ekspor semua data lokal sebagai teks, impor kembali untuk pulihkan (pindah HP jadi mudah, tanpa akun) |
-| 📊 **Statistik** | Grafik 7 dan 30 hari terakhir tanpa dependency, rata-rata XP per hari aktif, hari tersibuk, distribusi per kategori, total reroll dan chaos |
-| 👎 **Dislike** | Downvote misi supaya generator berhenti mengeluarkannya |
-| 🔔 **Pengingat harian** | Satu notifikasi sehari pada waktu pilihanmu, mati secara default |
-| 🌍 **UI Inggris dan Indonesia** | Inggris sebagai default, ganti ke Bahasa Indonesia di Profil |
-| 🎨 **Tema terang dan gelap** | Gelap sebagai default, mode terang plus 5 warna aksen di Profil |
-| 📳 **Haptic feedback** | Getaran kecil saat ketuk dan selesai, bisa dimatikan |
-| 📤 **Share card** | Render misi apa pun jadi kartu PNG 1080x1080, atau salin sebagai teks |
-| 📥 **Kotak masuk** | Simpan misi untuk nanti dan mulai kerjakan saat siap |
-| ⚡ **Misi kilat** | Batasi roll ke misi 15 menit atau kurang |
-| 🙈 **Matikan kategori** | Bisukan satu kategori penuh saat kamu tidak tertarik |
-| 📊 **Ringkasan mingguan** | Jumlah misi, XP, dan streak langsung di Beranda |
-| 🎁 **Bonus milestone** | XP ekstra setiap melewati kelipatan 10 level |
-| ↩️ **Urungkan penuh** | Urungkan 5 menit untuk misi, tantangan harian, langkah chain, dan misi buatanmu |
+|-------|-----------|
+| **Generator misi** | Misi acak dari katalog 55 misi, disesuaikan dengan mood, waktu, lokasi, dan energi, diberi bobot ke kategori yang paling jarang dimainkan, dengan misi musiman dan fallback cerdas sehingga kamu selalu dapat satu |
+| **Chaos Mode** | Mengabaikan semua filter, membuka misi khusus chaos |
+| **Terima / reroll** | Terima misi untuk XP, reroll hingga 3x per hari |
+| **Quick wins** | Persempit hasil ke misi berdurasi 15 menit atau kurang |
+| **Inbox** | Simpan misi untuk nanti dan putar saat kamu siap |
+| **Misi kustom** | Buat misimu sendiri dengan hadiah XP sesukamu |
+| **Favorit** | Sematkan misi katalog agar mudah ditemukan lagi |
+| **Dislike** | Beri downvote pada misi agar generator berhenti memunculkannya |
+| **Bisukan kategori** | Matikan satu kategori penuh saat kamu tidak tertarik |
 
-## 📦 Kebutuhan
+### Progres dan Hadiah
 
-- **Flutter** 3.47 atau lebih baru (stable channel)
-- **JDK** 17
-- **Android SDK** (API 34+)
-- HP atau emulator Android (minimum Android 8.0 / API 26)
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Pelacakan hasil** | Katakan apakah kamu benar-benar melakukannya: selesai, sebagian, atau dilewati. Sebagian dibayar 60 persen, dilewati tidak dibayar dan tidak pernah memajukan streak-mu |
+| **XP dan level** | Kurva progresif dengan gelar level yang absurd, XP ganda setiap akhir pekan |
+| **Streak** | Streak harian plus streak terpanjang, dengan masa tenggang 1 hari, token freeze, dan peringatan saat terancam putus |
+| **Bonus milestone** | XP tambahan setiap kali melewati batas 10 level |
+| **Quest chain** | 4 alur multi-langkah ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") dengan hadiah akhir besar |
+| **Achievement** | 29 achievement, berbasis progres dan berbasis kejadian (seperti "Night Owl") |
+| **Tantangan harian** | Satu tantangan khusus per hari, sama untuk semua orang pada tanggal yang sama, hadiah XP besar |
 
-### Belum pernah pakai terminal? Mulai di sini
+### Statistik dan Riwayat
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Statistik follow-through** | Persentase misi terlacak yang benar-benar kamu jalankan, ditampilkan sebagai tanda strip sampai data tersedia |
+| **Statistik** | Grafik 7 hari dan 30 hari terakhir yang digambar tanpa dependensi, rata-rata XP per hari aktif, hari tersibuk, distribusi per kategori, total reroll dan chaos |
+| **Rekap mingguan** | Misi, XP, dan streak terlihat langsung di Home |
+| **Insight mingguan** | Apa kata riwayatmu tentang dirimu: dibandingkan minggu lalu, jam produktifmu, kategori yang sering kamu tinggalkan, rata-rata XP. Tidak menampilkan apa pun daripada menebak |
+| **Pencarian riwayat** | Filter misi yang selesai berdasarkan judul atau kategori, lalu persempit berdasarkan tanggal (hari ini, 7 hari, 30 hari, semua) dan hasil |
+| **Transparansi data** | Riwayat menyebutkan berapa entri yang tersimpan dan berapa yang sedang kamu lihat, tanggal menampilkan tahun bila berbeda, dan favorit yatim bisa dibersihkan |
+
+### Data dan Keamanan
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Undo** | Jendela 5 menit untuk memulihkan penyelesaian terakhir |
+| **Undo penuh** | Undo 5 menit untuk misi, tantangan harian, langkah chain, dan misi kustom |
+| **Cadangkan dan pulihkan** | Ekspor semua data lokal sebagai teks, impor kembali (ramah ganti ponsel, tanpa akun) |
+
+### Pengingat dan Berbagi
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Pengingat harian** | Satu notifikasi per hari pada waktu pilihanmu, mati secara default |
+| **Kartu bagikan** | Render misi mana pun menjadi kartu PNG 1080x1080, atau salin sebagai teks |
+
+### Tampilan dan Nuansa
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Antarmuka Inggris dan Indonesia** | Bahasa Inggris secara default, ganti ke Bahasa Indonesia di Profile |
+| **Tema terang dan gelap** | Gelap secara default, mode terang plus 5 warna aksen di Profile |
+| **Umpan balik haptic** | Getaran kecil saat mengetuk dan menyelesaikan misi, bisa dimatikan |
+
+---
+
+## Persyaratan
+
+| Dependensi | Versi Minimum | Catatan |
+|------------|---------------|---------|
+| **Flutter** | 3.47 | Channel stable, hanya diperlukan untuk build dari source |
+| **JDK** | 17 | Hanya diperlukan untuk build dari source |
+| **Android SDK** | API 34+ | Hanya diperlukan untuk build dari source |
+| **Ponsel atau emulator Android** | Android 8.0 (API 26) | Diperlukan untuk menjalankan aplikasi |
+
+> [!TIP]
+> Kalau kamu hanya ingin bermain, kamu tidak perlu Flutter, JDK, atau Android SDK. Unduh APK dari halaman [Releases](https://github.com/nekonaru/boredom/releases).
+
+### Belum pernah memakai terminal? Mulai dari sini
 
 <details>
 <summary><b>Cara membuka terminal di Windows</b></summary>
 
 1. Tekan tombol **Windows**, ketik `PowerShell`, lalu tekan **Enter**
-2. Jendela biru akan terbuka. Di situlah perintah diketik
+2. Jendela biru akan terbuka. Di situlah kamu mengetik perintah
 3. Setiap perintah `flutter ...` atau `git ...` di panduan ini diketik di jendela itu, diikuti **Enter**
 
 </details>
 
-## 🚀 Instalasi
+---
+
+## Instalasi
 
 ### Opsi A: Unduh APK (paling mudah)
 
 1. Buka halaman [Releases](https://github.com/nekonaru/boredom/releases)
-2. Unduh APK yang cocok dengan HP (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama)
-3. Buka di HP, izinkan instalasi dari sumber tidak dikenal jika diminta
+2. Unduh APK yang sesuai dengan perangkatmu (`app-arm64-v8a-release.apk` untuk kebanyakan ponsel modern, `app-armeabi-v7a-release.apk` untuk ponsel 32-bit yang lebih lama)
+3. Buka di ponselmu, izinkan instalasi dari sumber tidak dikenal jika diminta
 
-### Opsi B: Build dari source (untuk development / membaca atau mengubah kode)
+### Opsi B: Build dari source (untuk pengembangan / membaca atau mengubah kode)
 
-**1. Ambil kode project**
+#### 1. Ambil kode proyek
 
 <details>
-<summary><b>Saya sudah punya Git</b></summary>
+<summary><b>Saya sudah menginstal Git</b></summary>
 
 ```bash
 git clone https://github.com/nekonaru/boredom.git
@@ -97,10 +162,10 @@ cd boredom
 <details>
 <summary><b>Saya belum punya Git</b></summary>
 
-1. Buka halaman repo di GitHub
+1. Buka halaman repositori di GitHub
 2. Klik tombol hijau **`Code`**, pilih **`Download ZIP`**
 3. Ekstrak ZIP ke folder pilihanmu
-4. Di terminal, masuk ke folder hasil ekstrak, contoh:
+4. Di terminal, masuk ke folder hasil ekstrak, contohnya:
 
 ```bash
 cd Downloads/boredom-main
@@ -108,7 +173,7 @@ cd Downloads/boredom-main
 
 </details>
 
-**2. Instal dependency dan verifikasi**
+#### 2. Instal dependensi dan verifikasi
 
 ```bash
 flutter pub get
@@ -116,131 +181,162 @@ flutter analyze
 flutter test
 ```
 
-`flutter analyze` harus melaporkan **No issues found** dan semua test harus lolos.
+> [!IMPORTANT]
+> `flutter analyze` harus melaporkan **No issues found** dan semua tes harus lulus.
 
-**3. Build APK**
+#### 3. Build APK
 
 ```bash
 flutter build apk --release --split-per-abi
 ```
 
-Hasilnya ada di `build/app/outputs/flutter-apk/` (`app-arm64-v8a-release.apk` dan kawan-kawan).
+Hasilnya ada di `build/app/outputs/flutter-apk/` (`app-arm64-v8a-release.apk` dan kawan-kawannya).
 
-## 🖥️ Cara Pakai
+---
 
-**Pertama kali buka:**
-1. Pilih mood, waktu luang, lokasi, dan energi
-2. Tekan **I'M BORED**
-3. Terima misinya dan kerjakan, atau reroll (3x sehari)
+## Penggunaan
 
-**Pemakaian sehari-hari:**
-- Buka **Misi** untuk quest chain, misi buatanmu, favorit, dan riwayat yang bisa dicari
-- Cek **Tantangan Harian** di Beranda untuk bonus XP
-- Pantau **Statistik** untuk grafik mingguan dan rincian kategori
-- Ganti bahasa atau cadangkan data dari **Profil**
+### Pertama kali dibuka
 
-## 🌍 Bahasa Tampilan
+1. Pilih mood, waktu luang, lokasi, dan energimu
+2. Ketuk **I'M BORED**
+3. Terima misinya lalu kerjakan, atau reroll (3x per hari)
 
-UI aplikasi (menu, tombol, pesan, dan pengaturan) tersedia dalam **English** (default) dan **Bahasa Indonesia**.
+### Penggunaan sehari-hari
 
-1. Buka **Profil**
-2. Di bagian **Bahasa**, pilih **English** atau **Bahasa Indonesia**
-3. Pilihan diingat antar sesi
+- Buka **Missions** untuk quest chain, misi kustom, favorit, dan riwayat yang bisa dicari
+- Cek **Daily Challenge** di Home untuk XP bonus
+- Pantau **Stats** untuk grafik mingguan dan rincian kategori
+- Ganti bahasa atau cadangkan datamu dari **Profile**
 
-## 🗂️ Struktur Project
+---
+
+## Bahasa Tampilan
+
+Antarmuka aplikasi (menu, tombol, pesan, dan pengaturan) tersedia dalam **English** (default) dan **Bahasa Indonesia**.
+
+1. Buka **Profile**
+2. Di bawah **Language**, pilih **English** atau **Bahasa Indonesia**
+3. Pilihanmu diingat antar sesi
+
+---
+
+## Struktur Proyek
 
 ```
 boredom/
 ├── lib/
 │   ├── main.dart                 # entry point, provider, MaterialApp + locale
 │   ├── l10n/
-│   │   └── app_strings.dart      # tabel Inggris (acuan) + Indonesia
+│   │   └── app_strings.dart      # tabel Inggris (sumber utama) + Indonesia
 │   ├── models/                   # Mission, UserProgress, Achievement, DailyChallenge,
 │   │                             # QuestChain, CustomMission
 │   ├── providers/                # BoredomProvider (state game), LanguageProvider
 │   │                             # ThemeProvider (gelap/terang, aksen)
-│   ├── screens/                  # Beranda, Misi, Statistik, Pencapaian, Profil, shell
-│   │                             # onboarding (tur perkenalan pertama buka)
+│   ├── screens/                  # Home, Missions, Stats, Achievements, Profile, shell
+│   │                             # onboarding (panduan saat pertama dibuka)
 │   ├── services/                 # katalog, generator, penyimpanan lokal,
-│   │                             # pengingat, share card
-│   ├── utils/                    # tema, format tanggal yang ringan
-│   └── widgets/                  # chip selector, mission sheet, XP bar, grafik,
+│   │                             # pengingat, kartu bagikan
+│   ├── utils/                    # tema, format tanggal ringan
+│   └── widgets/                  # selector chip, mission sheet, bar XP, grafik,
 │                                 # ringkasan mingguan, inbox, ...
 ├── test/
-│   ├── widget_test.dart          # app menyala tanpa crash
+│   ├── widget_test.dart          # aplikasi menyala, onboarding di instalasi baru
 │   ├── user_progress_test.dart   # kurva level
 │   ├── mission_service_test.dart # fallback generator, filter, pengecualian
-│   └── localization_test.dart    # cakupan string, kewarasan katalog
+│   ├── localization_test.dart    # cakupan string, kewarasan katalog
+│   ├── onboarding_test.dart      # flag onboarding tersimpan
 │   ├── stats_theme_test.dart     # statistik bulanan, palet, nama hari
-│   ├── events_test.dart          # XP akhir pekan, roll musiman, bobot
-│   └── v24_test.dart             # kategori dimatikan, XP milestone, ringkasan
-│   └── onboarding_test.dart      # flag onboarding tersimpan
-├── android_res_extra/            # icon launcher + splash yang dipasang CI ke APK
+│   ├── events_test.dart          # XP akhir pekan, roll musiman, pembobotan
+│   └── v24_test.dart             # kategori dibisukan, XP milestone, rekap
+├── android_res_extra/            # ikon launcher + splash yang dimasukkan ke APK oleh CI
 ├── .github/
 │   └── workflows/
-│       ├── build-apk.yml         # CI: analyze + build APK tiap push ke main/master
-│       └── release.yml           # rilis: test + APK per-ABI di setiap tag v*
+│       ├── build-apk.yml         # CI: analyze + build APK saat push ke main/master
+│       └── release.yml           # rilis: tes + APK terpisah dilampirkan di setiap tag v*
 ├── pubspec.yaml
-├── CHANGELOG.md                  # changelog (English)
+├── CHANGELOG.md                  # changelog (Inggris)
 ├── CHANGELOG.id.md               # changelog (Bahasa Indonesia)
 ├── LICENSE
-├── README.md                     # dokumentasi utama (English)
+├── README.md                     # dokumentasi utama (Inggris)
 └── README.id.md                  # dokumentasi (Bahasa Indonesia)
 ```
 
-**Menambah string baru yang tampil ke user:**
-1. Tambah pasangan EN/ID di `lib/l10n/app_strings.dart` (Inggris dulu)
-2. Kalau konten katalog (misi, pencapaian, tantangan, langkah chain), tambah field `titleId`/`descriptionId` di sebelah field Inggrisnya
-3. Pakai lewat `context.str.kuncimu` atau `localizedTitle(en: ..., id: ..., code: ...)`
-4. Tidak perlu langkah codegen (`flutter gen-l10n` sengaja tidak dipakai, supaya build tetap ringan)
+---
 
-## 🧪 Testing
+## Pengembangan
 
-Test unit dan widget mencakup kurva level, generator misi, dan lokalisasi:
+### Menambah string baru untuk pengguna
 
-```bash
-flutter test
-```
+1. Tambahkan pasangan EN/ID ke `lib/l10n/app_strings.dart` (Inggris dulu)
+2. Jika itu konten katalog (misi, achievement, tantangan, langkah chain), tambahkan field `titleId`/`descriptionId` di sebelah field Inggrisnya
+3. Gunakan lewat `context.str.yourKey` atau `localizedTitle(en: ..., id: ..., code: ...)`
+4. Tidak perlu langkah codegen (`flutter gen-l10n` sengaja tidak dipakai, agar build tetap ringan)
+
+---
+
+## Pengujian
+
+Unit test dan widget test mencakup kurva level, generator misi, dan lokalisasi.
 
 Verifikasi statis sebelum setiap push:
 
 ```bash
 flutter analyze
+flutter test
 ```
 
-Harus melaporkan **No issues found** (nol error, nol warning).
+| Pemeriksaan | Syarat |
+|-------------|--------|
+| `flutter analyze` | Harus melaporkan **No issues found** (nol error, nol warning) |
+| `flutter test` | Semua tes harus lulus |
 
-## ❓ FAQ
+---
+
+## Continuous Integration
+
+| Workflow | Fungsi |
+|----------|--------|
+| `build-apk.yml` | Analyze dan build APK saat push ke main/master |
+| `release.yml` | Tes dan lampirkan APK terpisah di setiap tag `v*` |
+
+Ikon launcher dan splash dari `android_res_extra/` dimasukkan ke APK oleh CI.
+
+---
+
+## FAQ
 
 <details>
-<summary><b>Apakah dataku dikirim ke mana-mana?</b></summary>
+<summary><b>Apakah datamu dikirim ke mana-mana?</b></summary>
 
-Tidak. Semua (XP, level, streak, riwayat, pencapaian, misi buatan, favorit) tersimpan lokal dengan SharedPreferences. Backup bekerja dengan menyalin teks, bukan mengunggah.
+Tidak. Semuanya (XP, level, streak, riwayat, achievement, misi kustom, favorit) disimpan secara lokal dengan SharedPreferences. Cadangan bekerja dengan menyalin teks, tidak pernah dengan mengunggah.
 
 </details>
 
 <details>
-<summary><b>Ganti HP. Bagaimana cara memindahkan progres?</b></summary>
+<summary><b>Saya ganti ponsel. Bagaimana memindahkan progres?</b></summary>
 
-Buka **Profil**, ketuk **Ekspor data**, simpan teks yang disalin di tempat aman. Di HP baru, buka **Profil**, ketuk **Impor data**, tempel teksnya.
-
-</details>
-
-<details>
-<summary><b>Misi yang keluar itu-itu saja?</b></summary>
-
-Roll melewati misi yang diselesaikan 7 hari terakhir selama masih ada alternatif. Kalau semuanya baru saja diselesaikan, generator fallback dengan anggun alih-alih menampilkan kosong.
+Buka **Profile**, ketuk **Export data**, simpan teks yang tersalin di tempat aman. Di ponsel baru, buka **Profile**, ketuk **Import data**, tempel teksnya.
 
 </details>
 
 <details>
-<summary><b>Bagaimana cara ganti bahasa?</b></summary>
+<summary><b>Misi yang sama terus muncul?</b></summary>
 
-Profil, bagian **Bahasa**, pilih English atau Bahasa Indonesia. English adalah default.
+Roll melewati misi yang diselesaikan dalam 7 hari terakhir bila ada alternatif. Jika semuanya baru saja diselesaikan, generator kembali ke fallback dengan baik, alih-alih tidak menampilkan apa pun.
 
 </details>
 
-## 👤 Author
+<details>
+<summary><b>Bagaimana cara mengganti bahasa?</b></summary>
+
+Profile, bagian **Language**, pilih English atau Bahasa Indonesia. Bahasa Inggris adalah default.
+
+</details>
+
+---
+
+## Penulis
 
 <div align="center">
 
@@ -251,14 +347,8 @@ Profil, bagian **Bahasa**, pilih English atau Bahasa Indonesia. English adalah d
 
 </div>
 
-## 📄 License
+---
 
-Didistribusikan di bawah **MIT License**. Lihat [`LICENSE`](LICENSE) untuk info lebih lanjut.
+## Lisensi
 
-<div align="center">
-
-Dibuat oleh **Nicolas Dwi Dharma**
-
-*Star repo ini kalau project ini membantumu!*
-
-</div>
+Didistribusikan di bawah **Lisensi MIT**. Lihat [`LICENSE`](LICENSE) untuk informasi lebih lanjut.
