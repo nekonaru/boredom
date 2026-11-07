@@ -289,7 +289,7 @@ boredom/
 │   ├── events_test.dart          # weekend XP, seasonal rolls, weighting
 │   └── v24_test.dart             # muted categories, milestone XP, recap
 ├── assets/
-│   └── icon/                     # app icon sources (SVG design + generated PNG)
+│   └── icon/                     # app icon (PNG master + launcher mipmap PNGs)
 ├── android_res_extra/            # launcher icon + splash drawn into the APK by CI
 ├── .github/
 │   └── workflows/
@@ -343,7 +343,7 @@ flutter test
 
 Launcher icon and splash from `android_res_extra/` are drawn into the APK by CI.
 
-Icon sources live in `assets/icon/` (`icon.svg`, `icon_background.svg`, `icon_foreground.svg`); launcher icons are generated with [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) from the PNG masters (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`).
+Icon sources live in `assets/icon/` (`icon.png` 1024x1024 full-bleed design, `icon_foreground.png` adaptive foreground). The vector-free PNG masters are copied into `android_res_extra/` (`drawable/ic_launcher_foreground.png` + `launcher/mipmap-*/ic_launcher.png`), which the CI workflows draw into the APK. `flutter_launcher_icons` can regenerate masters from the same `assets/icon/icon.png`.
 
 ---
 

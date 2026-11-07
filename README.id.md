@@ -251,7 +251,7 @@ boredom/
 │   ├── events_test.dart          # XP akhir pekan, roll musiman, pembobotan
 │   └── v24_test.dart             # kategori dibisukan, XP milestone, rekap
 ├── assets/
-│   └── icon/                     # sumber ikon aplikasi (SVG + PNG hasil generate)
+│   └── icon/                     # sumber ikon aplikasi (PNG master + mipmap launcher)
 ├── android_res_extra/            # ikon launcher + splash yang dimasukkan ke APK oleh CI
 ├── .github/
 │   └── workflows/
@@ -305,7 +305,7 @@ flutter test
 
 Ikon launcher dan splash dari `android_res_extra/` dimasukkan ke APK oleh CI.
 
-Sumber ikon ada di `assets/icon/` (`icon.svg`, `icon_background.svg`, `icon_foreground.svg`); ikon launcher dihasilkan dengan [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) dari PNG master (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`).
+Sumber ikon ada di `assets/icon/` (`icon.png` desain full-bleed 1024x1024, `icon_foreground.png` foreground adaptif). PNG master disalin ke `android_res_extra/` (`drawable/ic_launcher_foreground.png` + `launcher/mipmap-*/ic_launcher.png`), yang digambar ke dalam APK oleh workflow CI. `flutter_launcher_icons` bisa regenerate master dari `assets/icon/icon.png` yang sama.
 
 ---
 
