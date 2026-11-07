@@ -2,22 +2,18 @@
 
 ## v4.2.1
 
-## 🎨 New app icon
+### Added
 
-- **New icon design.** Purple gradient background with a white die, rounded
-  corners, "5" pip pattern, and the Boredom "B" lettermark.
-- **Launcher icon pipeline.** Added `flutter_launcher_icons` with PNG masters
-  (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`) and
-  adaptive icon generation for Android; the vector-based `android_res_extra/`
-  sources were updated to match the new artwork.
+- **New icon design.** Purple gradient background with a white die, rounded corners, a "5" pip pattern, and the Boredom "B" lettermark.
+- **Launcher icon pipeline.** Added `flutter_launcher_icons` with PNG masters and adaptive icon generation for Android; the vector-based `android_res_extra/` sources were updated to match the new artwork.
 
-## 📦 Release
+### Install / Update
 
-- Version bump to `4.2.1+29` so the new icon ships as its own release.
+- Download the `app-arm64-v8a-release.apk` from the `v4.2.1` release and install it over version `4.2.0`.
 
 ## v4.2.0
 
-## ✨ New features
+## New features
 
 - **Daily Wellness missions.** 10 new low-friction missions (deep breaths,
   gratitude, water check, plan tomorrow, call family, green hunt, read one
@@ -27,14 +23,14 @@
 - **Pulse on the primary action.** The "I'm Bored" / "Chaos Me" button
   gently pulses so new users notice it.
 
-## 🧹 Simplified UI
+## Simplified UI
 
 - **Home screen decluttered.** Streak, freeze tokens, and this week's
   missions now share one compact quick-stats card instead of four
   separate blocks. Weekly Insights moved to the bottom so it never
   crowds the primary action.
 
-## ⚙️ Optimizations
+## Optimizations
 
 - **O(1) mission catalog lookup.** `missionById()` now uses a cached Map
   instead of a linear scan, so history and inbox render faster as data
@@ -44,7 +40,7 @@
 - **Timer cleanup.** Home screen midnight and pulse timers are cancelled
   on dispose (fixes a pending-timer test failure).
 
-## 🐞 Bug fixes
+## Bug fixes
 
 - **Profile reminder time** no longer shows a stray space between hours
   and minutes (`07:30`, not `07: 30`).
@@ -54,18 +50,18 @@
 
 ## v4.1.0
 
-## ✨ New features
+## New features
 
 - **Preferred defaults in Profile.** Pick your usual mood, time budget,
   location, and energy level from a new section in Profile. They are
   applied automatically on the first roll of every fresh session.
 
-## ⚙️ Optimizations
+## Optimizations
 
 - **Defaults persist across restarts.** Your preferred filters are saved
   to local storage, so they survive app restarts and device reboots.
 
-## 📦 Install / Update
+## Install / Update
 
 Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
 
@@ -73,7 +69,7 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 
 ## v4.0.0
 
-## ✨ New features
+## New features
 
 - **Personalized defaults.** Your mood, time, location, and energy
   preferences are saved and applied on the first roll of every fresh
@@ -85,13 +81,13 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
   chaos missions (Chaos Master), and reroll 100 times total (Serial
   Reroller).
 
-## ⚙️ Optimizations
+## Optimizations
 
 - **First roll uses your taste.** The generator starts from your
   preferred defaults instead of hard-coded ones, reducing wasted rerolls
   on the first mission of the day.
 
-## 📦 Install / Update
+## Install / Update
 
 Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
 
@@ -100,7 +96,7 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 
 ## v3.4.0
 
-## ✨ New features
+## New features
 
 - **Streak calendar.** A 5-week grid on the Stats tab shows which days
   had activity, with today highlighted. No new chart package needed.
@@ -109,18 +105,18 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Weekly recap in Profile.** Missions, XP, and streak for the last 7
   days, right below your level bar.
 
-## ⚙️ Optimizations
+## Optimizations
 
 - **Active-day lookups are cached.** The calendar and charts now derive
   from a single `activeDaysLast35` getter instead of re-filtering
   history per widget.
 
-## 🐛 Bug fixes
+## Bug fixes
 
 - **Stats screen no longer rebuilds the whole list** on every provider
   notification (metric cards use `context.select` on the right fields).
 
-## 📦 Install / Update
+## Install / Update
 
 Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
 
@@ -129,13 +125,13 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 
 ## v3.3.0
 
-## ✨ New features
+## New features
 
 - **Edit custom missions.** Tap the edit icon on any custom mission to
   change its title, description, and XP reward without deleting and
   recreating it.
 - **Archive custom missions.** Soft-delete a custom mission instead of
-  removing it permanently — archived missions are hidden from the main
+  removing it permanently - archived missions are hidden from the main
   list but kept in storage so their history still makes sense. Unarchive
   anytime.
 - **Custom mission categories.** Create your own categories (with an
@@ -144,17 +140,17 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Archived section** in History shows archived custom missions
   separately, with an unarchive button.
 
-## ⚙️ Optimizations
+## Optimizations
 
 - **Custom mission storage is additive.** New `category` and `archived`
   fields default to empty/false, so old saves load without migration.
 
-## 🐛 Bug fixes
+## Bug fixes
 
 - **Custom mission counter no longer drifts** on edit or archive (both
   now persist immediately).
 
-## 📦 Install / Update
+## Install / Update
 
 Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
 
@@ -167,7 +163,7 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Freeze token display on Home.** Your saved freeze tokens now show at the
   top of Home so you always know how many streak-savers you have left.
 - **History sort options.** History can now be sorted newest-first,
-  oldest-first, or by XP earned (highest first) — tap the sort chip above
+  oldest-first, or by XP earned (highest first) - tap the sort chip above
   the list.
 
 ### Fixed
@@ -184,7 +180,7 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 
 ## v3.1.0
 
-## ✨ New features
+## New features
 
 - **Daily challenge outcome selection.** The daily challenge now offers
   "Done", "Partly done", and "Didn't do it" alongside the accept button,
@@ -194,14 +190,14 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
   60-day streak (Iron Streak), roll 10 chaos missions (Chaos Connoisseur),
   and reroll 50 times total (Serial Reroller).
 
-## ⚙️ Optimizations
+## Optimizations
 
 - **Milestone XP judged on actual award.** Daily challenge and quest chain
   completions now calculate milestone bonus against the XP you really
   receive (weekend double + partial scaling), so you no longer receive a
   phantom level bonus on a partial weekend mission.
 
-## 🐛 Bug fixes
+## Bug fixes
 
 - **Daily challenge milestone paid on full value.** The milestone bonus
   was computed against the full weekend-doubled XP even when a partial
@@ -210,7 +206,7 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Quest chain milestone paid on full value.** Same fix as the daily
   challenge: milestone bonus is now judged on the actual awarded XP.
 
-## 📦 Install / Update
+## Install / Update
 
 Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
 
@@ -224,18 +220,18 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 
 ## Boredom v3.1.0
 
-## ✨ Fitur baru
+## Fitur baru
 
 - **Pilihan hasil tantangan harian.** Tantangan harian kini menawarkan
   "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan" di samping
   tombol terima, sama seperti sheet misi. Tantangan harian yang
-  dilewati tidak lagi memajukan streak atau memberi XP — kejujuran
+  dilewati tidak lagi memajukan streak atau memberi XP - kejujuran
   diberi reward, bukan dihukum.
 - **Empat achievement baru.** Capai level 100 (Beyond Boredom), jaga
   streak 60 hari (Iron Streak), roll 10 misi Chaos Mode (Chaos
   Connoisseur), dan reroll 50 kali secara total (Serial Reroller).
 
-## ⚙️ Optimisasi
+## Optimisasi
 
 - **Milestone XP dihitung pada XP yang benar-benar diterima.**
   Tantangan harian dan langkah quest chain kini menghitung bonus
@@ -244,7 +240,7 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
   level hampa saat misi parsial di akhir pekan tidak benar-benar
   mencapai level tersebut.
 
-## 🐛 Perbaikan bug
+## Perbaikan bug
 
 - **Milestone XP tantangan harian dibayar pada nilai penuh.** Bonus
   milestone dihitung terhadap nilai XP penuh yang difold di akhir pekan
@@ -254,12 +250,12 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
   yang sama seperti tantangan harian: bonus milestone kini dihitung
   terhadap XP yang benar-benar diterima.
 
-## 📦 Instalasi / Update
+## Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
 
-UI/UX dan optimasi setelah review v3.0.0–v3.0.1. Tidak ada perubahan
+UI/UX dan optimasi setelah review v3.0.0-v3.0.1. Tidak ada perubahan
 format penyimpanan, jadi semua cadangan tetap kompatibel.
 
 ### Ditingkatkan
@@ -275,7 +271,7 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
   sekarang pakai `SliverGrid` alih-alih `GridView(shrinkWrap: true)` yang
   lebih efisien.
 - **History lookup O(1).** Resolusi judul/kategori riwayat sebelumnya
-  memindai katalog (55 entri) per baris per build — sekarang pakai `Map`
+  memindai katalog (55 entri) per baris per build - sekarang pakai `Map`
   langsung.
 - **Weekly Insights refresh saat hari berganti** melalui `context.watch`
   provider, bukan hanya saat ada penyelesaian baru.
@@ -283,18 +279,18 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
   pindah ke dalam WeeklyInsights).
 
 ### Diperbaiki
-- **Toast "+0 XP" untuk misi yang dilewati** — sekarang bilang dengan
+- **Toast "+0 XP" untuk misi yang dilewati** - sekarang bilang dengan
   jujur bahwa tidak ada XP dan streak tidak berubah.
-- **Ketuk-ganda pada quest chain membayar dua kali** — langkah sekarang
+- **Ketuk-ganda pada quest chain membayar dua kali** - langkah sekarang
   diklaim sebelum proses async, dengan guard in-flight.
 - **Timer tengah malam tidak lagi menumpuk** setiap kali aplikasi
   dibuka kembali (tidak ada lagi N timer hidup setelah N resume).
-- **ID tantangan harian dari cadangan divalidasi** — ID yang tidak ada
+- **ID tantangan harian dari cadangan divalidasi** - ID yang tidak ada
   dalam katalog build ini dibuang alih-alih diam-diam menimpa arc lain.
 - **Riwayat di memori sekarang ikut mematuhi batas 1000 entri** seperti
   penyimpanan, jadi laporan "menampilkan N dari M" tidak lagi melanggar.
 - **Filter riwayat dipindah ke modul murni** (`history_filter.dart`)
-  dengan 16 test — sebelumnya method privat di widget yang mustahil
+  dengan 16 test - sebelumnya method privat di widget yang mustahil
   diuji.
 
 ### Optimasi

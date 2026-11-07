@@ -1,23 +1,19 @@
-﻿# Changelog
+# Changelog
 
 ## v4.2.1
 
-## 🎨 Ikon aplikasi baru
+### Ditambahkan
 
-- **Desain ikon baru.** Latar gradien ungu dengan white die, sudut
-  melengkung, pola pip "5", dan lettermark huruf "B" Boredom.
-- **Pipeline ikon launcher.** Menambahkan `flutter_launcher_icons` dengan
-  PNG master (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`)
-  dan generasi adaptive icon untuk Android; sumber vector di `android_res_extra/`
-  diperbarui agar sesuai artwork baru.
+- **Desain ikon baru.** Latar gradien ungu dengan white die, sudut melengkung, pola pip "5", dan lettermark huruf "B" Boredom.
+- **Pipeline ikon launcher.** Menambahkan `flutter_launcher_icons` dengan PNG master dan generasi adaptive icon untuk Android; sumber vector di `android_res_extra/` diperbarui agar sesuai artwork baru.
 
-## 📦 Rilis
+### Instalasi / Update
 
-- Version bump ke `4.2.1+29` agar ikon baru tersedia sebagai rilis sendiri.
+- Download APK `app-arm64-v8a-release.apk` dari rilis `v4.2.1` dan instal versi `4.2.0`.
 
 ## v4.2.0
 
-## ✨ Fitur baru
+## Fitur baru
 
 - **Misi Harian Kesehatan (Daily Wellness).** 10 misi baru dengan gaya
   rendah (nafas dalam, syukur, cek air, rencana besok, telepon keluarga,
@@ -28,14 +24,14 @@
 - **Pulse pada tombol utama.** Tombol "Misi Bosan" / "Acak Bebasnya"
   berkedip pelan agar pengguna baru melihatnya.
 
-## 🧹 UI Disederhanakan
+## UI Disederhanakan
 
 - **Beranda dibersihkan.** Streak, token beku, dan misi minggu ini
   sekarang berbagi satu kartu statistik ringkas daripada empat blok
   terpisah. Weekly Insights dipindah ke bawah supaya tidak merempet
   tindakan utama.
 
-## ⚙️ Optimisasi
+## Optimisasi
 
 - **Pengambilan katalog misi O(1).** `missionById()` sekarang pakai
   cached Map bukan scan linear, jadi riwayat dan inbox lebih cepat
@@ -46,7 +42,7 @@
 - **Pembersih timer.** Timer tengah malam dan pulse di Beranda
   dibatalkan saat dispose (mengatasi pending-timer pada test).
 
-## 🐞 Perbaikan bug
+## Perbaikan bug
 
 - **Waktu pengingat di Profil** tidak lagi menampilkan spasi aneh
   antara jam dan menit (`07:30`, bukan `07: 30`).
@@ -57,19 +53,19 @@
 
 ## v4.1.0
 
-## ✨ Fitur baru
+## Fitur baru
 
 - **Default pilihan di Profil.** Pilih suasana, anggaran waktu, lokasi,
   dan tingkat energi biasamu dari bagian baru di Profil. Otomatis
   diterapkan pada roll pertama setiap sesi baru.
 
-## ⚙️ Optimisasi
+## Optimisasi
 
 - **Default tersimpan lintas restart.** Filter pilihanmu disimpan ke
   penyimpanan lokal, sehingga bertahan saat aplikasi di-restart dan
   perangkat di-reboot.
 
-## 📦 Instalasi / Update
+## Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
@@ -77,7 +73,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 
 ## v4.0.0
 
-## ✨ Fitur baru
+## Fitur baru
 
 - **Default pribadi.** Preferensi suasana, waktu, lokasi, dan energimu
   disimpan dan diterapkan pada roll pertama setiap sesi baru, sehingga
@@ -89,13 +85,13 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   misi Chaos Mode (Chaos Master), dan reroll 100 kali secara total
   (Serial Reroller).
 
-## ⚙️ Optimisasi
+## Optimisasi
 
 - **Roll pertama memakai selera kamu.** Generator dimulai dari default
   pilihanmu alih-alih nilai hard-coded, mengurangi reroll yang sia-sia
   pada misi pertama hari itu.
 
-## 📦 Instalasi / Update
+## Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
@@ -104,7 +100,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 
 ## v3.4.0
 
-## ✨ Fitur baru
+## Fitur baru
 
 - **Kalender streak.** Grid 5 minggu di tab Statistik menunjukkan hari
   mana yang aktif, dengan hari ini dihighlight. Tanpa package chart
@@ -115,19 +111,19 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 - **Ringkasan mingguan di Profil.** Jumlah misi, XP, dan streak untuk 7
   hari terakhir, tepat di bawah bar levelmu.
 
-## ⚙️ Optimisasi
+## Optimisasi
 
 - **Lookup hari aktif di-cache.** Kalender dan grafik sekarang berasal
   dari satu getter `activeDaysLast35` alih-alih memfilter ulang
   riwayat per widget.
 
-## 🐛 Perbaikan bug
+## Perbaikan bug
 
 - **Layar Statistik tidak lagi rebuild seluruh daftar** pada setiap
   notifikasi provider (kartu metrik memakai `context.select` pada field
   yang tepat).
 
-## 📦 Instalasi / Update
+## Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
@@ -136,13 +132,13 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 
 ## v3.3.0
 
-## ✨ Fitur baru
+## Fitur baru
 
 - **Ubah misi buatan sendiri.** Ketuk ikon edit pada misi buatanmu untuk
   mengubah judul, deskripsi, dan hadiah XP tanpa menghapus dan membuat
   ulang.
 - **Arsipkan misi buatan.** Soft-delete misi buatan alih-alih
-  menghapusnya permanen — misi yang diarsipkan disembunyikan dari daftar
+  menghapusnya permanen - misi yang diarsipkan disembunyikan dari daftar
   utama tapi tetap tersimpan agar riwayatnya tetap bermakna. Batalkan
   arsip kapan saja.
 - **Kategori buatan pengguna.** Buat kategorimu sendiri (dengan emoji)
@@ -150,18 +146,18 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 - **Bagian arsip** di Riwayat menampilkan misi buatan yang diarsipkan
   secara terpisah, dengan tombol unarchive.
 
-## ⚙️ Optimisasi
+## Optimisasi
 
 - **Penyimpanan misi buatan bersifat aditif.** Field `category` dan
   `archived` baru default ke kosong/false, jadi simpanan lama terbaca
   tanpa migrasi.
 
-## 🐛 Perbaikan bug
+## Perbaikan bug
 
 - **Penghitung misi buatan tidak lagi drifting** saat edit atau arsip
   (keduanya sekarang langsung persist).
 
-## 📦 Instalasi / Update
+## Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
@@ -175,7 +171,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   ditampilkan di layar Beranda sehingga kamu selalu tahu berapa banyak
   pelindung streak yang tersisa.
 - **Urutan riwayat dapat diubah.** Riwayat sekarang dapat diurutkan
-  terbaru-dulu, terlama-dulu, atau berdasarkan XP tertinggi — tekan chip
+  terbaru-dulu, terlama-dulu, atau berdasarkan XP tertinggi - tekan chip
   urutan di atas daftar.
 
 ### Diperbaiki
@@ -192,7 +188,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 
 ## v3.1.0
 
-## âœ¨ Fitur baru
+## Fitur baru
 
 - **Pilihan hasil tantangan harian.** Tantangan harian kini menawarkan
   "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan" di samping
@@ -203,7 +199,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   streak 60 hari (Iron Streak), roll 10 misi Chaos Mode (Chaos
   Connoisseur), dan reroll 50 kali secara total (Serial Reroller).
 
-## âš™ï¸ Optimisasi
+## Optimisasi
 
 - **Milestone XP dihitung pada XP yang benar-benar diterima.** Tantangan
   harian dan langkah quest chain kini menghitung bonus milestone
@@ -212,7 +208,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   hampa saat misi parsial di akhir pekan tidak benar-benar mencapai
   level tersebut.
 
-## ðŸ› Perbaikan bug
+## Perbaikan bug
 
 - **Milestone XP tantangan harian dibayar pada nilai penuh.** Bonus
   milestone dihitung terhadap nilai XP penuh yang difold di akhir pekan
@@ -222,7 +218,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   yang sama seperti tantangan harian: bonus milestone kini dihitung
   terhadap XP yang benar-benar diterima.
 
-## ðŸ“¦ Instalasi / Update
+## Instalasi / Update
 
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
