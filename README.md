@@ -1,4 +1,7 @@
 <div align="center">
+  <h1>Boredom: Turn Boredom Into Missions</h1>
+  <p><b>Tap one button, get one real-world mission, earn XP, level up.<br/>
+  A tiny game for everyday life, fully offline.</b></p>
 
 # 🎲 Boredom: Turn Boredom Into Missions
 
@@ -10,12 +13,36 @@
 ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
 ![CI](https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg)
-
 </div>
+
+<br />
 
 **English** | [Bahasa Indonesia](README.id.md)
 
-## ✨ About
+> [!NOTE]
+> Boredom works fully offline. Everything (XP, level, streak, history, achievements, custom missions, favorites) is stored locally on your phone, and backups work by copying text, never by uploading.
+
+---
+
+## Table of Contents
+
+- [About](#about)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Display Language](#display-language)
+- [Project Structure](#project-structure)
+- [Development](#development)
+- [Testing](#testing)
+- [Continuous Integration](#continuous-integration)
+- [FAQ](#faq)
+- [Author](#author)
+- [License](#license)
+
+---
+
+## About
 
 **Boredom** is a tiny Flutter game for everyday life, not a productivity app. Pick your **mood**, **free time**, **location**, and **energy**, tap **I'M BORED**, and get one concrete mission you can do right now (never generic advice). **Accept** it for XP, or **reroll** (3x per day) when it does not fit. XP levels you up through absurd titles, from "Bored" to "The Final Boss of Boredom".
 
@@ -23,10 +50,15 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 > _"You are bored. So... what now?"_
 
-## 🎯 Features
+---
+
+## Features
+
+### Missions
 
 | Feature | Description |
 |---------|-------------|
+<<<<<<< HEAD
 | 🎲 **Mission generator** | Random mission from a 65-mission catalog (55 core + 10 Daily Wellness), matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
@@ -57,13 +89,77 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | 🔍 **Weekly insights** | What your history says about you: week over week, your productive hour, the category you bail out of, average XP. Renders nothing rather than guessing |
 | 🎁 **Milestone bonus** | Extra XP every time you cross a 10-level boundary |
 | ↩️ **Full undo** | 5-minute undo for missions, daily challenges, chain steps, and custom missions |
+=======
+| **Mission generator** | Random mission from a 55-mission catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
+| **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
+| **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
+| **Quick wins** | Narrow rolls to missions of 15 minutes or less |
+| **Inbox** | Save missions for later and roll them when you are ready |
+| **Custom missions** | Create your own missions with your own XP rewards |
+| **Favorites** | Pin catalog missions to find them again fast |
+| **Dislikes** | Downvote missions so the generator stops rolling them |
+| **Mute categories** | Silence a whole category when you are not interested |
+>>>>>>> 36dd6a428ab012147d1065be228f005e59e97023
 
-## 📦 Requirements
+### Progress and Rewards
 
-- **Flutter** 3.47 or newer (stable channel)
-- **JDK** 17
-- **Android SDK** (API 34+)
-- An Android phone or emulator (minimum Android 8.0 / API 26)
+| Feature | Description |
+|---------|-------------|
+| **Outcome tracking** | Say whether you actually did it: done, partly, or skipped. Partial pays 60 percent, skipped pays nothing and never advances your streak |
+| **XP and levels** | Progressive curve with absurd level titles, double XP every weekend |
+| **Streaks** | Daily streak plus longest streak, with a 1-day grace period, freeze tokens, and an at-risk warning |
+| **Milestone bonus** | Extra XP every time you cross a 10-level boundary |
+| **Quest chains** | 4 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") with a big final reward |
+| **Achievements** | 29 achievements, progress-based and event-based (like "Night Owl") |
+| **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
+
+### Statistics and History
+
+| Feature | Description |
+|---------|-------------|
+| **Follow-through stat** | The share of tracked missions you really carried out, with a dash until you have data |
+| **Statistics** | Last-7-days and last-30-days charts drawn dependency-free, average XP per active day, busiest weekday, per-category distribution, reroll and chaos totals |
+| **Weekly recap** | Missions, XP, and streak visible straight on Home |
+| **Weekly insights** | What your history says about you: week over week, your productive hour, the category you bail out of, average XP. Renders nothing rather than guessing |
+| **History search** | Filter completed missions by title or category, then narrow by date (today, 7 days, 30 days, all) and by outcome |
+| **Data transparency** | History states how many entries are stored and how many you are viewing, dates show the year when it differs, and orphaned favorites can be cleaned up |
+
+### Data and Safety
+
+| Feature | Description |
+|---------|-------------|
+| **Undo** | 5-minute window to restore the last completion |
+| **Full undo** | 5-minute undo for missions, daily challenges, chain steps, and custom missions |
+| **Backup and restore** | Export all local data as text, import it back (phone-switch friendly, no account needed) |
+
+### Reminders and Sharing
+
+| Feature | Description |
+|---------|-------------|
+| **Daily reminder** | One notification a day at the time you choose, off by default |
+| **Share card** | Render any mission into a 1080x1080 PNG card, or copy it as text |
+
+### Appearance and Feel
+
+| Feature | Description |
+|---------|-------------|
+| **English and Indonesian UI** | English by default, switch to Bahasa Indonesia in Profile |
+| **Light and dark themes** | Dark by default, light mode plus 5 accent colors in Profile |
+| **Haptic feedback** | Tiny vibration on taps and completions, toggleable |
+
+---
+
+## Requirements
+
+| Dependency | Minimum Version | Notes |
+|------------|-----------------|-------|
+| **Flutter** | 3.47 | Stable channel, required only to build from source |
+| **JDK** | 17 | Required only to build from source |
+| **Android SDK** | API 34+ | Required only to build from source |
+| **Android device or emulator** | Android 8.0 (API 26) | Required to run the app |
+
+> [!TIP]
+> If you only want to play, you do not need Flutter, JDK, or the Android SDK. Download the APK from the [Releases](https://github.com/nekonaru/boredom/releases) page instead.
 
 ### Never used a terminal? Start here
 
@@ -76,7 +172,9 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 </details>
 
-## 🚀 Installation
+---
+
+## Installation
 
 ### Option A: Download the APK (easiest)
 
@@ -86,7 +184,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 ### Option B: Build from source (for development / to read or change the code)
 
-**1. Get the project code**
+#### 1. Get the project code
 
 <details>
 <summary><b>I have Git installed</b></summary>
@@ -112,7 +210,7 @@ cd Downloads/boredom-main
 
 </details>
 
-**2. Install dependencies and verify**
+#### 2. Install dependencies and verify
 
 ```bash
 flutter pub get
@@ -120,9 +218,10 @@ flutter analyze
 flutter test
 ```
 
-`flutter analyze` must report **No issues found** and all tests must pass.
+> [!IMPORTANT]
+> `flutter analyze` must report **No issues found** and all tests must pass.
 
-**3. Build the APK**
+#### 3. Build the APK
 
 ```bash
 flutter build apk --release --split-per-abi
@@ -130,20 +229,26 @@ flutter build apk --release --split-per-abi
 
 The results are at `build/app/outputs/flutter-apk/` (`app-arm64-v8a-release.apk` and friends).
 
-## 🖥️ Usage
+---
 
-**First launch:**
+## Usage
+
+### First launch
+
 1. Pick your mood, free time, location, and energy
 2. Tap **I'M BORED**
 3. Accept the mission and do it, or reroll (3x per day)
 
-**Everyday use:**
+### Everyday use
+
 - Open **Missions** for quest chains, your custom missions, favorites, and searchable history
 - Check the **Daily Challenge** on Home for bonus XP
 - Watch your **Stats** for the weekly chart and category breakdown
 - Switch language or back up your data from **Profile**
 
-## 🌍 Display Language
+---
+
+## Display Language
 
 The app UI (menus, buttons, messages, and settings) is available in **English** (default) and **Bahasa Indonesia**.
 
@@ -151,7 +256,9 @@ The app UI (menus, buttons, messages, and settings) is available in **English** 
 2. Under **Language**, pick **English** or **Bahasa Indonesia**
 3. The choice is remembered between sessions
 
-## 🗂️ Project Structure
+---
+
+## Project Structure
 
 ```
 boredom/
@@ -192,29 +299,49 @@ boredom/
 └── README.id.md                  # documentation (Bahasa Indonesia)
 ```
 
-**Adding a new user-facing string:**
+---
+
+## Development
+
+### Adding a new user-facing string
+
 1. Add the EN/ID pair to `lib/l10n/app_strings.dart` (English first)
 2. If it is catalog content (mission, achievement, challenge, chain step), add the `titleId`/`descriptionId` fields next to the English ones
 3. Use it via `context.str.yourKey` or `localizedTitle(en: ..., id: ..., code: ...)`
 4. No codegen step needed (`flutter gen-l10n` is intentionally not used, to keep the build light)
 
-## 🧪 Testing
+---
 
-Unit and widget tests cover the level curve, the mission generator, and localization:
+## Testing
 
-```bash
-flutter test
-```
+Unit and widget tests cover the level curve, the mission generator, and localization.
 
 Static verification before every push:
 
 ```bash
 flutter analyze
+flutter test
 ```
 
-It must report **No issues found** (zero errors, zero warnings).
+| Check | Requirement |
+|-------|-------------|
+| `flutter analyze` | Must report **No issues found** (zero errors, zero warnings) |
+| `flutter test` | All tests must pass |
 
-## ❓ FAQ
+---
+
+## Continuous Integration
+
+| Workflow | Purpose |
+|----------|---------|
+| `build-apk.yml` | Analyze and build APK on push to main/master |
+| `release.yml` | Test and attach split APKs to each `v*` tag |
+
+Launcher icon and splash from `android_res_extra/` are drawn into the APK by CI.
+
+---
+
+## FAQ
 
 <details>
 <summary><b>Is my data sent anywhere?</b></summary>
@@ -244,7 +371,9 @@ Profile, section **Language**, pick English or Bahasa Indonesia. English is the 
 
 </details>
 
-## 👤 Author
+---
+
+## Author
 
 <div align="center">
 
@@ -255,14 +384,8 @@ Profile, section **Language**, pick English or Bahasa Indonesia. English is the 
 
 </div>
 
-## 📄 License
+---
+
+## License
 
 Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
-
-<div align="center">
-
-Made by **Nicolas Dwi Dharma**
-
-*Star this repo if this project helps you!*
-
-</div>
