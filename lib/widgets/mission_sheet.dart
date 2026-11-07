@@ -8,6 +8,7 @@ import '../providers/theme_provider.dart';
 import '../services/share_card.dart';
 import '../utils/feedback.dart';
 import '../widgets/kit.dart';
+import '../widgets/mission_steps.dart';
 
 /// Shows the mission card as a bottom sheet that cannot be casually
 /// dismissed (so the user thinks ACCEPT vs REROLL instead of swiping away).
@@ -37,7 +38,7 @@ class _MissionSheetState extends State<MissionSheet> {
   bool _isSubmitting = false;
 
   /// Single entry point for all three outcome buttons, so the submitting
-  /// guard and the pop behave identically no matter which was tapped.
+  /// guard and the close behave identically no matter which was tapped.
   Future<void> _submit(
     BuildContext context,
     BoredomProvider provider,
@@ -47,10 +48,8 @@ class _MissionSheetState extends State<MissionSheet> {
     setState(() => _isSubmitting = true);
     buzzIfEnabled(context);
     await provider.completeMission(outcome);
-    // No need to reset _isSubmitting: this widget is popped/disposed once
-    // currentMission becomes null (via the post-frame callback above), so
-    // this state never rebuilds again.
-    if (context.mounted) Navigator.of(context).pop();
+    // The sheet closes itself: once currentMission becomes null, build()
+    // renders nothing and the post-frame callback pops this route.
   }
 
   @override
@@ -225,6 +224,8 @@ class _MissionSheetState extends State<MissionSheet> {
                 ),
               ),
               const SizedBox(height: AppKit.xl),
+              MissionSteps(provider: provider, s: s, pal: pal),
+              const SizedBox(height: AppKit.xl),
               Wrap(
                 spacing: AppKit.md,
                 runSpacing: AppKit.md,
@@ -292,8 +293,11 @@ class _MissionSheetState extends State<MissionSheet> {
                     flex: 2,
                     child: AppKit.primaryButton(
                       context: context,
-                      label: _isSubmitting ? '' : s.acceptBtn,
+                      label: _isSubmitting
+                          ? ''
+                          : (provider.allStepsComplete ? s.finishBtn : s.acceptBtn),
                       loading: _isSubmitting,
+                      backgroundColor: provider.allStepsComplete ? pal.success : null,
                       onPressed: _isSubmitting
                           ? null
                           : () => _submit(context, provider, MissionOutcome.done),

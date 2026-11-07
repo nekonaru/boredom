@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Timer? _midnightTimer;
   Timer? _pulseTimer;
   bool _pulsePrimary = false;
+  bool _filtersOpen = false;
 
   @override
   void initState() {
@@ -253,63 +254,106 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
             const SizedBox(height: AppKit.xl),
 
-            // Filter selectors — four rows, compact.
-            SelectorRow<Mood>(
-              title: s.secMood,
-              selected: selectedMood,
-              onChanged: actions.setMood,
-              options: Mood.values
-                  .map((m) => SelectorOption(m, m.emoji, s.moodLabel(m)))
-                  .toList(),
-            ),
-            const SizedBox(height: AppKit.lg),
-            SelectorRow<TimeBudget>(
-              title: s.secTime,
-              selected: selectedTime,
-              onChanged: actions.setTime,
-              options: TimeBudget.values
-                  .map((t) => SelectorOption(t, '⏱️', s.timeLabel(t)))
-                  .toList(),
-            ),
-            const SizedBox(height: AppKit.lg),
-            SelectorRow<LocationType>(
-              title: s.secLocation,
-              selected: selectedLocation,
-              onChanged: actions.setLocation,
-              options: LocationType.values
-                  .map((l) => SelectorOption(l, l.emoji, s.locationLabel(l)))
-                  .toList(),
-            ),
-            const SizedBox(height: AppKit.lg),
-            SelectorRow<EnergyLevel>(
-              title: s.secEnergy,
-              selected: selectedEnergy,
-              onChanged: actions.setEnergy,
-              options: EnergyLevel.values
-                  .map((e) => SelectorOption(e, e.emoji, s.energyLabel(e)))
-                  .toList(),
+            // Filters — collapsed into one expandable card so the screen
+            // does not scroll for miles before reaching the primary action.
+            AppKit.card(
+              color: pal.surface,
+              child: Column(
+                children: [
+                  InkWell(
+                    borderRadius: BorderRadius.circular(AppKit.rLg),
+                    onTap: () => setState(() => _filtersOpen = !_filtersOpen),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppKit.lg, vertical: AppKit.md),
+                      child: Row(
+                        children: [
+                          const Text('⚙️', style: TextStyle(fontSize: 18)),
+                          const SizedBox(width: AppKit.md),
+                          Expanded(
+                            child: Text(
+                              s.filterTitle,
+                              style: TextStyle(
+                                color: pal.textPrimary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          AnimatedRotation(
+                            turns: _filtersOpen ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 300),
+                            child: Icon(
+                              Icons.expand_more,
+                              color: pal.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (_filtersOpen) ...[
+                    const Divider(height: 1),
+                    const SizedBox(height: AppKit.lg),
+                    SelectorRow<Mood>(
+                      title: s.secMood,
+                      selected: selectedMood,
+                      onChanged: actions.setMood,
+                      options: Mood.values
+                          .map((m) => SelectorOption(m, m.emoji, s.moodLabel(m)))
+                          .toList(),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    SelectorRow<TimeBudget>(
+                      title: s.secTime,
+                      selected: selectedTime,
+                      onChanged: actions.setTime,
+                      options: TimeBudget.values
+                          .map((t) => SelectorOption(t, '⏱️', s.timeLabel(t)))
+                          .toList(),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    SelectorRow<LocationType>(
+                      title: s.secLocation,
+                      selected: selectedLocation,
+                      onChanged: actions.setLocation,
+                      options: LocationType.values
+                          .map((l) => SelectorOption(l, l.emoji, s.locationLabel(l)))
+                          .toList(),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    SelectorRow<EnergyLevel>(
+                      title: s.secEnergy,
+                      selected: selectedEnergy,
+                      onChanged: actions.setEnergy,
+                      options: EnergyLevel.values
+                          .map((e) => SelectorOption(e, e.emoji, s.energyLabel(e)))
+                          .toList(),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    AppKit.toggleRow(
+                      context,
+                      emoji: '⚡',
+                      title: s.quickWins,
+                      subtitle: s.quickWinsDesc,
+                      value: quickWins,
+                      onChanged: () => actions.setQuickWins(!quickWins),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    AppKit.toggleRow(
+                      context,
+                      emoji: '☢️',
+                      title: s.chaosTitle,
+                      subtitle: s.chaosDesc,
+                      value: chaosMode,
+                      onChanged: () => actions.setChaosMode(!chaosMode),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                  ],
+                ],
+              ),
             ),
             const SizedBox(height: AppKit.xl),
-
-            // Toggles.
-            AppKit.toggleRow(
-              context,
-              emoji: '⚡',
-              title: s.quickWins,
-              subtitle: s.quickWinsDesc,
-              value: quickWins,
-              onChanged: () => actions.setQuickWins(!quickWins),
-            ),
-            const SizedBox(height: AppKit.lg),
-            AppKit.toggleRow(
-              context,
-              emoji: '☢️',
-              title: s.chaosTitle,
-              subtitle: s.chaosDesc,
-              value: chaosMode,
-              onChanged: () => actions.setChaosMode(!chaosMode),
-            ),
-            const SizedBox(height: AppKit.xxl),
 
             // Primary action — pulsed so it invites a tap.
             AppKit.pulseWrapper(

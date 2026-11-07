@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/mission.dart';
+import '../models/mission_step.dart';
 import '../models/user_progress.dart';
 import '../models/achievement.dart';
 import '../models/daily_challenge.dart';
@@ -13,6 +14,7 @@ import '../services/achievement_catalog.dart';
 import '../services/daily_challenge_catalog.dart';
 import '../services/quest_chain_catalog.dart';
 import '../services/reminder_service.dart';
+import '../services/mission_guide.dart';
 import 'language_provider.dart';
 
 const int kMaxRerollsPerDay = 3;
@@ -39,6 +41,35 @@ class BoredomProvider extends ChangeNotifier {
 
   MissionInstance? currentMission;
   int _missionCounter = 0;
+
+  /// Indexes of steps the player has ticked off for the current mission.
+  /// Reset each time a new mission rolls; harmless when the catalog
+  /// shrinks or the stored mission is bizarre.
+  Set<int> completedStepIndexes = {};
+
+  /// Steps for the active mission (empty list when nothing is running).
+  List<MissionStep> get activeSteps {
+    final mission = currentMission?.mission;
+    if (mission == null) return const [];
+    return MissionGuide.stepsFor(mission);
+  }
+
+  int get completedSteps => completedStepIndexes.length;
+  bool get allStepsComplete =>
+      activeSteps.isNotEmpty && completedStepIndexes.length >= activeSteps.length;
+
+  /// Toggles one step. Returns the new completion count.
+  int toggleStep(int index) {
+    if (completedStepIndexes.contains(index)) {
+      completedStepIndexes = {...completedStepIndexes}..remove(index);
+    } else {
+      completedStepIndexes = {...completedStepIndexes, index};
+    }
+    notifyListeners();
+    return completedStepIndexes.length;
+  }
+
+  void _resetSteps() => completedStepIndexes = {};
 
   UserProgress progress = const UserProgress();
   List<CompletedMission> history = [];
@@ -549,6 +580,7 @@ class BoredomProvider extends ChangeNotifier {
       missionNumber: _missionCounter,
       isChaos: chaosMode,
     );
+    _resetSteps();
     notifyListeners();
   }
 
@@ -654,6 +686,7 @@ class BoredomProvider extends ChangeNotifier {
       isChaos: false,
     );
     currentMission = instance;
+    _resetSteps();
     notifyListeners();
     return instance;
   }
@@ -723,6 +756,7 @@ class BoredomProvider extends ChangeNotifier {
 
   void dismissMission() {
     currentMission = null;
+    _resetSteps();
     notifyListeners();
   }
 
@@ -744,6 +778,7 @@ class BoredomProvider extends ChangeNotifier {
     // first call is still awaiting, sees null, and returns [] with no
     // double XP.
     currentMission = null;
+    _resetSteps();
     notifyListeners();
 
     final mission = instance.mission;
@@ -1626,6 +1661,7 @@ class BoredomProvider extends ChangeNotifier {
     _missionCounter = 0;
     _firstRollDone = false;
     currentMission = null;
+    _resetSteps();
     final now = DateTime.now();
     progress = _resetRerollsIfNewDay(progress, now);
     progress = _handleAppOpen(progress, now);

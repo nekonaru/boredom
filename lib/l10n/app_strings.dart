@@ -199,7 +199,15 @@ class AppStrings {
         'Daily rerolls are used up. Try again tomorrow.',
         'Reroll harian sudah habis. Coba lagi besok.',
       );
+  String get filterTitle => _pick('Mission filters', 'Filter Misi');
   String get acceptBtn => _pick('ACCEPT & COMPLETE', 'TERIMA & SELESAIKAN');
+  String get finishBtn => _pick('FINISH MISSION', 'SELESAIKAN MISI');
+  String stepsDone(int done, int total) => _pick(
+        '$done/$total steps',
+        '$done/$total langkah',
+      );
+  String get missionStepsTitle => _pick('Mission steps', 'Langkah misi');
+  String get missionStepsDone => _pick('All steps done! Nice.', 'Semua langkah selesai! Mantap.');
   String get skipBtn => _pick('Skip for now', 'Lewati dulu');
   String xpSnack(int xp) =>
       _pick('Nice! +$xp XP', 'Mantap! +$xp XP');
