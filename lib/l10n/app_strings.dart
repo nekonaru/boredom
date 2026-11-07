@@ -264,10 +264,6 @@ class AppStrings {
   String get mTotalRerolls => _pick('Total Rerolls', 'Total Reroll');
   String get mChaos => _pick('Chaos Missions', 'Misi Chaos');
   String days(int n) => isId ? '$n hari' : '$n day${n == 1 ? '' : 's'}';
-  String get perCategory => _pick(
-        'Missions per Category',
-        'Misi per Kategori',
-      );
   String get statsEmpty => _pick(
         'No data yet. Complete a few missions first.',
         'Belum ada data. Selesaikan beberapa misi dulu.',

@@ -33,16 +33,16 @@ class AppPalette {
   });
 
   static AppPalette dark(Color accent) => AppPalette(
-        background: const Color(0xFF0E0E12),
-        surface: const Color(0xFF17171D),
-        surfaceElevated: const Color(0xFF1F1F27),
+        background: const Color(0xFF101015),
+        surface: const Color(0xFF1B1B23),
+        surfaceElevated: const Color(0xFF23232F),
         accent: accent,
         textPrimary: const Color(0xFFF4F4F7),
         textSecondary: const Color(0xFF9B9BA8),
         success: const Color(0xFF57D19C),
         warning: const Color(0xFFE0B457),
         danger: const Color(0xFFE0637A),
-        emptyBar: const Color(0xFF2A2A33),
+        emptyBar: const Color(0xFF2B2B35),
       );
 
   static AppPalette light(Color accent) => AppPalette(

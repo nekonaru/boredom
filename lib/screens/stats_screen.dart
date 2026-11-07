@@ -213,51 +213,6 @@ class StatsScreen extends StatelessWidget {
                   ),
                 );
               }),
-            const SizedBox(height: AppKit.xxl),
-            AppKit.sectionHeader(context, s, title: s.perCategory),
-            const SizedBox(height: AppKit.md),
-            if (progress.totalMissionsCompleted == 0)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppKit.xl),
-                child: Center(
-                  child: Text(
-                    s.statsEmpty,
-                    style: TextStyle(color: pal.textSecondary),
-                  ),
-                ),
-              )
-            else
-              ...sortedCategories.map((cat) {
-                final count = categoryCounts[cat.name] ?? 0;
-                final ratio = maxCount == 0 ? 0.0 : count / maxCount;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppKit.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(cat.labelFor(s.code),
-                              style: TextStyle(color: pal.textPrimary, fontSize: 13)),
-                          Text('$count',
-                              style: TextStyle(color: pal.textSecondary, fontSize: 12)),
-                        ],
-                      ),
-                      const SizedBox(height: AppKit.sm),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(AppKit.rSm),
-                        child: LinearProgressIndicator(
-                          value: ratio,
-                          minHeight: AppKit.md,
-                          backgroundColor: pal.emptyBar,
-                          valueColor: AlwaysStoppedAnimation(pal.accent),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
           ],
         ),
       ),
