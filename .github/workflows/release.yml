@@ -201,6 +201,18 @@ jobs:
               )
               return m.group(1).strip() if m else ''
 
+          def split_summary(block):
+              # The one-sentence summary is the first non-empty line that is not
+              # a heading and not a bullet. If none exists, keep the whole
+              # block as-is.
+              lines = block.splitlines()
+              for idx, line in enumerate(lines):
+                  if line.strip():
+                      if not line.startswith(('## ', '### ', '- ')):
+                          return line.strip(), '\n'.join(lines[idx + 1:]).strip()
+                      return '', block
+              return '', block
+
           def subsections(block):
               # Split "## Heading" or "### Heading" groups, keep bullet lines
               # only. Wrapped bullets (continuation lines) are joined back
@@ -248,8 +260,12 @@ jobs:
                   return block
               return '\n\n'.join(parts)
 
-          en_body = render(section(en_log), en_map)
-          id_body = render(section(id_log), id_map)
+          en_block = section(en_log)
+          id_block = section(id_log)
+          en_summary, en_body_raw = split_summary(en_block)
+          id_summary, id_body_raw = split_summary(id_block)
+          en_body = render(en_body_raw, en_map)
+          id_body = render(id_body_raw, id_map)
 
           install_en = (
               '## Install / Update\n\n'
@@ -268,11 +284,16 @@ jobs:
               'bila diminta. Minimum Android 8.0 (API 26).'
           )
 
-          body = ('# English\n\n**Boredom ' + version + '**\n\n' + en_body +
-                  '\n\n' + install_en +
-                  '\n\n<br>\n\n---\n\n<br>\n\n' +
-                  '# Bahasa Indonesia\n\n**Boredom ' + version + '**\n\n' +
-                  id_body + '\n\n' + install_id + '\n')
+          body = ''
+          body += '# English\n\n'
+          body += (en_summary if en_summary else '') + '\n\n'
+          body += en_body + '\n\n'
+          body += install_en + '\n\n'
+          body += '<br>\n\n---\n\n<br>\n\n'
+          body += '# Bahasa Indonesia\n\n'
+          body += (id_summary if id_summary else '') + '\n\n'
+          body += id_body + '\n\n'
+          body += install_id + '\n'
           pathlib.Path('RELEASE_BODY.md').write_text(body, encoding='utf-8')
           print(body)
           PYEOF
