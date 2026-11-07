@@ -24,27 +24,27 @@ Misi sekarang interaktif, dengan langkah-langkah nyata di dalam sheet, dan layar
 
 ## v4.2.2
 
+Ikon peluncur baru dari tangan kreator proyek ini hadir bersama pipeline ikon yang terdokumentasi sepenuhnya.
+
 ### Ditambahkan
 
 - **Desain ikon baru.** Latar gelap dengan spiral gradasi warna toska ke oranye dan bintang, identitas visual baru aplikasi ini.
 - **Pipeline ikon launcher adaptif.** Adaptive background dan foreground sekarang dikomit sebagai PNG di `android_res_extra/` dan disalin oleh workflow CI, sehingga desain baru ikut di setiap build CI (termasuk ikon untuk API di bawah 26).
 
-### Instalasi / Update
-
-- Download APK `app-arm64-v8a-release.apk` dari rilis `v4.2.2` dan instal versi `4.2.1`.
-
+#
 ## v4.2.1
+
+Branding default Flutter digantikan dengan dadu gradien ungu, pola pip, dan huruf B Boredom.
 
 ### Ditambahkan
 
 - **Desain ikon baru.** Latar gradien ungu dengan white die, sudut melengkung, pola pip "5", dan lettermark huruf "B" Boredom.
 - **Pipeline ikon launcher.** Menambahkan `flutter_launcher_icons` dengan PNG master dan generasi adaptive icon untuk Android; sumber vector di `android_res_extra/` diperbarui agar sesuai artwork baru.
 
-### Instalasi / Update
-
-- Download APK `app-arm64-v8a-release.apk` dari rilis `v4.2.1` dan instal versi `4.2.0`.
-
+#
 ## v4.2.0
+
+Sepuluh misi Daily Wellness baru berhambatan rendah dan tampilan Beranda yang lebih tenang.
 
 ## Fitur baru
 
@@ -86,6 +86,8 @@ Misi sekarang interaktif, dengan langkah-langkah nyata di dalam sheet, dan layar
 
 ## v4.1.0
 
+Filter misi favoritmu sekarang bisa disimpan sebagai preferensi persisten di Profile.
+
 ## Fitur baru
 
 - **Default pilihan di Profil.** Pilih suasana, anggaran waktu, lokasi,
@@ -98,13 +100,9 @@ Misi sekarang interaktif, dengan langkah-langkah nyata di dalam sheet, dan layar
   penyimpanan lokal, sehingga bertahan saat aplikasi di-restart dan
   perangkat di-reboot.
 
-## Instalasi / Update
-
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
-
-
-
 ## v4.0.0
+
+Roll pertama setiap sesi sekarang menghormati preferensi tersimpan milikmu.
 
 ## Fitur baru
 
@@ -124,14 +122,9 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   pilihanmu alih-alih nilai hard-coded, mengurangi reroll yang sia-sia
   pada misi pertama hari itu.
 
-## Instalasi / Update
-
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
-
-
-
-
 ## v3.4.0
+
+Pelacakan progres visual mendarat di Stats dengan kalender streak dan XP per kategori.
 
 ## Fitur baru
 
@@ -156,14 +149,9 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   notifikasi provider (kartu metrik memakai `context.select` pada field
   yang tepat).
 
-## Instalasi / Update
-
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
-
-
-
-
 ## v3.3.0
+
+Misi kustom mendapatkan kontrol siklus hidup penuh: edit, arsipkan, dan kategori kustom.
 
 ## Fitur baru
 
@@ -190,14 +178,9 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 - **Penghitung misi buatan tidak lagi drifting** saat edit atau arsip
   (keduanya sekarang langsung persist).
 
-## Instalasi / Update
-
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
-
-
-
-
 ## v3.2.0
+
+Token beku streak sekarang terlihat di Beranda dan riwayat bisa diurutkan berdasarkan tanggal atau XP.
 
 ### Ditambahkan
 - **Token beku ditampilkan di Beranda.** Jumlah token beku sekarang
@@ -216,10 +199,9 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 - **UI urutan riwayat.** Chip urutan di atas daftar riwayat memudahkan
   menemukan entri lama atau penyelesaian dengan XP tertinggi.
 
-
-
-
 ## v3.1.0
+
+Tantangan harian mendapatkan pilihan hasil yang jujur terhadap streak dan empat achievement baru.
 
 ## Fitur baru
 
@@ -251,13 +233,9 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
   yang sama seperti tantangan harian: bonus milestone kini dihitung
   terhadap XP yang benar-benar diterima.
 
-## Instalasi / Update
+## v3.0.2
 
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
-
-
-UI/UX dan optimasi setelah review v3.0.0-v3.0.1. Tidak ada perubahan
-format penyimpanan, jadi semua cadangan tetap kompatibel.
+Polish UI dan optimasi setelah review v3.0.0-v3.0.1. Format penyimpanan tidak berubah, jadi semua cadangan tetap kompatibel.
 
 ### Ditingkatkan
 - **Design system bersama.** `AppKit` di `lib/widgets/kit.dart`
@@ -301,6 +279,8 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
 - **174 test hijau** (termasuk 16 test baru history filter).
 
 ## v3.0.1
+
+Self-review terhadap semua yang dikirim antara v2.5.0 dan v3.0.0; murni mencari cacat yang terbawa.
 
 ### Diperbaiki
 - **Melaporkan misi sebagai "tidak dikerjakan" menghukum dua kali.**
@@ -552,7 +532,6 @@ tetap terbaca.
 ## v2.4.3
 
 Audit ketiga, difokuskan pada sistem undo dan penghitung inbox.
-
 
 ### Diperbaiki
 - **Undo bisa membuat penghitung misi tersimpan rusak secara
@@ -869,7 +848,4 @@ Rilis awal.
 
 ### Ditambahkan
 - Rilis publik pertama Boredom.
-
-
-
 

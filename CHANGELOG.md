@@ -24,6 +24,8 @@ Missions are now interactive, with real steps to follow inside the sheet, and th
 
 ## v4.2.2
 
+A fresh, hand-drawn launcher icon arrives alongside the fully documented icon pipeline.
+
 ### Added
 
 - **New app icon artwork.** Navy background with a teal-to-orange spiral and a star, matching the new look of the app.
@@ -35,6 +37,8 @@ Missions are now interactive, with real steps to follow inside the sheet, and th
 
 ## v4.2.1
 
+The default Flutter branding is replaced with a purple gradient die, a pip pattern, and the Boredom B lettermark.
+
 ### Added
 
 - **New icon design.** Purple gradient background with a white die, rounded corners, a "5" pip pattern, and the Boredom "B" lettermark.
@@ -45,6 +49,8 @@ Missions are now interactive, with real steps to follow inside the sheet, and th
 - Download the `app-arm64-v8a-release.apk` from the `v4.2.1` release and install it over version `4.2.0`.
 
 ## v4.2.0
+
+Ten new low-friction Daily Wellness missions and a calmer, decluttered Home screen.
 
 ## New features
 
@@ -83,6 +89,8 @@ Missions are now interactive, with real steps to follow inside the sheet, and th
 
 ## v4.1.0
 
+Your usual mission filters can now be saved as persistent preferences from Profile.
+
 ## New features
 
 - **Preferred defaults in Profile.** Pick your usual mood, time budget,
@@ -94,13 +102,9 @@ Missions are now interactive, with real steps to follow inside the sheet, and th
 - **Defaults persist across restarts.** Your preferred filters are saved
   to local storage, so they survive app restarts and device reboots.
 
-## Install / Update
-
-Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
-
-
-
 ## v4.0.0
+
+The first roll of every session now respects your saved preferences.
 
 ## New features
 
@@ -120,14 +124,9 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
   preferred defaults instead of hard-coded ones, reducing wasted rerolls
   on the first mission of the day.
 
-## Install / Update
-
-Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
-
-
-
-
 ## v3.4.0
+
+Visual progress tracking lands on Stats with a streak calendar and XP per category.
 
 ## New features
 
@@ -149,14 +148,9 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Stats screen no longer rebuilds the whole list** on every provider
   notification (metric cards use `context.select` on the right fields).
 
-## Install / Update
-
-Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
-
-
-
-
 ## v3.3.0
+
+Custom missions gain full lifecycle controls: edit, archive, and custom categories.
 
 ## New features
 
@@ -183,14 +177,9 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Custom mission counter no longer drifts** on edit or archive (both
   now persist immediately).
 
-## Install / Update
-
-Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
-
-
-
-
 ## v3.2.0
+
+Streak freeze tokens are now visible on Home and history can be sorted by date or XP.
 
 ### Added
 - **Freeze token display on Home.** Your saved freeze tokens now show at the
@@ -208,10 +197,9 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **History sort UI.** The sort chips above the history list make it easy
   to find old entries or high-XP completions quickly.
 
-
-
-
 ## v3.1.0
+
+The daily challenge gains a streak-honest outcome selection and four new achievements.
 
 ## New features
 
@@ -238,10 +226,6 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
   actually reaching that level in total XP.
 - **Quest chain milestone paid on full value.** Same fix as the daily
   challenge: milestone bonus is now judged on the actual awarded XP.
-
-## Install / Update
-
-Download the APK matching your device below (`app-arm64-v8a-release.apk` for most modern phones, `app-armeabi-v7a-release.apk` for older 32-bit ones). Open it on your phone and allow installs from unknown sources if asked. Minimum Android 8.0 (API 26).
 
 <br>
 
@@ -282,11 +266,6 @@ Download the APK matching your device below (`app-arm64-v8a-release.apk` for mos
 - **Milestone XP langkah quest chain dibayar pada nilai penuh.** Perbaiki
   yang sama seperti tantangan harian: bonus milestone kini dihitung
   terhadap XP yang benar-benar diterima.
-
-## Instalasi / Update
-
-Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
-
 
 UI/UX dan optimasi setelah review v3.0.0-v3.0.1. Tidak ada perubahan
 format penyimpanan, jadi semua cadangan tetap kompatibel.
@@ -330,6 +309,31 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
 - **Analyze bersih, 0 warning/error.** Semua perbaikan type dan tipe
   parameter dari review ulang v3.0.0 diterapkan.
 - **174 test hijau** (termasuk 16 test baru history filter).
+
+## v3.0.2
+
+UI and optimization polish after the v3.0.0-v3.0.1 review. Storage format unchanged, so every backup stays compatible.
+
+### Improvements
+- **Shared design system.** `AppKit` in `lib/widgets/kit.dart` consolidates spacing, radius, cards, buttons, and card metrics that were previously copy-pasted between screens. No more scattered magic numbers.
+- **Cleaner Home.** The "I'm Bored" and "Chaos Me" CTAs now span full width with distinct colors; Quick Wins and Chaos Mode toggles are consistent bars.
+- **Tighter Mission Sheet.** Header action buttons 4x, title/description centered, and an outcomes grid readable on small screens and at large text sizes.
+- **Stats & Achievements use the same metric cards**, and Achievements now uses `SliverGrid` instead of shrinkWrapped `GridView` for better performance.
+- **History lookup O(1).** Resolving title/category previously scanned the 55-entry catalog per row per build; now it uses a `Map` direct lookup.
+- **Weekly Insights refresh on day rollover** via the `context.watch` provider, not only on new completion.
+- **No dead space** under Home for new players; the gap moved into WeeklyInsights.
+
+### Bug fixes
+- **"+0 XP" toast for skipped missions** now honestly says nothing was awarded and the streak did not move.
+- **Double-tapping a quest chain step paid twice**; the step is now claimed before any async process, with an in-flight guard.
+- **Midnight timer no longer duplicates** every time the app is resumed (no N live timers after N resumes).
+- **Daily challenge IDs from backup are validated**; missing IDs from this build's catalog are dropped instead of silently overwriting another arc.
+- **In-memory history now respects the 1000-entry cap** like storage, so the "displaying N of M" report never lies.
+- **History filter moved to a pure module** (`history_filter.dart`) with 16 test cases; previously a private method in a widget.
+
+### Optimizations
+- **Analyze clean, 0 warnings/errors.** All type and parameter improvements from the v3.0.0 review are applied.
+- **174 tests green** (including 16 new history filter tests).
 
 ## v3.0.1
 
