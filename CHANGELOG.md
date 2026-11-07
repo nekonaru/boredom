@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.3.0
+
+Missions are now interactive, with real steps to follow inside the sheet, and the core screens are calmer and more consistent.
+
+## New features
+
+- **Interactive mission steps.** Every mission now ships with three concrete sub-steps matched to what the mission actually asks; progress is shown as a live checklist inside the mission sheet so finishing a task never feels like guesswork.
+- **Mission progress indicator.** The sheet shows an animated progress bar and `x / 3 steps` counter, and the primary action turns into a green "finish" state once all steps are complete.
+- **Redesigned onboarding.** Each page now uses a radial accent halo behind the mascot and an animated expanding progress indicator instead of three static dots.
+- **Profile hero card.** Level, XP bar, mission count, streak, total XP, and daily rerolls now live in a single consolidated hero card, with freeze tokens shown in the following card.
+
+## Improvements
+
+- **Cleaner Home.** The four filter rows and two toggles were collapsed into one expandable "Mission filters" card, so the primary action is no longer buried under a wall of controls.
+- **Quieter Stats screen.** The duplicated "XP per category" section is removed; dark mode surface tones were lifted so cards read as discrete layers.
+- **Subtle default card border.** Every card in the app now carries a 1dp border by default, so cards are visually separated on both dark and light themes without extra code per screen.
+- **Release notes and changelog are regenerated automatically** from this file and its Indonesian twin, in an identical bilingual shape, which keeps every historical release in sync.
+
+## Bug fixes
+
+- **Black screen after accepting a mission.** The sheet used to call `pop()` on submit while the build method also scheduled one, so the sheet closed twice and the player was thrown out of the route stack; the sheet now closes itself exactly once.
+
 ## v4.2.2
 
 ### Added
@@ -854,3 +876,10 @@ functional bug plus a few polish items.
 
 No changes to the stored data format, so progress already on the phone
 keeps loading normally after the update.
+
+## v1.0.0
+
+Initial release.
+
+### Added
+- First public release of Boredom.

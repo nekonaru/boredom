@@ -202,14 +202,14 @@ jobs:
               return m.group(1).strip() if m else ''
 
           def subsections(block):
-              # Split "### Heading" groups, keep bullet lines only.
-              # Wrapped bullets (continuation lines) are joined back so no
-              # point ever renders truncated.
+              # Split "## Heading" or "### Heading" groups, keep bullet lines
+              # only. Wrapped bullets (continuation lines) are joined back
+              # so no point ever renders truncated.
               out = []
               current = None
               bullets = []
               for line in block.splitlines():
-                  h = re.match(r'^###\s+(.*)\s*$', line)
+                  h = re.match(r'^#{2,3}\s+(.*)\s*$', line)
                   if h:
                       if current and bullets:
                           out.append((current, bullets))
@@ -224,11 +224,17 @@ jobs:
               return out
 
           en_map = {'Added': 'New features',
-                    'Improved': 'Optimizations',
-                    'Fixed': 'Bug fixes'}
+                    'Improved': 'Improvements',
+                    'Fixed': 'Bug fixes',
+                    'New features': 'New features',
+                    'Improvements': 'Improvements',
+                    'Bug fixes': 'Bug fixes'}
           id_map = {'Ditambahkan': 'Fitur baru',
-                    'Ditingkatkan': 'Optimisasi',
-                    'Diperbaiki': 'Perbaikan bug'}
+                    'Ditingkatkan': 'Peningkatan',
+                    'Diperbaiki': 'Perbaikan bug',
+                    'Fitur baru': 'Fitur baru',
+                    'Peningkatan': 'Peningkatan',
+                    'Perbaikan bug': 'Perbaikan bug'}
 
           def render(block, mapping):
               parts = []

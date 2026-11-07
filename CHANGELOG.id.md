@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.3.0
+
+Misi sekarang interaktif, dengan langkah-langkah nyata di dalam sheet, dan layar inti lebih tenang serta konsisten.
+
+## Fitur baru
+
+- **Langkah misi interaktif.** Setiap misi sekarang punya tiga sublangkah konkret yang sesuai dengan isi misi; progress ditampilkan sebagai checklist hidup di dalam mission sheet sehingga menyelesaikan tugas tidak pernah terasa seperti tebak-tebakan.
+- **Indikator progress misi.** Sheet menampilkan progress bar animasi dan counter `x / 3 langkah`, serta berubah menjadi tombol hijau "SELESAIKAN MISI" begitu semua langkah tuntas.
+- **Onboarding diperbarui.** Setiap halaman sekarang menggunakan halo radial berwarna akses di belakang maskot dan indikator progress yang melebar secara animasi, bukan tiga titik statis.
+- **Kartu hero Profile.** Level, XpBar, jumlah misi, streak, total XP, dan reroll harian sekarang ada di satu kartu hero yang terkompactasi, dengan token beku di kartu berikutnya.
+
+## Peningkatan
+
+- **Home lebih bersih.** Empat baris filter dan dua toggle digabung menjadi satu kartu "Mission filters" yang bisa dibuka dan ditutup, sehingga tombol utama tidak lagi tenggelam oleh kontrol yang banyak.
+- **Stats lebih sunyi.** Bagian duplikat "XP per category" dihapus; tone permukaan gelap digantikan warna yang sedikit lebih terang sehingga kartu terbaca sebagai lapisan terpisah.
+- **Border kartu default.** Semua kartu di seluruh aplikasi sekarang membawa border tipis secara default, sehingga kartu terlihat berbeda pada tema gelap maupun terang tanpa kode tambahan per layar.
+- **Release notes dan changelog digenerate otomatis** dari file ini dan twin Indonesiannya, dalam format bilingual yang identik, sehingga setiap rilis historis tetap sinkron.
+
+## Perbaikan bug
+
+- **Layar hitam setelah accept misi.** Sheet dulu memanggil `pop()` saat submit sementara build() juga menjadwalkan pop, sehingga sheet tertutup dua kali dan pemain terlempar keluar dari route stack; sekarang sheet menutup dirinya sendiri tepat satu kali.
+
 ## v4.2.2
 
 ### Ditambahkan
@@ -840,6 +862,13 @@ fungsional nyata plus beberapa item polish.
 
 Tidak ada perubahan format data tersimpan, jadi progres yang sudah ada
 di HP tetap terbaca normal setelah update.
+
+## v1.0.0
+
+Rilis awal.
+
+### Ditambahkan
+- Rilis publik pertama Boredom.
 
 
 
