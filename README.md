@@ -4,7 +4,7 @@
 
 **Tap one button, get one real-world mission, earn XP, level up. A tiny game for everyday life, fully offline.**
 
-![Flutter](https://img.shields.io/badge/Flutter-3.35-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?style=flat-square&logo=flutter&logoColor=white)
 ![Release](https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)
@@ -27,7 +27,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 | Feature | Description |
 |---------|-------------|
-| 🎲 **Mission generator** | Random mission from a 55-mission catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
+| 🎲 **Mission generator** | Random mission from a 65-mission catalog (55 core + 10 Daily Wellness), matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
 | 🎚️ **Outcome tracking** | Say whether you actually did it: done, partly, or skipped. Partial pays 60 percent, skipped pays nothing and never advances your streak |
