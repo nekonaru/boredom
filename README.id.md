@@ -3,6 +3,8 @@
   <p><b>Ketuk satu tombol, dapat satu misi dunia nyata, raih XP, naik level.<br/>
   Game mungil untuk kehidupan sehari-hari, sepenuhnya offline.</b></p>
 
+  <img src="https://raw.githubusercontent.com/nekonaru/boredom/master/assets/icon/icon.png" alt="Boredom App Icon" />
+
   <a href="https://github.com/nekonaru/boredom/releases"><img src="https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue" alt="Release" /></a>
   <a href="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml"><img src="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg" alt="CI" /></a>
   <img src="https://img.shields.io/badge/Flutter-3.35-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" />
@@ -249,6 +251,8 @@ boredom/
 │   ├── stats_theme_test.dart     # statistik bulanan, palet, nama hari
 │   ├── events_test.dart          # XP akhir pekan, roll musiman, pembobotan
 │   └── v24_test.dart             # kategori dibisukan, XP milestone, rekap
+├── assets/
+│   └── icon/                     # sumber ikon aplikasi (SVG + PNG hasil generate)
 ├── android_res_extra/            # ikon launcher + splash yang dimasukkan ke APK oleh CI
 ├── .github/
 │   └── workflows/
@@ -301,6 +305,8 @@ flutter test
 | `release.yml` | Tes dan lampirkan APK terpisah di setiap tag `v*` |
 
 Ikon launcher dan splash dari `android_res_extra/` dimasukkan ke APK oleh CI.
+
+Sumber ikon ada di `assets/icon/` (`icon.svg`, `icon_background.svg`, `icon_foreground.svg`); ikon launcher dihasilkan dengan [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) dari PNG master (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`).
 
 ---
 

@@ -7,6 +7,8 @@
 
 **Tap one button, get one real-world mission, earn XP, level up. A tiny game for everyday life, fully offline.**
 
+![Boredom App Icon](https://raw.githubusercontent.com/nekonaru/boredom/master/assets/icon/icon.png)
+
 ![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?style=flat-square&logo=flutter&logoColor=white)
 ![Release](https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
@@ -286,6 +288,8 @@ boredom/
 │   ├── stats_theme_test.dart     # monthly stats, palettes, weekday names
 │   ├── events_test.dart          # weekend XP, seasonal rolls, weighting
 │   └── v24_test.dart             # muted categories, milestone XP, recap
+├── assets/
+│   └── icon/                     # app icon sources (SVG design + generated PNG)
 ├── android_res_extra/            # launcher icon + splash drawn into the APK by CI
 ├── .github/
 │   └── workflows/
@@ -338,6 +342,8 @@ flutter test
 | `release.yml` | Test and attach split APKs to each `v*` tag |
 
 Launcher icon and splash from `android_res_extra/` are drawn into the APK by CI.
+
+Icon sources live in `assets/icon/` (`icon.svg`, `icon_background.svg`, `icon_foreground.svg`); launcher icons are generated with [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) from the PNG masters (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`).
 
 ---
 
