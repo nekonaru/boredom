@@ -22,3 +22,7 @@ ios/.symlinks/
 # Local-only notes (never commit)
 rules.md
 rancangan.md
+.dev/
+SECURITY_MAP.md
+SECURITY_REVIEW.md
+SECURITY_REPORT.md

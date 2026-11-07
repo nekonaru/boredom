@@ -1,13 +1,12 @@
 <div align="center">
   <h1>Boredom: Ubah Rasa Bosan Jadi Misi</h1>
-  <p><b>Ketuk satu tombol, dapat satu misi dunia nyata, raih XP, naik level.<br/>
-  Game mungil untuk kehidupan sehari-hari, sepenuhnya offline.</b></p>
+  <p><b>Ubah rasa bosan menjadi misi dunia nyata (Flutter) dengan XP, level, streak, rantai quest, dan pencapaian. Sepenuhnya offline.</b></p>
 
   <img src="https://raw.githubusercontent.com/nekonaru/boredom/master/assets/icon/icon.png" alt="Boredom App Icon" />
 
   <a href="https://github.com/nekonaru/boredom/releases"><img src="https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue" alt="Release" /></a>
   <a href="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml"><img src="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg" alt="CI" /></a>
-  <img src="https://img.shields.io/badge/Flutter-3.35-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Flutter-3.47-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" />
   <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Platform" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square" alt="Status" />

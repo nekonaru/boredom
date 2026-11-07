@@ -5,7 +5,7 @@
 
 # 🎲 Boredom: Turn Boredom Into Missions
 
-**Tap one button, get one real-world mission, earn XP, level up. A tiny game for everyday life, fully offline.**
+**Turn boredom into real-world missions (Flutter) with XP, levels, streaks, quest chains, and achievements. Fully offline.**
 
 ![Boredom App Icon](https://raw.githubusercontent.com/nekonaru/boredom/master/assets/icon/icon.png)
 
