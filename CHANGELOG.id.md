@@ -1,5 +1,20 @@
 ﻿# Changelog
 
+## v4.2.1
+
+## 🎨 Ikon aplikasi baru
+
+- **Desain ikon baru.** Latar gradien ungu dengan white die, sudut
+  melengkung, pola pip "5", dan lettermark huruf "B" Boredom.
+- **Pipeline ikon launcher.** Menambahkan `flutter_launcher_icons` dengan
+  PNG master (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`)
+  dan generasi adaptive icon untuk Android; sumber vector di `android_res_extra/`
+  diperbarui agar sesuai artwork baru.
+
+## 📦 Rilis
+
+- Version bump ke `4.2.1+29` agar ikon baru tersedia sebagai rilis sendiri.
+
 ## v4.2.0
 
 ## ✨ Fitur baru

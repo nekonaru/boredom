@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.2.1
+
+## 🎨 New app icon
+
+- **New icon design.** Purple gradient background with a white die, rounded
+  corners, "5" pip pattern, and the Boredom "B" lettermark.
+- **Launcher icon pipeline.** Added `flutter_launcher_icons` with PNG masters
+  (`assets/icon/icon.png`, `icon_background.png`, `icon_foreground.png`) and
+  adaptive icon generation for Android; the vector-based `android_res_extra/`
+  sources were updated to match the new artwork.
+
+## 📦 Release
+
+- Version bump to `4.2.1+29` so the new icon ships as its own release.
+
 ## v4.2.0
 
 ## ✨ New features
