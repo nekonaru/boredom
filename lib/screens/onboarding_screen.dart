@@ -57,6 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: pages.length,
+                padEnds: false,
                 onPageChanged: (i) => setState(() => _page = i),
                 itemBuilder: (context, i) => _OnboardingPage(data: pages[i]),
               ),
@@ -65,12 +66,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 pages.length,
-                (i) => Container(
+                (i) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 8,
+                  width: i == _page ? 28 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(6),
                     color: i == _page
                         ? pal.accent
                         : pal.textSecondary.withValues(alpha: 0.4),
@@ -139,8 +143,22 @@ class _OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(data.emoji, style: const TextStyle(fontSize: 72)),
-          const SizedBox(height: 24),
+          Container(
+            width: 160,
+            height: 160,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  pal.accent.withValues(alpha: 0.22),
+                  pal.accent.withValues(alpha: 0),
+                ],
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Text(data.emoji, style: const TextStyle(fontSize: 76)),
+          ),
+          const SizedBox(height: 28),
           Text(
             data.title,
             textAlign: TextAlign.center,
