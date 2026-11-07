@@ -67,53 +67,51 @@ class ProfileScreen extends StatelessWidget {
             AppKit.card(
               color: pal.surface,
               padding: const EdgeInsets.all(AppKit.lg),
-              child: XpBar(progress: progress),
-            ),
-            const SizedBox(height: AppKit.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: AppKit.metricCard(context,
-                    label: s.mTotalMissions,
-                    value: '${progress.totalMissionsCompleted}',
-                    emoji: '🎯',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  XpBar(progress: progress),
+                  const SizedBox(height: AppKit.lg),
+                  const Divider(height: 1, thickness: 1),
+                  const SizedBox(height: AppKit.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ProfileStat(
+                          emoji: '🎯',
+                          value: '${progress.totalMissionsCompleted}',
+                          label: s.missionsWord,
+                          color: pal.accent,
+                        ),
+                      ),
+                      Expanded(
+                        child: _ProfileStat(
+                          emoji: '🔥',
+                          value: s.days(progress.streakDays),
+                          label: s.mActiveStreak,
+                          color: pal.warning,
+                        ),
+                      ),
+                      Expanded(
+                        child: _ProfileStat(
+                          emoji: '⚡',
+                          value: '${progress.totalXp}',
+                          label: 'XP',
+                          color: pal.success,
+                        ),
+                      ),
+                      Expanded(
+                        child: _ProfileStat(
+                          emoji: '🎲',
+                          value: '$rerollsLeft/$kMaxRerollsPerDay',
+                          label: 'Reroll',
+                          color: pal.accent,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: AppKit.md),
-                Expanded(
-                  child: AppKit.metricCard(context,
-                    label: s.mActiveStreak,
-                    value: s.days(progress.streakDays),
-                    emoji: '🔥',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppKit.md),
-            Row(
-              children: [
-                Expanded(
-                  child: AppKit.metricCard(context,
-                    label: s.mTotalXp,
-                    value: '${progress.totalXp}',
-                    emoji: '⚡',
-                  ),
-                ),
-                const SizedBox(width: AppKit.md),
-                Expanded(
-                  child: AppKit.metricCard(context,
-                    label: s.mRerollsToday,
-                    value: '$rerollsLeft/$kMaxRerollsPerDay',
-                    emoji: '🎲',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppKit.lg),
-            _WeeklyRecapCard(
-              s: s,
-              pal: pal,
-              provider: provider,
+                ],
+              ),
             ),
             const SizedBox(height: AppKit.lg),
             AppKit.card(
@@ -941,117 +939,6 @@ class _BackupSection extends StatelessWidget {
   }
 }
 
-/// Weekly recap card for Profile.
-class _WeeklyRecapCard extends StatelessWidget {
-  final AppStrings s;
-  final AppPalette pal;
-  final BoredomProvider provider;
-
-  const _WeeklyRecapCard({
-    required this.s,
-    required this.pal,
-    required this.provider,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final summary = context.select<BoredomProvider, ({int missions, int xp})>(
-      (p) => p.last7DaysSummary,
-    );
-    final streak = context.select<BoredomProvider, int>(
-      (p) => p.progress.streakDays,
-    );
-    return AppKit.card(
-      color: pal.surface,
-      padding: const EdgeInsets.all(AppKit.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            s.weeklySummary,
-            style: TextStyle(
-              color: pal.textPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: AppKit.md),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${summary.missions}',
-                      style: TextStyle(
-                        color: pal.accent,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      s.missionsWord,
-                      style: TextStyle(
-                        color: pal.textSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '+${summary.xp}',
-                      style: TextStyle(
-                        color: pal.success,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'XP',
-                      style: TextStyle(
-                        color: pal.textSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$streak',
-                      style: TextStyle(
-                        color: pal.warning,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      s.days(streak),
-                      style: TextStyle(
-                        color: pal.textSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// About text + version footer.
 class _AboutSection extends StatelessWidget {
   final AppStrings s;
@@ -1069,6 +956,51 @@ class _AboutSection extends StatelessWidget {
         Text(
           s.aboutBody,
           style: TextStyle(color: pal.textSecondary, fontSize: 13, height: 1.5),
+        ),
+      ],
+    );
+  }
+}
+
+/// Compact inline stat used inside the hero card.
+class _ProfileStat extends StatelessWidget {
+  final String emoji;
+  final String value;
+  final String label;
+  final Color color;
+
+  const _ProfileStat({
+    required this.emoji,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 14)),
+        const SizedBox(height: AppKit.xs),
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: pal.textSecondary,
+            fontSize: 10,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );

@@ -24,7 +24,8 @@ class AppKit {
   static const double rPill = 28.0;
 
   // ---------------- Cards ----------------
-  /// Plain surface card used everywhere.
+  /// Plain surface card used everywhere. Defaults to a subtle border so
+  /// every card reads as a discrete surface in both dark and light themes.
   static Widget card({
     required Widget child,
     Color? color,
@@ -37,7 +38,11 @@ class AppKit {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(radius),
-        border: border,
+        border: border ??
+            Border.all(
+              color: const Color(0xFFFFFFFF).withValues(alpha: 0.06),
+              width: 1,
+            ),
       ),
       child: child,
     );
