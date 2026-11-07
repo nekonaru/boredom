@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.2.2
+
+### Added
+
+- **New app icon artwork.** Navy background with a teal-to-orange spiral and a star, matching the new look of the app.
+- **Adaptive launcher icon pipeline.** The adaptive background and foreground are now committed as PNGs in `android_res_extra/` and are copied by the CI workflows, so the new artwork ships in every CI build (including pre-API 26 icons).
+
+### Install / Update
+
+- Download the `app-arm64-v8a-release.apk` from the `v4.2.2` release and install it over version `4.2.1`.
+
 ## v4.2.1
 
 ### Added

@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.2.2
+
+### Ditambahkan
+
+- **Desain ikon baru.** Latar gelap dengan spiral gradasi warna toska ke oranye dan bintang, identitas visual baru aplikasi ini.
+- **Pipeline ikon launcher adaptif.** Adaptive background dan foreground sekarang dikomit sebagai PNG di `android_res_extra/` dan disalin oleh workflow CI, sehingga desain baru ikut di setiap build CI (termasuk ikon untuk API di bawah 26).
+
+### Instalasi / Update
+
+- Download APK `app-arm64-v8a-release.apk` dari rilis `v4.2.2` dan instal versi `4.2.1`.
+
 ## v4.2.1
 
 ### Ditambahkan
