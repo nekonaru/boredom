@@ -18,3 +18,7 @@ ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
 ios/Pods/
 ios/.symlinks/
+
+# Local-only notes (never commit)
+rules.md
+rancangan.md

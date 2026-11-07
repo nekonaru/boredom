@@ -1,5 +1,45 @@
 ﻿# Changelog
 
+## v4.2.0
+
+## ✨ Fitur baru
+
+- **Misi Harian Kesehatan (Daily Wellness).** 10 misi baru dengan gaya
+  rendah (nafas dalam, syukur, cek air, rencana besok, telepon keluarga,
+  buruan hijau, baca satu halaman, duduk taman, siram tanaman) yang
+  sebenarnya bisa dilakukan siapa saja.
+- **Transisi tab lebih smooth.** Animasi cross-fade saat berpindah
+  antara Beranda, Riwayat, Statistik, Pencapaian, dan Profil.
+- **Pulse pada tombol utama.** Tombol "Misi Bosan" / "Acak Bebasnya"
+  berkedip pelan agar pengguna baru melihatnya.
+
+## 🧹 UI Disederhanakan
+
+- **Beranda dibersihkan.** Streak, token beku, dan misi minggu ini
+  sekarang berbagi satu kartu statistik ringkas daripada empat blok
+  terpisah. Weekly Insights dipindah ke bawah supaya tidak merempet
+  tindakan utama.
+
+## ⚙️ Optimisasi
+
+- **Pengambilan katalog misi O(1).** `missionById()` sekarang pakai
+  cached Map bukan scan linear, jadi riwayat dan inbox lebih cepat
+  render seiring data bertambah.
+- **Tulisan lokal bersamaan.** Penyimpanan progres, riwayat, tantangan
+  harian, dan rantai quest sekarang berjalan paralel di mana
+  independen.
+- **Pembersih timer.** Timer tengah malam dan pulse di Beranda
+  dibatalkan saat dispose (mengatasi pending-timer pada test).
+
+## 🐞 Perbaikan bug
+
+- **Waktu pengingat di Profil** tidak lagi menampilkan spasi aneh
+  antara jam dan menit (`07:30`, bukan `07: 30`).
+- **Tile misi buatan** tidak lagi punya tombol edit duplikat.
+- **Weekly Insights** tidak lagi mem-watch seluruh provider, jadi
+  perubahan tema atau filter tidak membangun ulang seluruh halaman
+  Beranda.
+
 ## v4.1.0
 
 ## ✨ Fitur baru

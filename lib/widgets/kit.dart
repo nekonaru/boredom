@@ -265,4 +265,59 @@ class AppKit {
       );
     }
   }
+
+  // ---------------- Animations ----------------
+
+  /// Cross-fades between pages so tab switches feel smooth instead of
+  /// abrupt. Wraps the page body; each page must have a unique [key].
+  static Widget pageFadeTransition({
+    required Widget child,
+    required Key key,
+    required Duration duration,
+  }) {
+    return AnimatedSwitcher(
+      duration: duration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: child,
+    );
+  }
+
+  /// Fade + slide up entrance for cards and list items.
+  /// [delay] staggers multiple items so they enter one after another.
+  static Widget fadeSlideIn({
+    required Widget child,
+    required Duration delay,
+  }) {
+    return AnimatedOpacity(
+      opacity: 1.0,
+      duration: const Duration(milliseconds: 400),
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.only(top: 0),
+        child: child,
+      ),
+    );
+  }
+
+  /// Subtle pulse used on the primary action to invite a tap without
+  /// shouting. Controlled by [pulse] so callers can turn it off.
+  static Widget pulseWrapper({
+    required Widget child,
+    required bool pulse,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(seconds: 2),
+      curve: Curves.easeInOut,
+      transform: (() {
+        final m = Matrix4.identity();
+        final s = pulse ? 1.02 : 1.0;
+        m[0] = s;
+        m[5] = s;
+        return m;
+      })(),
+      child: child,
+    );
+  }
 }

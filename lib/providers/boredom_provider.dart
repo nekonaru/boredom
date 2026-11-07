@@ -80,6 +80,11 @@ class BoredomProvider extends ChangeNotifier {
 
   bool get failedToLoad => loadError != null;
 
+  /// O(1) catalog lookup built once at load time. missionById() is called
+  /// on every history row and inbox tile, so a linear scan per call adds
+  /// up as the history grows.
+  Map<String, Mission>? _missionCatalogCache;
+
   bool onboardingDone = true;
   bool hapticsEnabled = true;
 
@@ -655,10 +660,8 @@ class BoredomProvider extends ChangeNotifier {
 
   /// Catalog lookup by id, or null when the id no longer exists.
   Mission? missionById(String id) {
-    for (final m in MissionCatalog.all) {
-      if (m.id == id) return m;
-    }
-    return null;
+    final cache = _missionCatalogCache ??= {for (final m in MissionCatalog.all) m.id: m};
+    return cache[id];
   }
 
   // ---------------- Reminders ----------------
@@ -813,8 +816,11 @@ class BoredomProvider extends ChangeNotifier {
     // compares with DeepCollectionEquality, which treats an in-place
     // mutation as unchanged and would skip the rebuild.
     history = _appendHistory(entry);
-    await StorageService.instance.saveProgress(progress);
-    await StorageService.instance.addHistoryEntry(entry);
+    // Independent writes run concurrently.
+    await Future.wait([
+      StorageService.instance.saveProgress(progress),
+      StorageService.instance.addHistoryEntry(entry),
+    ]);
 
     final newlyUnlocked = <Achievement>[];
 
@@ -1133,8 +1139,11 @@ class BoredomProvider extends ChangeNotifier {
     // mutation as unchanged and would skip the rebuild.
     history = _appendHistory(entry);
 
-    await StorageService.instance.saveProgress(progress);
-    await StorageService.instance.addHistoryEntry(entry);
+    // Independent writes run concurrently.
+    await Future.wait([
+      StorageService.instance.saveProgress(progress),
+      StorageService.instance.addHistoryEntry(entry),
+    ]);
 
     final newlyUnlocked = _evaluateThresholdAchievements(now);
     if (newlyUnlocked.isNotEmpty) {
@@ -1424,9 +1433,12 @@ class BoredomProvider extends ChangeNotifier {
     );
     history = _appendHistory(entry);
 
-    await StorageService.instance.saveDailyChallengeState(dailyChallengeState!);
-    await StorageService.instance.saveProgress(progress);
-    await StorageService.instance.addHistoryEntry(entry);
+    // Independent writes run concurrently.
+    await Future.wait([
+      StorageService.instance.saveDailyChallengeState(dailyChallengeState!),
+      StorageService.instance.saveProgress(progress),
+      StorageService.instance.addHistoryEntry(entry),
+    ]);
 
     final newlyUnlocked = _evaluateThresholdAchievements(now);
     if (newlyUnlocked.isNotEmpty) {
@@ -1554,9 +1566,12 @@ class BoredomProvider extends ChangeNotifier {
       );
       history = _appendHistory(entry);
 
-      await StorageService.instance.saveProgress(progress);
-      await StorageService.instance.addHistoryEntry(entry);
-      await StorageService.instance.saveQuestChainProgress(null);
+      // Independent writes run concurrently.
+      await Future.wait([
+        StorageService.instance.saveProgress(progress),
+        StorageService.instance.addHistoryEntry(entry),
+        StorageService.instance.saveQuestChainProgress(null),
+      ]);
 
       final newlyUnlocked = _evaluateThresholdAchievements(now);
       if (newlyUnlocked.isNotEmpty) {

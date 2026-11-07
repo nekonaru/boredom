@@ -579,8 +579,7 @@ class _ReminderSection extends StatelessWidget {
                   onPressed: onPickTime,
                   icon: const Icon(Icons.schedule, size: 18),
                   label: Text(
-                    '${(reminderTime ~/ 60).toString().padLeft(2, '0')}:' 
-                    '${(reminderTime % 60).toString().padLeft(2, '0')}',
+                    '${(reminderTime ~/ 60).toString().padLeft(2, '0')}:${(reminderTime % 60).toString().padLeft(2, '0')}',
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: pal.accent,

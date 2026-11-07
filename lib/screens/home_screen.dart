@@ -9,11 +9,11 @@ import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/feedback.dart';
 import '../widgets/kit.dart';
-import '../widgets/weekly_summary.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
 import '../widgets/daily_challenge_card.dart';
+import '../widgets/weekly_summary.dart';
 import '../widgets/weekly_insights.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,30 +25,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Timer? _midnightTimer;
+  Timer? _pulseTimer;
+  bool _pulsePrimary = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _scheduleMidnight();
+    // Gentle pulse on the primary action so first-time users notice it.
+    _pulseTimer = Timer(const Duration(milliseconds: 800), () {
+      if (mounted) setState(() => _pulsePrimary = true);
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _midnightTimer?.cancel();
+    _pulseTimer?.cancel();
     super.dispose();
   }
 
-  /// Wakes up just after midnight and rolls the day over.
-  ///
-  /// Without this, leaving the app open across midnight kept yesterday's
-  /// streak warning, reroll allowance, and daily challenge on screen until
-  /// the app was backgrounded and resumed.
   void _scheduleMidnight() {
-    // Cancel first. Resuming the app re-arms this, and without the cancel
-    // the previous chain kept re-arming itself: N background/resume cycles
-    // meant N independent timers and N redundant midnight writes.
     _midnightTimer?.cancel();
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
@@ -60,13 +59,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// Runs the provider's day-rollover check when the app resumes, so a
-  /// long-lived process does not keep serving yesterday's challenge.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // The timer can fire while backgrounded, or be an hour out of date
-      // after a long suspend, so resume is still the primary trigger.
       _scheduleMidnight();
       context.read<BoredomProvider>().refreshIfDayChanged();
     }
@@ -75,9 +70,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void _handleCompletion(BuildContext context, AppStrings s,
       BoredomProvider provider) {
     final gained = provider.lastXpGained;
-    // A skipped mission sets lastXpGained to 0. Gating on null showed a
-    // green "+0 XP" celebration for the exact outcome the feature exists
-    // to discourage.
     if (gained != null) {
       AppKit.showXp(context, s,
           gained: gained,
@@ -105,8 +97,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final s = context.str;
     final pal = context.palette;
-    // Selective rebuilds: each piece only listens to the field it renders,
-    // so tapping a chip does not rebuild the whole page.
     final progress = context.select<BoredomProvider, UserProgress>((p) => p.progress);
     final selectedMood = context.select<BoredomProvider, Mood>((p) => p.selectedMood);
     final selectedTime = context.select<BoredomProvider, TimeBudget>((p) => p.selectedTime);
@@ -133,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header: brand + streak chip.
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -150,13 +141,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     color: pal.warning.withValues(alpha: 0.15),
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppKit.sm, vertical: AppKit.xs),
-                    child: Text(
-                      '🔥 ${s.streak(progress.streakDays)}',
-                      style: TextStyle(
-                        color: pal.warning,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🔥', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        Text(
+                          s.streak(progress.streakDays),
+                          style: TextStyle(
+                            color: pal.warning,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
               ],
@@ -178,8 +176,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
             const SizedBox(height: AppKit.xl),
             XpBar(progress: progress),
+            const SizedBox(height: AppKit.lg),
+
+            // Quick-stats row: streak, freeze tokens, this week — combined
+            // into one card so the screen doesn't feel like a wall of data.
+            AppKit.card(
+              color: pal.surface,
+              padding: const EdgeInsets.all(AppKit.lg),
+              child: Row(
+                children: [
+                  _QuickStat(
+                    emoji: '🔥',
+                    value: '${progress.streakDays}',
+                    label: s.days(progress.streakDays),
+                    color: pal.warning,
+                  ),
+                  const SizedBox(width: AppKit.lg),
+                  if (freezeTokens > 0) ...[
+                    _QuickStat(
+                      emoji: '❄️',
+                      value: '$freezeTokens',
+                      label: s.freezeTokens,
+                      color: pal.success,
+                    ),
+                    const SizedBox(width: AppKit.lg),
+                  ],
+                  _QuickStat(
+                    emoji: '🎯',
+                    value: '${progress.totalMissionsCompleted}',
+                    label: s.missionsWord,
+                    color: pal.accent,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppKit.lg),
+
+            // Streak-at-risk warning.
             if (streakAtRisk) ...[
-              const SizedBox(height: AppKit.md),
               AppKit.card(
                 color: pal.surface,
                 border: Border.all(
@@ -204,59 +238,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 ),
               ),
+              const SizedBox(height: AppKit.lg),
             ],
-            if (freezeTokens > 0) ...[
-              const SizedBox(height: AppKit.md),
-              AppKit.card(
-                color: pal.success.withValues(alpha: 0.15),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppKit.lg,
-                  vertical: AppKit.md,
-                ),
-                child: Row(
-                  children: [
-                    const Text('❄️', style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: AppKit.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            s.freezeTokens,
-                            style: TextStyle(
-                              color: pal.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: AppKit.xs),
-                          Text(
-                            s.freezeTokensDesc(freezeTokens),
-                            style: TextStyle(
-                              color: pal.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: AppKit.lg),
-            RepaintBoundary(
-              child: const WeeklySummaryStrip(),
-            ),
-            const SizedBox(height: AppKit.lg),
+
+            // Daily challenge — prominent, right under the stats.
             RepaintBoundary(
               child: const DailyChallengeCard(),
             ),
             const SizedBox(height: AppKit.xl),
+
+            // Weekly summary strip.
             RepaintBoundary(
-              child: const WeeklyInsights(),
+              child: const WeeklySummaryStrip(),
             ),
             const SizedBox(height: AppKit.xl),
+
+            // Filter selectors — four rows, compact.
             SelectorRow<Mood>(
               title: s.secMood,
               selected: selectedMood,
@@ -293,6 +290,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   .toList(),
             ),
             const SizedBox(height: AppKit.xl),
+
+            // Toggles.
             AppKit.toggleRow(
               context,
               emoji: '⚡',
@@ -301,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               value: quickWins,
               onChanged: () => actions.setQuickWins(!quickWins),
             ),
-            const SizedBox(height: AppKit.xl),
+            const SizedBox(height: AppKit.lg),
             AppKit.toggleRow(
               context,
               emoji: '☢️',
@@ -311,19 +310,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               onChanged: () => actions.setChaosMode(!chaosMode),
             ),
             const SizedBox(height: AppKit.xxl),
-            AppKit.primaryButton(
-              context: context,
-              label:
-                  '${chaosMode ? '☢️ ' : '🎲 '}${chaosMode ? s.chaosButton : s.boredButton}',
-              backgroundColor: chaosMode ? pal.danger : null,
-              onPressed: () async {
-                buzzIfEnabled(context);
-                actions.rollMission();
-                if (!context.mounted) return;
-                await showMissionSheet(context);
-                if (!context.mounted) return;
-                _handleCompletion(context, s, actions);
-              },
+
+            // Primary action — pulsed so it invites a tap.
+            AppKit.pulseWrapper(
+              pulse: _pulsePrimary,
+              child: AppKit.primaryButton(
+                context: context,
+                label:
+                    '${chaosMode ? '☢️ ' : '🎲 '}${chaosMode ? s.chaosButton : s.boredButton}',
+                backgroundColor: chaosMode ? pal.danger : null,
+                onPressed: () async {
+                  buzzIfEnabled(context);
+                  actions.rollMission();
+                  if (!context.mounted) return;
+                  await showMissionSheet(context);
+                  if (!context.mounted) return;
+                  _handleCompletion(context, s, actions);
+                },
+              ),
             ),
             const SizedBox(height: AppKit.sm),
             Center(
@@ -332,9 +336,62 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 style: TextStyle(color: pal.textSecondary, fontSize: 12),
               ),
             ),
+            const SizedBox(height: AppKit.lg),
+
+            // Weekly insights — shown only when there is enough history,
+            // and placed at the bottom so it never crowds the primary action.
+            RepaintBoundary(
+              child: const WeeklyInsights(),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _QuickStat extends StatelessWidget {
+  final String emoji;
+  final String value;
+  final String label;
+  final Color color;
+
+  const _QuickStat({
+    required this.emoji,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 6),
+            Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(color: context.palette.textSecondary, fontSize: 11),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }

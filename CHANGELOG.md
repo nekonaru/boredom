@@ -1,5 +1,42 @@
 # Changelog
 
+## v4.2.0
+
+## ✨ New features
+
+- **Daily Wellness missions.** 10 new low-friction missions (deep breaths,
+  gratitude, water check, plan tomorrow, call family, green hunt, read one
+  page, park sit, water plants) that anyone can actually do.
+- **Smoother tab transitions.** Cross-fade animation when switching
+  between Home, History, Stats, Achievements, and Profile.
+- **Pulse on the primary action.** The "I'm Bored" / "Chaos Me" button
+  gently pulses so new users notice it.
+
+## 🧹 Simplified UI
+
+- **Home screen decluttered.** Streak, freeze tokens, and this week's
+  missions now share one compact quick-stats card instead of four
+  separate blocks. Weekly Insights moved to the bottom so it never
+  crowds the primary action.
+
+## ⚙️ Optimizations
+
+- **O(1) mission catalog lookup.** `missionById()` now uses a cached Map
+  instead of a linear scan, so history and inbox render faster as data
+  grows.
+- **Concurrent local writes.** Progress, history, daily challenge, and
+  quest-chain saves now run in parallel where independent.
+- **Timer cleanup.** Home screen midnight and pulse timers are cancelled
+  on dispose (fixes a pending-timer test failure).
+
+## 🐞 Bug fixes
+
+- **Profile reminder time** no longer shows a stray space between hours
+  and minutes (`07:30`, not `07: 30`).
+- **Custom mission tile** no longer has a duplicate edit button.
+- **Weekly Insights** no longer watches the whole provider, so theme or
+  filter changes don't rebuild the whole Home page.
+
 ## v4.1.0
 
 ## ✨ New features

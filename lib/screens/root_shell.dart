@@ -6,7 +6,10 @@ import 'history_screen.dart';
 import 'stats_screen.dart';
 import 'achievements_screen.dart';
 import 'profile_screen.dart';
+import '../widgets/kit.dart';
 
+/// Bottom-nav shell. Tab switches cross-fade so the change feels smooth
+/// instead of an instant swap.
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
 
@@ -17,7 +20,7 @@ class RootShell extends StatefulWidget {
 class _RootShellState extends State<RootShell> {
   int _index = 0;
 
-  static const _screens = [
+  final List<Widget> _screens = const [
     HomeScreen(),
     HistoryScreen(),
     StatsScreen(),
@@ -30,18 +33,43 @@ class _RootShellState extends State<RootShell> {
     final s = context.str;
     final pal = context.palette;
     return Scaffold(
-      body: IndexedStack(index: _index, children: _screens),
+      body: AppKit.pageFadeTransition(
+        key: ValueKey<int>(_index),
+        child: IndexedStack(index: _index, children: _screens),
+        duration: const Duration(milliseconds: 300),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         backgroundColor: pal.surface,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        animationDuration: const Duration(milliseconds: 200),
         destinations: [
-          NavigationDestination(icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home), label: s.navHome),
-          NavigationDestination(icon: const Icon(Icons.history_outlined), selectedIcon: const Icon(Icons.history), label: s.navMissions),
-          NavigationDestination(icon: const Icon(Icons.bar_chart_outlined), selectedIcon: const Icon(Icons.bar_chart), label: s.navStats),
-          NavigationDestination(icon: const Icon(Icons.emoji_events_outlined), selectedIcon: const Icon(Icons.emoji_events), label: s.navAchievements),
-          NavigationDestination(icon: const Icon(Icons.person_outline), selectedIcon: const Icon(Icons.person), label: s.navProfile),
+          NavigationDestination(
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: s.navHome,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.history_outlined),
+            selectedIcon: const Icon(Icons.history),
+            label: s.navMissions,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.bar_chart_outlined),
+            selectedIcon: const Icon(Icons.bar_chart),
+            label: s.navStats,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.emoji_events_outlined),
+            selectedIcon: const Icon(Icons.emoji_events),
+            label: s.navAchievements,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: s.navProfile,
+          ),
         ],
       ),
     );

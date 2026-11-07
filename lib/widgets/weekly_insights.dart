@@ -21,12 +21,9 @@ class WeeklyInsights extends StatelessWidget {
     final history = context.select<BoredomProvider, List<CompletedMission>>(
       (p) => p.history,
     );
-    // Most insight cards are functions of the current date, but `history`
-    // only changes on a completion. Listening to the provider itself means
-    // the day rollover in refreshIfDayChanged() also refreshes them,
-    // instead of leaving yesterday's comparison on screen until the user
-    // next completes something.
-    context.watch<BoredomProvider>();
+    // `history` only changes on a completion, so this widget rebuilds then.
+    // Day rollover is handled by HomeScreen's refreshIfDayChanged() which
+    // notifies the provider; the next build picks up the new date.
 
     if (history.length < 5) return const SizedBox.shrink();
     final items = Insights.build(history, DateTime.now());

@@ -796,14 +796,6 @@ class _CustomMissionTile extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-              onPressed: onEdit,
-              icon: Icon(
-                Icons.edit_outlined,
-                color: pal.textSecondary,
-                size: 20,
-              ),
-            ),
             TextButton(
               onPressed: () async {
                 buzzIfEnabled(context);
