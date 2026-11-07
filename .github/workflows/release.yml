@@ -195,7 +195,7 @@ jobs:
           def section(text):
               # Grab the "## [v]{version}" block (up to the next "## " header).
               m = re.search(
-                  r'^## v?' + re.escape(version) + r'\s*\n(.*?)(?=^## |\Z)',
+                  r'^## v?' + re.escape(version) + r'\s*\n(.*?)(?=^## v[0-9]|\Z)',
                   text,
                   re.M | re.S,
               )
@@ -223,12 +223,12 @@ jobs:
                   out.append((current, bullets))
               return out
 
-          en_map = {'Added': '✨ New features',
-                    'Improved': '⚡ Optimizations',
-                    'Fixed': '🐛 Bug fixes'}
-          id_map = {'Ditambahkan': '✨ Fitur baru',
-                    'Ditingkatkan': '⚡ Optimisasi',
-                    'Diperbaiki': '🐛 Perbaikan bug'}
+          en_map = {'Added': 'New features',
+                    'Improved': 'Optimizations',
+                    'Fixed': 'Bug fixes'}
+          id_map = {'Ditambahkan': 'Fitur baru',
+                    'Ditingkatkan': 'Optimisasi',
+                    'Diperbaiki': 'Perbaikan bug'}
 
           def render(block, mapping):
               parts = []
@@ -246,7 +246,7 @@ jobs:
           id_body = render(section(id_log), id_map)
 
           install_en = (
-              '## 📦 Install / Update\n\n'
+              '## Install / Update\n\n'
               'Download the APK matching your device below '
               '(`app-arm64-v8a-release.apk` for most modern phones, '
               '`app-armeabi-v7a-release.apk` for older 32-bit ones). '
@@ -254,7 +254,7 @@ jobs:
               'if asked. Minimum Android 8.0 (API 26).'
           )
           install_id = (
-              '## 📦 Instalasi / Update\n\n'
+              '## Instalasi / Update\n\n'
               'Download APK sesuai HP di bawah '
               '(`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, '
               '`app-armeabi-v7a-release.apk` untuk yang 32-bit lama). '

@@ -204,7 +204,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 - **Pilihan hasil tantangan harian.** Tantangan harian kini menawarkan
   "Selesai", "Dikerjakan sebagian", dan "Tidak dikerjakan" di samping
   tombol terima, sama seperti sheet misi. Tantangan harian yang
-  dilewati tidak lagi memajukan streak atau memberikan XP â€” kejujuran
+  dilewati tidak lagi memajukan streak atau memberikan XP, kejujuran
   dihargai, bukan dihukum.
 - **Empat achievement baru.** Capai level 100 (Beyond Boredom), jaga
   streak 60 hari (Iron Streak), roll 10 misi Chaos Mode (Chaos
@@ -234,7 +234,7 @@ Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP
 Download APK sesuai HP di bawah (`app-arm64-v8a-release.apk` untuk kebanyakan HP modern, `app-armeabi-v7a-release.apk` untuk yang 32-bit lama). Buka di HP dan izinkan instalasi dari sumber tidak dikenal bila diminta. Minimum Android 8.0 (API 26).
 
 
-UI/UX dan optimasi setelah review v3.0.0â€“v3.0.1. Tidak ada perubahan
+UI/UX dan optimasi setelah review v3.0.0-v3.0.1. Tidak ada perubahan
 format penyimpanan, jadi semua cadangan tetap kompatibel.
 
 ### Ditingkatkan
@@ -251,7 +251,7 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
   Achievements sekarang pakai `SliverGrid` yang lebih efisien daripada
   `GridView(shrinkWrap: true)`.
 - **History lookup O(1).** Resolusi judul dan kategori riwayat
-  sebelumnya memindai katalog (55 entri) per baris per build â€” sekarang
+  sebelumnya memindai katalog (55 entri) per baris per build, sekarang
   pakai `Map` langsung.
 - **Weekly Insights refresh saat hari berganti** melalui
   `context.watch` provider, bukan hanya saat ada penyelesaian baru.
@@ -259,18 +259,18 @@ format penyimpanan, jadi semua cadangan tetap kompatibel.
   dipindah ke dalam WeeklyInsights).
 
 ### Diperbaiki
-- **Toast "+0 XP" untuk misi yang dilewati** â€” sekarang bilang dengan
+- **Toast "+0 XP" untuk misi yang dilewati**, sekarang bilang dengan
   jujur bahwa tidak ada XP dan streak tidak berubah.
-- **Ketuk ganda pada quest chain membayar dua kali** â€” langkah sekarang
+- **Ketuk ganda pada quest chain membayar dua kali**, langkah sekarang
   diklaim sebelum proses async, dengan guard in-flight.
 - **Timer tengah malam tidak lagi menumpuk** setiap kali aplikasi
   dibuka kembali (tidak ada lagi N timer hidup setelah N resume).
-- **ID tantangan harian dari cadangan divalidasi** â€” ID yang tidak ada
+- **ID tantangan harian dari cadangan divalidasi**, ID yang tidak ada
   dalam katalog build ini dibuang alih-alih diam-diam menimpa arc lain.
 - **Riwayat di memori sekarang ikut mematuhi batas 1000 entri** seperti
   penyimpanan, jadi laporan "menampilkan N dari M" tidak lagi melanggar.
 - **Filter riwayat dipindah ke modul murni** (`history_filter.dart`)
-  dengan 16 test â€” sebelumnya method privat di widget yang mustahil
+  dengan 16 test, sebelumnya method privat di widget yang mustahil
   diuji.
 
 ### Optimasi

@@ -1,20 +1,14 @@
 <div align="center">
+  <img src="assets/icon/icon.png" alt="Boredom logo" width="120" />
   <h1>Boredom: Turn Boredom Into Missions</h1>
-  <p><b>Tap one button, get one real-world mission, earn XP, level up.<br/>
-  A tiny game for everyday life, fully offline.</b></p>
+  <p><b>Turn boredom into real-world missions (Flutter) with XP, levels, streaks, quest chains, and achievements. Fully offline.</b></p>
 
-# 🎲 Boredom: Turn Boredom Into Missions
-
-**Turn boredom into real-world missions (Flutter) with XP, levels, streaks, quest chains, and achievements. Fully offline.**
-
-<img src="assets/icon/icon.png" alt="Boredom logo" width="120" />
-
-![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?style=flat-square&logo=flutter&logoColor=white)
-![Release](https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
-![CI](https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg)
+  <a href="https://github.com/nekonaru/boredom/releases"><img src="https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue" alt="Release" /></a>
+  <a href="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml"><img src="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg" alt="CI" /></a>
+  <img src="https://img.shields.io/badge/Flutter-3.47-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square" alt="Status" />
 </div>
 
 <br />
@@ -60,39 +54,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 | Feature | Description |
 |---------|-------------|
-<<<<<<< HEAD
-| 🎲 **Mission generator** | Random mission from a 65-mission catalog (55 core + 10 Daily Wellness), matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
-| ☢️ **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
-| ✅ **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
-| 🎚️ **Outcome tracking** | Say whether you actually did it: done, partly, or skipped. Partial pays 60 percent, skipped pays nothing and never advances your streak |
-| 📊 **Follow-through stat** | The share of tracked missions you really carried out, with a dash until you have data |
-| ⭐ **XP and levels** | Progressive curve with absurd level titles, double XP every weekend |
-| 🔥 **Streaks** | Daily streak plus longest streak, with a 1-day grace period, freeze tokens, and an at-risk warning |
-| 📜 **Quest chains** | 4 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") with a big final reward |
-| 🏆 **Achievements** | 29 achievements, progress-based and event-based (like "Night Owl") |
-| 📅 **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
-| ⭐ **Custom missions** | Create your own missions with your own XP rewards |
-| ❤️ **Favorites** | Pin catalog missions to find them again fast |
-| 🔍 **History search** | Filter completed missions by title or category, then narrow by date (today, 7 days, 30 days, all) and by outcome |
-| 🧹 **Data transparency** | History states how many entries are stored and how many you are viewing, dates show the year when it differs, and orphaned favorites can be cleaned up |
-| ↩️ **Undo** | 5-minute window to restore the last completion |
-| 💾 **Backup and restore** | Export all local data as text, import it back (phone-switch friendly, no account needed) |
-| 📊 **Statistics** | Last-7-days and last-30-days charts drawn dependency-free, average XP per active day, busiest weekday, per-category distribution, reroll and chaos totals |
-| 👎 **Dislikes** | Downvote missions so the generator stops rolling them |
-| 🔔 **Daily reminder** | One notification a day at the time you choose, off by default |
-| 🌍 **English and Indonesian UI** | English by default, switch to Bahasa Indonesia in Profile |
-| 🎨 **Light and dark themes** | Dark by default, light mode plus 5 accent colors in Profile |
-| 📳 **Haptic feedback** | Tiny vibration on taps and completions, toggleable |
-| 📤 **Share card** | Render any mission into a 1080x1080 PNG card, or copy it as text |
-| 📥 **Inbox** | Save missions for later and roll them when you are ready |
-| ⚡ **Quick wins** | Narrow rolls to missions of 15 minutes or less |
-| 🙈 **Mute categories** | Silence a whole category when you are not interested |
-| 📊 **Weekly recap** | Missions, XP, and streak visible straight on Home |
-| 🔍 **Weekly insights** | What your history says about you: week over week, your productive hour, the category you bail out of, average XP. Renders nothing rather than guessing |
-| 🎁 **Milestone bonus** | Extra XP every time you cross a 10-level boundary |
-| ↩️ **Full undo** | 5-minute undo for missions, daily challenges, chain steps, and custom missions |
-=======
-| **Mission generator** | Random mission from a 55-mission catalog, matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
+| **Mission generator** | Random mission from a 65-mission catalog (55 core + 10 Daily Wellness), matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
 | **Quick wins** | Narrow rolls to missions of 15 minutes or less |
@@ -101,7 +63,6 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | **Favorites** | Pin catalog missions to find them again fast |
 | **Dislikes** | Downvote missions so the generator stops rolling them |
 | **Mute categories** | Silence a whole category when you are not interested |
->>>>>>> 36dd6a428ab012147d1065be228f005e59e97023
 
 ### Progress and Rewards
 
