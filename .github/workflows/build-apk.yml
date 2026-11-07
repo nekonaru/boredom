@@ -45,8 +45,10 @@ jobs:
           mkdir -p android/app/src/main/res/mipmap-anydpi-v26
           mkdir -p android/app/src/main/res/values
           cp android_res_extra/drawable/*.xml android/app/src/main/res/drawable/
+          cp android_res_extra/drawable/*.png android/app/src/main/res/drawable/
           cp android_res_extra/launcher/mipmap-anydpi-v26/*.xml android/app/src/main/res/mipmap-anydpi-v26/
           cp android_res_extra/launcher/values/*.xml android/app/src/main/res/values/
+          cp -r android_res_extra/launcher/mipmap-* android/app/src/main/res/
 
       - name: Declare notification permissions and receivers
         run: |
