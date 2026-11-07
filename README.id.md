@@ -2,7 +2,7 @@
   <h1>Boredom: Ubah Rasa Bosan Jadi Misi</h1>
   <p><b>Ubah rasa bosan menjadi misi dunia nyata (Flutter) dengan XP, level, streak, rantai quest, dan pencapaian. Sepenuhnya offline.</b></p>
 
-  <img src="https://raw.githubusercontent.com/nekonaru/boredom/master/assets/icon/icon.png" alt="Boredom App Icon" />
+  <img src="assets/icon/icon.png" alt="Boredom logo" width="120" />
 
   <a href="https://github.com/nekonaru/boredom/releases"><img src="https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue" alt="Release" /></a>
   <a href="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml"><img src="https://github.com/nekonaru/boredom/actions/workflows/build-apk.yml/badge.svg" alt="CI" /></a>

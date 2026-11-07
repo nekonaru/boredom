@@ -7,7 +7,7 @@
 
 **Turn boredom into real-world missions (Flutter) with XP, levels, streaks, quest chains, and achievements. Fully offline.**
 
-![Boredom App Icon](https://raw.githubusercontent.com/nekonaru/boredom/master/assets/icon/icon.png)
+<img src="assets/icon/icon.png" alt="Boredom logo" width="120" />
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?style=flat-square&logo=flutter&logoColor=white)
 ![Release](https://img.shields.io/github/v/release/nekonaru/boredom?style=flat-square&color=blue)
