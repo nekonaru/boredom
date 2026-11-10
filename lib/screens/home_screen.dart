@@ -8,6 +8,7 @@ import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/feedback.dart';
+import '../widgets/celebration.dart';
 import '../widgets/kit.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
@@ -70,27 +71,67 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _handleCompletion(BuildContext context, AppStrings s,
       BoredomProvider provider) {
-    final gained = provider.lastXpGained;
-    if (gained != null) {
-      AppKit.showXp(context, s,
-          gained: gained,
-          usedFreeze: provider.lastFreezeUsed,
-          onUndo: provider.canUndo
-              ? () async {
-                  final ok = await provider.undoLastComplete();
-                  if (context.mounted && ok) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(s.undoDone)));
-                  }
-                }
-              : null);
-      provider.clearLastXpGained();
-    }
+    final pal = context.palette;
     final code = s.code;
-    for (final a in provider.lastUnlockedAchievements) {
-      if (!context.mounted) break;
-      AppKit.showAchievements(context, s, [a], code);
+    final gained = provider.lastXpGained;
+    final unlocked = provider.lastUnlockedAchievements;
+
+    if (gained == null && unlocked.isEmpty) return;
+
+    Future<void> undo() async {
+      final ok = await provider.undoLastComplete();
+      if (context.mounted && ok) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(s.undoDone)));
+      }
     }
+
+    if (gained != null && gained > 0) {
+      // Success moment: confetti plus any achievement just unlocked, with
+      // undo offered in place of the old plain snackbar.
+      String? subtitle;
+      if (unlocked.isNotEmpty) {
+        subtitle = unlocked
+            .map((a) =>
+                '${a.emoji} ${localizedTitle(en: a.title, id: a.titleId, code: code)}')
+            .join('\n');
+      }
+      if (provider.lastFreezeUsed) {
+        subtitle =
+            subtitle == null ? s.freezeUsed : '$subtitle\n${s.freezeUsed}';
+      }
+      showCelebration(
+        context,
+        emoji: '🎉',
+        title: s.xpSnack(gained),
+        subtitle: subtitle,
+        accent: pal.success,
+        actionLabel: provider.canUndo ? s.undoAction : null,
+        onAction: provider.canUndo ? undo : null,
+      );
+    } else if (unlocked.isNotEmpty) {
+      // No XP (skipped or partial) but an achievement still opened:
+      // celebrate the achievement on its own.
+      final first = unlocked.first;
+      showCelebration(
+        context,
+        emoji: first.emoji,
+        title: localizedTitle(en: first.title, id: first.titleId, code: code),
+        subtitle: s.achievementSnack,
+        accent: pal.accent,
+      );
+    } else {
+      // Honest neutral feedback for a skipped or partial outcome.
+      AppKit.showXp(
+        context,
+        s,
+        gained: gained ?? 0,
+        usedFreeze: provider.lastFreezeUsed,
+        onUndo: provider.canUndo ? undo : null,
+      );
+    }
+
+    provider.clearLastXpGained();
     provider.clearLastUnlockedAchievements();
   }
 
