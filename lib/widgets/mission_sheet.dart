@@ -92,6 +92,11 @@ class _MissionSheetState extends State<MissionSheet> {
     final rerollsLeft = context.select<BoredomProvider, int>(
       (p) => p.rerollsLeft,
     );
+    // Subscribe so the finish button relabels and recolors the moment the
+    // last step is ticked (reading it inline would leave it stale).
+    final allStepsComplete = context.select<BoredomProvider, bool>(
+      (p) => p.allStepsComplete,
+    );
 
     final projectedXp =
         BoredomProvider.xpForDate(mission.baseXp, DateTime.now());
@@ -295,9 +300,9 @@ class _MissionSheetState extends State<MissionSheet> {
                       context: context,
                       label: _isSubmitting
                           ? ''
-                          : (provider.allStepsComplete ? s.finishBtn : s.acceptBtn),
+                          : (allStepsComplete ? s.finishBtn : s.acceptBtn),
                       loading: _isSubmitting,
-                      backgroundColor: provider.allStepsComplete ? pal.success : null,
+                      backgroundColor: allStepsComplete ? pal.success : null,
                       onPressed: _isSubmitting
                           ? null
                           : () => _submit(context, provider, MissionOutcome.done),
