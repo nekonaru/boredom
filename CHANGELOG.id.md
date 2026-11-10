@@ -1,5 +1,24 @@
 # Changelog
 
+## v4.4.0
+
+Langkah misi akhirnya merespons setiap ketukan, dan setiap kemenangan kini hadir dengan perayaan confetti.
+
+## Fitur baru
+
+- **Perayaan confetti saat sukses.** Menyelesaikan misi kini meledakkan overlay confetti berisi XP yang didapat, achievement yang baru terbuka, dan tombol Undo, menggantikan snackbar polos sebelumnya.
+- **Animasi unlock achievement.** Membuka achievement baru menampilkan kartu perayaan animasinya sendiri, bukan sekadar snackbar teks.
+
+## Peningkatan
+
+- **Checkbox langkah misi lebih jelas.** Kotak langkah kini terbaca sebagai checkbox sungguhan: kotak membulat kosong yang terisi hijau dengan centang pop, dan seluruh baris bisa diketuk dengan riak.
+- **Animasi langkah lebih halus.** Isi checkbox, teks dicoret, progress bar, dan counter `x / 3 langkah` kini beranimasi dengan kurva lebih lembut sehingga checklist tidak lagi terasa kaku.
+- **Umpan balik semua-langkah-tuntas.** Menyelesaikan langkah terakhir membuat kartu menyala hijau dan banner "Semua langkah selesai!" masuk, serta tombol finish berubah label secara langsung.
+
+## Perbaikan bug
+
+- **Checkbox langkah misi tidak bisa diketuk.** Checklist membaca state provider tanpa subscribe, jadi menekan kotak tidak menghasilkan perubahan apa pun; kini ia rebuild di setiap ketukan dan tombol finish berubah begitu semua langkah tuntas.
+
 ## v4.3.0
 
 Misi sekarang interaktif, dengan langkah-langkah nyata di dalam sheet, dan layar inti lebih tenang serta konsisten.

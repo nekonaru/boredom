@@ -1,5 +1,24 @@
 # Changelog
 
+## v4.4.0
+
+Mission steps finally respond to every tap, and every win now lands with a confetti celebration.
+
+## New features
+
+- **Confetti celebration on success.** Completing a mission now bursts into a confetti overlay with the XP gained, any achievement just unlocked, and an Undo button, replacing the old plain snackbar.
+- **Achievement unlock animation.** Opening a new achievement shows its own animated celebration card instead of a text-only snackbar.
+
+## Improvements
+
+- **Clearer mission-step checkbox.** The step box now reads as a real checkbox: a hollow rounded square that fills green with a springy check pop, and the whole row is tappable with a ripple.
+- **Smoother step animations.** Checkbox fill, strikethrough, progress bar, and the `x / 3 steps` counter all animate with softer easing, so the checklist no longer feels stiff.
+- **All-steps-complete feedback.** Finishing the last step glows the card green and slides in an "All steps done!" banner, and the finish button relabels live.
+
+## Bug fixes
+
+- **Mission step checkboxes were unresponsive.** The checklist read provider state without subscribing, so tapping a box did nothing visible; it now rebuilds on every tap and the finish button updates the moment all steps are complete.
+
 ## v4.3.0
 
 Missions are now interactive, with real steps to follow inside the sheet, and the core screens are calmer and more consistent.
