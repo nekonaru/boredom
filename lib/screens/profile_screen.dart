@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
+import '../models/boredom_rank.dart';
 import '../models/custom_mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
@@ -77,6 +78,8 @@ class ProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   XpBar(progress: progress),
+                  const SizedBox(height: AppKit.md),
+                  _RankRow(progress: progress, code: s.code),
                   const SizedBox(height: AppKit.lg),
                   const Divider(height: 1, thickness: 1),
                   const SizedBox(height: AppKit.lg),
@@ -1055,6 +1058,53 @@ class _ProfileStat extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ],
+    );
+  }
+}
+
+/// Cosmetic rank strip. Purely derived from lifetime XP, so it cannot go
+/// out of sync with saved progress.
+class _RankRow extends StatelessWidget {
+  final UserProgress progress;
+  final String code;
+  const _RankRow({required this.progress, required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final s = context.str;
+    final tier = BoredomRanks.forXp(progress.totalXp);
+    final next = BoredomRanks.xpToNext(progress.totalXp);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppKit.md,
+        vertical: AppKit.sm,
+      ),
+      decoration: BoxDecoration(
+        color: pal.accent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppKit.rMd),
+      ),
+      child: Row(
+        children: [
+          Text(tier.emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: AppKit.sm),
+          Text(
+            BoredomRanks.title(progress.totalXp, code: code),
+            style: TextStyle(
+              color: pal.textPrimary,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            next == null
+                ? s.rankMaxed
+                : s.rankToNext(next),
+            style: TextStyle(color: pal.textSecondary, fontSize: 11),
+          ),
+        ],
+      ),
     );
   }
 }

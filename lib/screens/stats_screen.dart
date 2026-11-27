@@ -7,6 +7,7 @@ import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_theme.dart';
 import '../widgets/kit.dart';
+import '../widgets/activity_heatmap.dart';
 import '../widgets/weekly_chart.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -42,6 +43,23 @@ class StatsScreen extends StatelessWidget {
     final activeDays = context.select<BoredomProvider, Set<DateTime>>(
       (p) => p.activeDaysLast35,
     );
+    final history = context.select<BoredomProvider, List<CompletedMission>>(
+      (p) => p.history,
+    );
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final cutoff = today.subtract(const Duration(days: 364));
+    final heatCounts = <DateTime, int>{};
+    for (final row in history) {
+      if (row.outcome == MissionOutcome.skipped) continue;
+      final day = DateTime(
+        row.completedAt.year,
+        row.completedAt.month,
+        row.completedAt.day,
+      );
+      if (day.isBefore(cutoff) || day.isAfter(today)) continue;
+      heatCounts[day] = (heatCounts[day] ?? 0) + 1;
+    }
 
     final categoryCounts = progress.categoryCounts;
     final maxCount = categoryCounts.values.isEmpty
@@ -168,6 +186,12 @@ class StatsScreen extends StatelessWidget {
             AppKit.sectionHeader(context, s, title: s.streakCalendarTitle),
             const SizedBox(height: AppKit.md),
             _StreakCalendar(activeDays: activeDays),
+            const SizedBox(height: AppKit.xxl),
+            AppKit.sectionHeader(context, s, title: s.heatmapTitle),
+            const SizedBox(height: AppKit.md),
+            RepaintBoundary(
+              child: ActivityHeatmap(counts: heatCounts),
+            ),
             const SizedBox(height: AppKit.xxl),
             AppKit.sectionHeader(context, s, title: s.xpPerCategoryTitle),
             const SizedBox(height: AppKit.md),

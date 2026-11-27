@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Timer? _pulseTimer;
   bool _pulsePrimary = false;
   bool _filtersOpen = false;
+  int? _lastSeenLevel;
 
   @override
   void initState() {
@@ -75,6 +76,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final code = s.code;
     final gained = provider.lastXpGained;
     final unlocked = provider.lastUnlockedAchievements;
+    final levelBefore = _lastSeenLevel;
+    final levelAfter = provider.progress.level;
+    _lastSeenLevel = levelAfter;
+    final leveledUp = levelBefore != null && levelAfter > levelBefore;
 
     if (gained == null && unlocked.isEmpty) return;
 
@@ -131,6 +136,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       );
     }
 
+    if (leveledUp) {
+      // A distinct moment from the XP gain: the level title actually
+      // changed, so give it its own beat instead of hiding it in a subtitle.
+      showCelebration(
+        context,
+        emoji: '⬆️',
+        title: s.levelUpTitle(levelAfter),
+        subtitle: provider.progress.levelTitleFor(code),
+        accent: pal.accent,
+        duration: const Duration(milliseconds: 2000),
+      );
+    }
+
     provider.clearLastXpGained();
     provider.clearLastUnlockedAchievements();
   }
@@ -158,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       (p) => p.progress.freezeTokens,
     );
     final actions = context.read<BoredomProvider>();
+    _lastSeenLevel ??= progress.level;
 
     return SafeArea(
       child: SingleChildScrollView(

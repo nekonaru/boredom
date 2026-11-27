@@ -311,6 +311,14 @@ class AppStrings {
   String get themeLight => _pick('Light', 'Terang');
   String get themeSystem => _pick('System', 'Sistem');
   String get themeBlack => _pick('Black', 'Hitam');
+  String get rankTitle => _pick('Rank', 'Peringkat');
+  String rankToNext(int xp) => _pick(
+        '$xp XP to next rank',
+        '$xp XP lagi ke peringkat berikutnya',
+      );
+  String get rankMaxed => _pick('Top rank reached', 'Peringkat tertinggi tercapai');
+  String levelUpTitle(int level) =>
+      _pick('Level $level reached!', 'Level $level tercapai!');
   String get themeModeTitle => _pick('Theme mode', 'Mode tema');
   String get fontScaleTitle => _pick('Text size', 'Ukuran teks');
   String get fontScaleSmall => _pick('Small', 'Kecil');
@@ -559,6 +567,7 @@ class AppStrings {
   String get mAvgXp => _pick('XP / Active Day', 'XP / Hari Aktif');
   String get mBestDay => _pick('Busiest Day', 'Hari Tersibuk');
   String get streakCalendarTitle => _pick('Streak Calendar', 'Kalender Streak');
+  String get heatmapTitle => _pick('Year in Review', 'Setahun dalam Sekilas');
   String get xpPerCategoryTitle => _pick('XP per Category', 'XP per Kategori');
 
   String weekdayName(int weekday) {
