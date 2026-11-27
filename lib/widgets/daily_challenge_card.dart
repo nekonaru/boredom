@@ -22,6 +22,7 @@ class DailyChallengeCard extends StatelessWidget {
     final completed = context.select<BoredomProvider, bool>(
       (p) => p.dailyChallengeCompleted,
     );
+    final provider = context.read<BoredomProvider>();
     final code = s.code;
 
     return Container(
@@ -75,7 +76,30 @@ class DailyChallengeCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           completed
-              ? Icon(Icons.check_circle, color: pal.success)
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle, color: pal.success),
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: () async {
+                        await provider.reopenDailyChallenge();
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(44, 32),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        s.reopenChallenge,
+                        style: TextStyle(
+                          color: pal.textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
               : ElevatedButton(
                   onPressed: () async {
                     buzzIfEnabled(context);
@@ -153,6 +177,7 @@ class DailyChallengeCard extends StatelessWidget {
                       ),
                     );
                     provider.clearLastXpGained();
+                    provider.clearLastUnlockedAchievements();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

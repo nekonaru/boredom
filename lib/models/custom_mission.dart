@@ -26,8 +26,16 @@ class CustomMission {
     this.archived = false,
   });
 
-  MissionCategory get missionCategory =>
-      category.isEmpty ? MissionCategory.custom : MissionCategory.custom;
+  /// Stored [category] may be a free-form custom category or the `name` of
+  /// a built-in category. Resolve built-ins when possible so stats and
+  /// charts do not silently bucket everything as custom.
+  MissionCategory get missionCategory {
+    if (category.isEmpty) return MissionCategory.custom;
+    for (final value in MissionCategory.values) {
+      if (value.name == category) return value;
+    }
+    return MissionCategory.custom;
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

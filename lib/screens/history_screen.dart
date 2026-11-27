@@ -25,6 +25,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _query = '';
   HistoryRange _range = HistoryRange.all;
   HistoryFilter _outcomeFilter = HistoryFilter.all;
+  HistorySort _sort = HistorySort.newestFirst;
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +46,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // row is O(n) instead of O(n*m) per build (n = rows, m = catalog size).
     final catalogMap = {for (final m in MissionCatalog.all) m.id: m};
 
-    final filtered = HistoryFilters.apply(
-      history,
-      query: _query,
-      range: _range,
-      outcome: _outcomeFilter,
-      now: DateTime.now(),
-      titleOf: (e) => _titleFor(e, catalogMap, code),
-      categoryOf: (e) => _categoryFor(e, catalogMap, code),
+    final filtered = HistoryFilters.sort(
+      HistoryFilters.apply(
+        history,
+        query: _query,
+        range: _range,
+        outcome: _outcomeFilter,
+        now: DateTime.now(),
+        titleOf: (e) => _titleFor(e, catalogMap, code),
+        categoryOf: (e) => _categoryFor(e, catalogMap, code),
+      ),
+      _sort,
     );
     final favoriteMissions = MissionCatalog.all
         .where((m) => favorites.contains(m.id))
@@ -255,6 +259,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             selected: _outcomeFilter == o,
                             onSelected: (_) =>
                                 setState(() => _outcomeFilter = o),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final order in HistorySort.values)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(s.historySortLabel(order)),
+                            selected: _sort == order,
+                            onSelected: (_) => setState(() => _sort = order),
                           ),
                         ),
                     ],
