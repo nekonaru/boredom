@@ -20,6 +20,7 @@ class StorageService {
   static const _kCustomMissions = 'boredom_custom_missions';
   static const _kCustomCategories = 'boredom_custom_categories';
   static const _kFavorites = 'boredom_favorites';
+  static const _kPinnedAchievements = 'boredom_pinned_achievements';
   static const _kDisliked = 'boredom_disliked';
   static const _kHaptics = 'boredom_haptics';
   static const _kOnboarding = 'boredom_onboarding_done';
@@ -246,6 +247,16 @@ class StorageService {
   Future<void> saveFavorites(Set<String> ids) async {
     final p = await prefs;
     await p.setStringList(_kFavorites, ids.toList());
+  }
+
+  Future<Set<String>> loadPinnedAchievements() async {
+    final p = await prefs;
+    return (p.getStringList(_kPinnedAchievements) ?? []).toSet();
+  }
+
+  Future<void> savePinnedAchievements(Set<String> ids) async {
+    final p = await prefs;
+    await p.setStringList(_kPinnedAchievements, ids.toList());
   }
 
   Future<Set<String>> loadDisliked() async {

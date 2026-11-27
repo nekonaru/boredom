@@ -21,6 +21,9 @@ class AchievementsScreen extends StatelessWidget {
     final unlockedIds = context.select<BoredomProvider, Set<String>>(
       (p) => p.achievements.map((a) => a.achievementId).toSet(),
     );
+    final pinnedIds = context.select<BoredomProvider, Set<String>>(
+      (p) => p.pinnedAchievements,
+    );
     final progress = context.select<BoredomProvider, UserProgress>(
       (p) => p.progress,
     );
@@ -82,9 +85,42 @@ class AchievementsScreen extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final a = all[index];
-                  return AchievementBadge(
-                    achievement: a,
-                    unlocked: unlockedIds.contains(a.id),
+                  final unlocked = unlockedIds.contains(a.id);
+                  final pinned = pinnedIds.contains(a.id);
+                  // A locked badge keeps the plain, non-interactive card.
+                  // Only unlocked badges expose the pin button.
+                  return Stack(
+                    children: [
+                      AchievementBadge(achievement: a, unlocked: unlocked),
+                      if (unlocked)
+                        Positioned(
+                          top: AppKit.xs,
+                          right: AppKit.xs / 2,
+                          child: Semantics(
+                            button: true,
+                            label: pinned
+                                ? 'Unpin ${a.title}'
+                                : 'Pin ${a.title}',
+                            child: IconButton(
+                              icon: Icon(
+                                pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                                size: 18,
+                                color: pinned ? pal.accent : pal.textSecondary,
+                              ),
+                              tooltip: pinned
+                                  ? 'Unpin achievement'
+                                  : 'Pin achievement',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints.tightFor(
+                                width: 34,
+                                height: 34,
+                              ),
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => actions.togglePinned(a.id),
+                            ),
+                          ),
+                        ),
+                    ],
                   );
                 },
                 childCount: all.length,

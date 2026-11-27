@@ -19,6 +19,9 @@ import 'language_provider.dart';
 
 const int kMaxRerollsPerDay = 3;
 
+/// Only three achievements can be pinned to the top of the list.
+const int kMaxPinnedAchievements = 3;
+
 /// Undo window for restoring the last completed mission.
 const Duration kUndoWindow = Duration(minutes: 5);
 
@@ -79,6 +82,7 @@ class BoredomProvider extends ChangeNotifier {
   List<CustomMission> customMissions = [];
   List<CustomCategory> customCategories = [];
   Set<String> favoriteIds = {};
+  Set<String> pinnedAchievements = {};
   Set<String> dislikedIds = {};
   Set<String> mutedCategories = {};
   List<SavedMission> savedMissions = [];
@@ -158,6 +162,7 @@ class BoredomProvider extends ChangeNotifier {
       storage.loadDefaultTime(),
       storage.loadDefaultLocation(),
       storage.loadDefaultEnergy(),
+      storage.loadPinnedAchievements(),
     ]);
     progress = results[0] as UserProgress;
     history = results[1] as List<CompletedMission>;
@@ -179,6 +184,7 @@ class BoredomProvider extends ChangeNotifier {
     final loadedTime = results[17] as String?;
     final loadedLocation = results[18] as String?;
     final loadedEnergy = results[19] as String?;
+    pinnedAchievements = (results[20] as Set<String>?) ?? {};
     if (loadedMood != null) {
       defaultMood = Mood.values.firstWhere(
         (m) => m.name == loadedMood,
@@ -1015,6 +1021,24 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool isPinned(String id) => pinnedAchievements.contains(id);
+
+  /// Pins or unpins an achievement. A fourth pin is ignored so the pinned
+  /// row stays short. Always publishes a new Set instance, because
+  /// `context.select` compares collections by value and would miss an
+  /// in-place mutation.
+  Future<void> togglePinned(String id) async {
+    if (pinnedAchievements.contains(id)) {
+      pinnedAchievements = {...pinnedAchievements}..remove(id);
+    } else if (pinnedAchievements.length < kMaxPinnedAchievements) {
+      pinnedAchievements = {...pinnedAchievements, id};
+    } else {
+      return;
+    }
+    await StorageService.instance.savePinnedAchievements(pinnedAchievements);
+    notifyListeners();
+  }
+
   bool isDisliked(String missionId) => dislikedIds.contains(missionId);
 
   /// Always publishes a new Set instance for the same reason as
@@ -1195,7 +1219,7 @@ class BoredomProvider extends ChangeNotifier {
   Future<String> exportBackup() async {
     final data = {
       'app': 'boredom',
-      'version': 1,
+      'version': 2,
       'exportedAt': DateTime.now().toIso8601String(),
       'progress': progress.toJson(),
       'history': history.map((e) => e.toJson()).toList(),
@@ -1218,6 +1242,7 @@ class BoredomProvider extends ChangeNotifier {
       'customMissions': customMissions.map((m) => m.toJson()).toList(),
       'customCategories': customCategories.map((c) => c.toJson()).toList(),
       'favorites': favoriteIds.toList(),
+      'pinnedAchievements': pinnedAchievements.toList(),
       'disliked': dislikedIds.toList(),
       'saved': savedMissions.map((m) => m.toJson()).toList(),
       'mutedCategories': mutedCategories.toList(),
@@ -1278,6 +1303,13 @@ class BoredomProvider extends ChangeNotifier {
           .toList();
       final importedFavorites =
           ((data['favorites'] as List?) ?? []).map((e) => '$e').toSet();
+      // Older backups have no pinned ids; an empty set is their safe
+      // default. Cap the restore at the same limit as a live pin toggle.
+      final importedPinned = ((data['pinnedAchievements'] as List?) ?? [])
+          .map((e) => '$e')
+          .toSet()
+          .take(kMaxPinnedAchievements)
+          .toSet();
       final importedDisliked =
           ((data['disliked'] as List?) ?? []).map((e) => '$e').toSet();
       final importedSaved = ((data['saved'] as List?) ?? [])
@@ -1317,6 +1349,7 @@ class BoredomProvider extends ChangeNotifier {
       customMissions = importedCustom;
       customCategories = importedCustomCategories;
       favoriteIds = importedFavorites;
+      pinnedAchievements = importedPinned;
       dislikedIds = importedDisliked;
       savedMissions = importedSaved;
       mutedCategories = importedMuted;
@@ -1332,6 +1365,7 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveCustomMissions(customMissions);
       await storage.saveCustomCategories(customCategories);
       await storage.saveFavorites(favoriteIds);
+      await storage.savePinnedAchievements(pinnedAchievements);
       await storage.saveDisliked(dislikedIds);
       await storage.saveSavedMissions(savedMissions);
       await storage.saveMutedCategories(mutedCategories);
@@ -1633,6 +1667,7 @@ class BoredomProvider extends ChangeNotifier {
     await storage.saveCustomMissions(const []);
     await storage.saveCustomCategories(const []);
     await storage.saveFavorites(const {});
+    await storage.savePinnedAchievements(const {});
     await storage.saveDisliked(const {});
     await storage.saveSavedMissions(const []);
     await storage.saveMutedCategories(const {});
@@ -1649,6 +1684,7 @@ class BoredomProvider extends ChangeNotifier {
     customMissions = [];
     customCategories = [];
     favoriteIds = {};
+    pinnedAchievements = {};
     dislikedIds = {};
     mutedCategories = {};
     savedMissions = [];
