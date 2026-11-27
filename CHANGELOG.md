@@ -11,6 +11,10 @@ Boredom gets a new foundation: four theme modes, a calmer first run, and motion 
 - **Interactive onboarding.** Five short steps let you choose a mood, roll a real mission, accept a preview, and opt into a daily reminder.
 - **History sorting.** Sort completed missions by newest, oldest, or most XP earned.
 - **Actionable empty states.** An empty History now offers a button that rolls a mission right away.
+- **Boredom ranks.** Five cosmetic tiers from bronze to mythic, derived from lifetime XP and shown on Profile.
+- **Year in review heatmap.** A 365-day activity grid on Stats that reveals your consistent stretches at a tap.
+- **Level-up celebration.** Crossing a level now gets its own confetti moment with the new absurd title.
+- **Achievement pinning.** Pin up to three achievements to keep them close, with pins surviving backup and restore.
 
 ## Improvements
 

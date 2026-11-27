@@ -11,6 +11,10 @@ Boredom mendapat fondasi baru: empat mode tema, pengalaman pertama yang lebih te
 - **Onboarding interaktif.** Lima langkah singkat membiarkanmu memilih mood, me-roll misi asli, menerima contoh, dan mengaktifkan pengingat harian.
 - **Urutan riwayat.** Urutkan misi selesai berdasarkan terbaru, terlama, atau XP terbesar.
 - **Empty state beraksi.** Riwayat yang kosong kini menawarkan tombol untuk langsung me-roll misi.
+- **Peringkat Boredom.** Lima tingkat kosmetik dari perunggu hingga mitik, dihitung dari total XP dan ditampilkan di Profile.
+- **Heatmap setahun.** Grid aktivitas 365 hari di Stats yang menunjukkan konsistensimu saat disentuh.
+- **Perayaan naik level.** Menembus level kini punya momen confetti tersendiri dengan gelar absurd yang baru.
+- **Sematkan achievement.** Pasang hingga tiga achievement agar mudah dilihat, dan tetap tersimpan lewat backup dan restore.
 
 ## Peningkatan
 
