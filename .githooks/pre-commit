@@ -1,0 +1,16 @@
+#!/bin/sh
+# Local gate. Files in this folder are committed; the hook path is set with
+# git config core.hooksPath .githooks on each machine.
+set -e
+
+echo "pre-commit: analyzing"
+flutter analyze --no-pub
+
+echo "pre-commit: testing"
+flutter test
+
+echo "pre-commit: checking for secrets in staged diff"
+git diff --cached --unified=0 | grep -Ei '(api[_-]?key|secret[_-]?key|password[_-]?value|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' && {
+  echo "pre-commit: possible secret in staged diff"
+  exit 1
+} || true

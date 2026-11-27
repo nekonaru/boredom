@@ -34,8 +34,23 @@ class BoredomApp extends StatelessWidget {
           title: 'Boredom',
           debugShowCheckedModeBanner: false,
           theme: buildBoredomTheme(light: true, accent: tp.accent),
-          darkTheme: buildBoredomTheme(light: false, accent: tp.accent),
-          themeMode: tp.isLight ? ThemeMode.light : ThemeMode.dark,
+          darkTheme: buildBoredomTheme(
+            light: false,
+            accent: tp.accent,
+            black: tp.themeMode == ThemeModeKind.black,
+          ),
+          themeMode: tp.materialThemeMode,
+          builder: (context, child) {
+            final media = MediaQuery.of(context);
+            return MediaQuery(
+              data: media.copyWith(
+                textScaler: TextScaler.linear(tp.fontScale),
+                disableAnimations:
+                    media.disableAnimations || tp.reduceMotion,
+              ),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
           locale: lang.locale,
           // Without these the time picker, date picker and text selection
           // toolbar stay English inside an otherwise Indonesian app.

@@ -118,6 +118,17 @@ class AppStrings {
     }
   }
 
+  String historySortLabel(HistorySort order) {
+    switch (order) {
+      case HistorySort.newestFirst:
+        return _pick('Newest', 'Terbaru');
+      case HistorySort.oldestFirst:
+        return _pick('Oldest', 'Terlama');
+      case HistorySort.xpHighest:
+        return _pick('Most XP', 'XP terbesar');
+    }
+  }
+
   String historyCount(int shown, int stored) {
     if (shown == stored) {
       return isId ? '$stored catatan tersimpan' : '$stored saved entries';
@@ -209,6 +220,7 @@ class AppStrings {
   String get missionStepsTitle => _pick('Mission steps', 'Langkah misi');
   String get missionStepsDone => _pick('All steps done! Nice.', 'Semua langkah selesai! Mantap.');
   String get skipBtn => _pick('Skip for now', 'Lewati dulu');
+  String get reopenChallenge => _pick('Reopen', 'Buka lagi');
   String xpSnack(int xp) =>
       _pick('Nice! +$xp XP', 'Mantap! +$xp XP');
   String get achievementSnack => _pick(
@@ -294,6 +306,18 @@ class AppStrings {
   String get appearanceTitle => _pick('Appearance', 'Tampilan');
   String get themeDark => _pick('Dark', 'Gelap');
   String get themeLight => _pick('Light', 'Terang');
+  String get themeSystem => _pick('System', 'Sistem');
+  String get themeBlack => _pick('Black', 'Hitam');
+  String get themeModeTitle => _pick('Theme mode', 'Mode tema');
+  String get fontScaleTitle => _pick('Text size', 'Ukuran teks');
+  String get fontScaleSmall => _pick('Small', 'Kecil');
+  String get fontScaleNormal => _pick('Normal', 'Normal');
+  String get fontScaleLarge => _pick('Large', 'Besar');
+  String get reduceMotionTitle => _pick('Reduce motion', 'Kurangi animasi');
+  String get reduceMotionDesc => _pick(
+        'Keep transitions gentle and still.',
+        'Perubahan tampilan dibuat lebih tenang.',
+      );
   String get accentTitle => _pick('Accent color', 'Warna aksen');
   String get hapticsTitle => _pick('Haptic feedback', 'Getaran haptic');
   String get hapticsDesc => _pick(

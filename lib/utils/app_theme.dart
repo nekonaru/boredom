@@ -57,10 +57,33 @@ class AppPalette {
         danger: const Color(0xFFC93A56),
         emptyBar: const Color(0xFFDCDCE1),
       );
+
+  /// True black AMOLED surface set. Only the surfaces change; semantic
+  /// colors stay identical to [dark] so status colors keep their meaning.
+  static AppPalette black(Color accent) => AppPalette(
+        background: const Color(0xFF000000),
+        surface: const Color(0xFF0D0D11),
+        surfaceElevated: const Color(0xFF17171E),
+        accent: accent,
+        textPrimary: const Color(0xFFF7F7FA),
+        textSecondary: const Color(0xFF9B9BA8),
+        success: const Color(0xFF57D19C),
+        warning: const Color(0xFFE0B457),
+        danger: const Color(0xFFE0637A),
+        emptyBar: const Color(0xFF202028),
+      );
 }
 
-ThemeData buildBoredomTheme({required bool light, required Color accent}) {
-  final pal = light ? AppPalette.light(accent) : AppPalette.dark(accent);
+ThemeData buildBoredomTheme({
+  required bool light,
+  required Color accent,
+  bool black = false,
+}) {
+  final pal = black && !light
+      ? AppPalette.black(accent)
+      : light
+          ? AppPalette.light(accent)
+          : AppPalette.dark(accent);
   final base = ThemeData(
     useMaterial3: true,
     brightness: light ? Brightness.light : Brightness.dark,
