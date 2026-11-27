@@ -1,5 +1,32 @@
 # Changelog
 
+## v5.0.0
+
+Boredom gets a new foundation: four theme modes, a calmer first run, and motion that respects your device.
+
+## New features
+
+- **Four theme modes.** Pick system, light, dark, or true black AMOLED. The old light/dark choice migrates automatically.
+- **Text size control.** Small, normal, and large scales apply across the whole app and persist between launches.
+- **Interactive onboarding.** Five short steps let you choose a mood, roll a real mission, accept a preview, and opt into a daily reminder.
+- **History sorting.** Sort completed missions by newest, oldest, or most XP earned.
+- **Actionable empty states.** An empty History now offers a button that rolls a mission right away.
+
+## Improvements
+
+- **Shared design tokens.** Typography, spacing, radius, and motion durations now live in one place, so screens stay consistent.
+- **Smoother motion.** Tab switches move in the direction you travel, XP and charts animate in, and new chips and skeletons use one animation language.
+- **Reduced motion setting.** The app follows the platform setting and lets you force gentler animations from Profile.
+- **Bilingual share cards.** Generated cards use the active language instead of always showing English.
+- **Reopen the daily challenge.** A finished challenge can be opened again from its card.
+- **Honest documentation.** README counts now match the actual 64 missions and 35 achievements in the code.
+
+## Bug fixes
+
+- **Skipped achievements no longer leak.** Completing the daily challenge now clears the transient achievement list, matching Home and History.
+- **Custom mission category mapping.** A custom mission whose category matches a built-in now resolves to that category in stats.
+- **Motion no longer crashes on taps.** Reduced-motion reads no longer subscribe from button handlers.
+
 ## v4.4.0
 
 Mission steps finally respond to every tap, and every win now lands with a confetti celebration.

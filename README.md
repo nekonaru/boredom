@@ -54,7 +54,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 
 | Feature | Description |
 |---------|-------------|
-| **Mission generator** | Random mission from a 65-mission catalog (55 core + 10 Daily Wellness), matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
+| **Mission generator** | Random mission from a 64-mission catalog (54 core + 10 Daily Wellness), matched to mood, time, location, and energy, weighted toward least-played categories, with seasonal missions and smart fallback so you always get one |
 | **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
 | **Quick wins** | Narrow rolls to missions of 15 minutes or less |
@@ -73,7 +73,7 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | **Streaks** | Daily streak plus longest streak, with a 1-day grace period, freeze tokens, and an at-risk warning |
 | **Milestone bonus** | Extra XP every time you cross a 10-level boundary |
 | **Quest chains** | 4 multi-step arcs ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") with a big final reward |
-| **Achievements** | 29 achievements, progress-based and event-based (like "Night Owl") |
+| **Achievements** | 35 achievements, progress-based and event-based (like "Night Owl") |
 | **Daily challenge** | One special challenge per day, same for everyone on the same date, big XP reward |
 
 ### Statistics and History
