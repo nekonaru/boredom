@@ -7,9 +7,10 @@ Goal: expand Boredom from a single-roll game into a deeper offline game with jou
 - Existing catalogs, providers, screens, and tests in `lib/` and `test/`.
 
 ## Outputs
-- Four tagged releases: `v5.0.0` foundation, `v5.1.0` content and progression, `v5.2.0` insight and reach, `v5.3.0` polish.
-- Bilingual release notes and changelogs for every tag.
-- Both APKs attached to every GitHub Release.
+- One tagged release, `v5.0.0`, covering the foundation and progression work delivered in this wave.
+- Bilingual release notes and changelog for the tag.
+- Both APKs attached to the GitHub Release.
+- Deferred to later waves, tracked here so they are not lost: mission packs and new categories, time of day rolls, mission decks, journal entries, smart notifications, quick find, and monthly report card.
 
 ## Constraints
 - Fully offline. No accounts, no HTTP, no new runtime packages.
