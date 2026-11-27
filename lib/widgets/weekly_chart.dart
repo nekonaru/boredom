@@ -17,12 +17,18 @@ class WeeklyChart extends StatelessWidget {
       child: SizedBox(
         height: 120,
         width: double.infinity,
-        child: CustomPaint(
-          painter: ActivityBarsPainter(
-            counts: counts,
-            active: pal.accent,
-            inactive: pal.accent.withValues(alpha: 0.45),
-            empty: pal.emptyBar,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: AppKit.motion(context, const Duration(milliseconds: 600)),
+          curve: AppKit.easeOut,
+          builder: (context, progress, _) => CustomPaint(
+            painter: ActivityBarsPainter(
+              counts: counts,
+              active: pal.accent,
+              inactive: pal.accent.withValues(alpha: 0.45),
+              empty: pal.emptyBar,
+              reveal: progress,
+            ),
           ),
         ),
       ),
@@ -44,12 +50,18 @@ class MonthlyChart extends StatelessWidget {
       child: SizedBox(
         height: 100,
         width: double.infinity,
-        child: CustomPaint(
-          painter: ActivityBarsPainter(
-            counts: counts,
-            active: pal.accent,
-            inactive: pal.accent.withValues(alpha: 0.45),
-            empty: pal.emptyBar,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: AppKit.motion(context, const Duration(milliseconds: 600)),
+          curve: AppKit.easeOut,
+          builder: (context, progress, _) => CustomPaint(
+            painter: ActivityBarsPainter(
+              counts: counts,
+              active: pal.accent,
+              inactive: pal.accent.withValues(alpha: 0.45),
+              empty: pal.emptyBar,
+              reveal: progress,
+            ),
           ),
         ),
       ),
@@ -62,11 +74,13 @@ class ActivityBarsPainter extends CustomPainter {
   final Color active;
   final Color inactive;
   final Color empty;
+  final double reveal;
   ActivityBarsPainter({
     required this.counts,
     required this.active,
     required this.inactive,
     required this.empty,
+    this.reveal = 1,
   });
 
   @override
@@ -89,7 +103,7 @@ class ActivityBarsPainter extends CustomPainter {
 
     for (var i = 0; i < counts.length; i++) {
       final ratio = counts[i] / maxValue;
-      final barHeight = (size.height - 18) * ratio;
+      final barHeight = (size.height - 18) * ratio * reveal.clamp(0.0, 1.0);
       final x = i * (barWidth + gap);
       final y = size.height - 18 - barHeight;
       final isToday = i == todayIndex;
@@ -119,6 +133,7 @@ class ActivityBarsPainter extends CustomPainter {
     }
     return oldDelegate.active != active ||
         oldDelegate.inactive != inactive ||
-        oldDelegate.empty != empty;
+        oldDelegate.empty != empty ||
+        oldDelegate.reveal != reveal;
   }
 }

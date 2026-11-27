@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../models/user_progress.dart';
 import '../providers/theme_provider.dart';
+import '../widgets/kit.dart';
 
 class XpBar extends StatelessWidget {
   final UserProgress progress;
@@ -43,11 +44,20 @@ class XpBar extends StatelessWidget {
               const SizedBox(height: 4),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
-                child: LinearProgressIndicator(
-                  value: progress.levelProgress.clamp(0, 1),
-                  minHeight: 6,
-                  backgroundColor: pal.emptyBar,
-                  valueColor: AlwaysStoppedAnimation(pal.accent),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(
+                    begin: 0,
+                    end: progress.levelProgress.clamp(0, 1),
+                  ),
+                  duration: AppKit.motion(
+                      context, const Duration(milliseconds: 500)),
+                  curve: AppKit.easeOut,
+                  builder: (context, value, _) => LinearProgressIndicator(
+                    value: value,
+                    minHeight: 6,
+                    backgroundColor: pal.emptyBar,
+                    valueColor: AlwaysStoppedAnimation(pal.accent),
+                  ),
                 ),
               ),
             ],
