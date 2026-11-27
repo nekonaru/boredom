@@ -55,7 +55,7 @@ Ada juga **Chaos Mode**, yang mengabaikan semua filter sehingga apa pun bisa mun
 
 | Fitur | Deskripsi |
 |-------|-----------|
-| **Generator misi** | Misi acak dari katalog 55 misi, disesuaikan dengan mood, waktu, lokasi, dan energi, diberi bobot ke kategori yang paling jarang dimainkan, dengan misi musiman dan fallback cerdas sehingga kamu selalu dapat satu |
+| **Generator misi** | Misi acak dari katalog 64 misi (54 misi inti + 10 Daily Wellness), disesuaikan dengan mood, waktu, lokasi, dan energi, diberi bobot ke kategori yang paling jarang dimainkan, dengan misi musiman dan fallback cerdas sehingga kamu selalu dapat satu |
 | **Chaos Mode** | Mengabaikan semua filter, membuka misi khusus chaos |
 | **Terima / reroll** | Terima misi untuk XP, reroll hingga 3x per hari |
 | **Quick wins** | Persempit hasil ke misi berdurasi 15 menit atau kurang |
@@ -74,7 +74,7 @@ Ada juga **Chaos Mode**, yang mengabaikan semua filter sehingga apa pun bisa mun
 | **Streak** | Streak harian plus streak terpanjang, dengan masa tenggang 1 hari, token freeze, dan peringatan saat terancam putus |
 | **Bonus milestone** | XP tambahan setiap kali melewati batas 10 level |
 | **Quest chain** | 4 alur multi-langkah ("Touch Grass Arc", "Creator Arc", "Reset Arc", "Deep Work Arc") dengan hadiah akhir besar |
-| **Achievement** | 29 achievement, berbasis progres dan berbasis kejadian (seperti "Night Owl") |
+| **Achievement** | 35 achievement, berbasis progres dan berbasis kejadian (seperti "Night Owl") |
 | **Tantangan harian** | Satu tantangan khusus per hari, sama untuk semua orang pada tanggal yang sama, hadiah XP besar |
 
 ### Statistik dan Riwayat

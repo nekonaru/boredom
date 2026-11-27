@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final code = s.code;
     final gained = provider.lastXpGained;
     final unlocked = provider.lastUnlockedAchievements;
+    final leveledUpTo = provider.lastLevelUpTo;
 
     if (gained == null && unlocked.isEmpty) return;
 
@@ -131,8 +132,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       );
     }
 
+    if (leveledUpTo != null) {
+      // A distinct moment from the XP gain: the level title actually
+      // changed, so give it its own beat instead of hiding it in a subtitle.
+      showCelebration(
+        context,
+        emoji: '⬆️',
+        title: s.levelUpTitle(leveledUpTo),
+        subtitle: provider.progress.levelTitleFor(code),
+        accent: pal.accent,
+        duration: const Duration(milliseconds: 2000),
+      );
+    }
+
     provider.clearLastXpGained();
     provider.clearLastUnlockedAchievements();
+    provider.clearLastLevelUp();
   }
 
   @override
@@ -220,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             XpBar(progress: progress),
             const SizedBox(height: AppKit.lg),
 
-            // Quick-stats row: streak, freeze tokens, this week — combined
+            // Quick-stats row: streak, freeze tokens, this week - combined
             // into one card so the screen doesn't feel like a wall of data.
             AppKit.card(
               color: pal.surface,
@@ -283,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               const SizedBox(height: AppKit.lg),
             ],
 
-            // Daily challenge — prominent, right under the stats.
+            // Daily challenge - prominent, right under the stats.
             RepaintBoundary(
               child: const DailyChallengeCard(),
             ),
@@ -295,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
             const SizedBox(height: AppKit.xl),
 
-            // Filters — collapsed into one expandable card so the screen
+            // Filters - collapsed into one expandable card so the screen
             // does not scroll for miles before reaching the primary action.
             AppKit.card(
               color: pal.surface,
@@ -396,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
             const SizedBox(height: AppKit.xl),
 
-            // Primary action — pulsed so it invites a tap.
+            // Primary action - pulsed so it invites a tap.
             AppKit.pulseWrapper(
               pulse: _pulsePrimary,
               child: AppKit.primaryButton(
@@ -423,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
             const SizedBox(height: AppKit.lg),
 
-            // Weekly insights — shown only when there is enough history,
+            // Weekly insights - shown only when there is enough history,
             // and placed at the bottom so it never crowds the primary action.
             RepaintBoundary(
               child: const WeeklyInsights(),

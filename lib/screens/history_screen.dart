@@ -12,6 +12,8 @@ import '../services/storage_service.dart';
 import '../utils/date_format.dart';
 import '../utils/feedback.dart';
 import '../widgets/inbox_section.dart';
+import '../widgets/kit.dart';
+import '../widgets/mission_sheet.dart';
 import '../widgets/quest_chain_section.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -25,6 +27,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _query = '';
   HistoryRange _range = HistoryRange.all;
   HistoryFilter _outcomeFilter = HistoryFilter.all;
+  HistorySort _sort = HistorySort.newestFirst;
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +48,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // row is O(n) instead of O(n*m) per build (n = rows, m = catalog size).
     final catalogMap = {for (final m in MissionCatalog.all) m.id: m};
 
-    final filtered = HistoryFilters.apply(
-      history,
-      query: _query,
-      range: _range,
-      outcome: _outcomeFilter,
-      now: DateTime.now(),
-      titleOf: (e) => _titleFor(e, catalogMap, code),
-      categoryOf: (e) => _categoryFor(e, catalogMap, code),
+    final filtered = HistoryFilters.sort(
+      HistoryFilters.apply(
+        history,
+        query: _query,
+        range: _range,
+        outcome: _outcomeFilter,
+        now: DateTime.now(),
+        titleOf: (e) => _titleFor(e, catalogMap, code),
+        categoryOf: (e) => _categoryFor(e, catalogMap, code),
+      ),
+      _sort,
     );
     final favoriteMissions = MissionCatalog.all
         .where((m) => favorites.contains(m.id))
@@ -260,6 +266,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final order in HistorySort.values)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(s.historySortLabel(order)),
+                            selected: _sort == order,
+                            onSelected: (_) => setState(() => _sort = order),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 12),
                 // Says out loud how many rows are stored versus how many
                 // you have actually completed, so a capped list can never
@@ -288,19 +311,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
               sliver: SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text(
-                    HistoryFilters.isUnfiltered(
-                      query: _query,
-                      range: _range,
-                      outcome: _outcomeFilter,
-                    )
-                        ? s.historyEmpty
-                        : s.searchEmpty,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: pal.textSecondary),
-                  ),
+                child: AppKit.emptyState(
+                  context,
+                  emoji: HistoryFilters.isUnfiltered(
+                          query: _query,
+                          range: _range,
+                          outcome: _outcomeFilter)
+                      ? '🎲'
+                      : '🔍',
+                  title: HistoryFilters.isUnfiltered(
+                          query: _query,
+                          range: _range,
+                          outcome: _outcomeFilter)
+                      ? s.historyEmptyTitle
+                      : s.searchEmpty,
+                  subtitle: HistoryFilters.isUnfiltered(
+                          query: _query,
+                          range: _range,
+                          outcome: _outcomeFilter)
+                      ? s.historyEmpty
+                      : '',
+                  actionLabel: s.rollMissionShort,
+                  onAction: () async {
+                    actions.rollMission();
+                    if (context.mounted) await showMissionSheet(context);
+                    // The level-up toast belongs to this screen when the
+                    // completion happened here; clear it so Home cannot
+                    // replay it later.
+                    actions.clearLastXpGained();
+                    actions.clearLastUnlockedAchievements();
+                    actions.clearLastLevelUp();
+                  },
                 ),
               ),
             )

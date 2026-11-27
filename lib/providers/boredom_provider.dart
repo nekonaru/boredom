@@ -19,6 +19,9 @@ import 'language_provider.dart';
 
 const int kMaxRerollsPerDay = 3;
 
+/// Only three achievements can be pinned to the top of the list.
+const int kMaxPinnedAchievements = 3;
+
 /// Undo window for restoring the last completed mission.
 const Duration kUndoWindow = Duration(minutes: 5);
 
@@ -73,12 +76,22 @@ class BoredomProvider extends ChangeNotifier {
 
   UserProgress progress = const UserProgress();
   List<CompletedMission> history = [];
+  // Cached id set so widgets can `select` a stable instance. Building a new
+  // Set in a selector always compares unequal (Set uses identity ==) and
+  // would rebuild the grid on every provider notification.
+  Set<String> _unlockedAchievementIds = const <String>{};
+  Set<String> get unlockedAchievementIds => _unlockedAchievementIds;
+
+  void _syncAchievementIds() => _unlockedAchievementIds =
+      achievements.map((a) => a.achievementId).toSet();
+
   List<UnlockedAchievement> achievements = [];
   DailyChallengeState? dailyChallengeState;
   QuestChainProgress? questChainProgress;
   List<CustomMission> customMissions = [];
   List<CustomCategory> customCategories = [];
   Set<String> favoriteIds = {};
+  Set<String> pinnedAchievements = {};
   Set<String> dislikedIds = {};
   Set<String> mutedCategories = {};
   List<SavedMission> savedMissions = [];
@@ -123,6 +136,13 @@ class BoredomProvider extends ChangeNotifier {
   List<Achievement> lastUnlockedAchievements = [];
   bool lastFreezeUsed = false;
 
+  /// Level reached by the most recent XP action, when it crossed a level.
+  /// Consumed by whichever screen is showing the celebration, so a level-up
+  /// from History or the daily card is not lost and Home never shows a stale
+  /// one later. Null means nothing to celebrate.
+  int? lastLevelUpTo;
+  void clearLastLevelUp() => lastLevelUpTo = null;
+
   Future<void> init() async {
     try {
       await _load();
@@ -158,10 +178,12 @@ class BoredomProvider extends ChangeNotifier {
       storage.loadDefaultTime(),
       storage.loadDefaultLocation(),
       storage.loadDefaultEnergy(),
+      storage.loadPinnedAchievements(),
     ]);
     progress = results[0] as UserProgress;
     history = results[1] as List<CompletedMission>;
     achievements = results[2] as List<UnlockedAchievement>;
+    _syncAchievementIds();
     questChainProgress = results[3] as QuestChainProgress?;
     customMissions = results[4] as List<CustomMission>;
     customCategories = results[5] as List<CustomCategory>;
@@ -179,6 +201,7 @@ class BoredomProvider extends ChangeNotifier {
     final loadedTime = results[17] as String?;
     final loadedLocation = results[18] as String?;
     final loadedEnergy = results[19] as String?;
+    pinnedAchievements = (results[20] as Set<String>?) ?? {};
     if (loadedMood != null) {
       defaultMood = Mood.values.firstWhere(
         (m) => m.name == loadedMood,
@@ -822,6 +845,7 @@ class BoredomProvider extends ChangeNotifier {
     }
 
     _captureUndo();
+    final levelBefore = progress.level;
     progress = progress.copyWith(
       totalXp: progress.totalXp + gainedXp,
       streakDays: streakDays,
@@ -837,6 +861,7 @@ class BoredomProvider extends ChangeNotifier {
       freezeTokensEarned: freezeTokensEarned,
     );
     lastXpGained = gainedXp;
+    _noteLevelUp(levelBefore, progress.level);
 
     final entry = CompletedMission(
       missionId: mission.id,
@@ -868,12 +893,19 @@ class BoredomProvider extends ChangeNotifier {
 
     newlyUnlocked.addAll(_evaluateThresholdAchievements(now));
     if (newlyUnlocked.isNotEmpty) {
+      _syncAchievementIds();
       await StorageService.instance.saveAchievements(achievements);
     }
     lastUnlockedAchievements = newlyUnlocked;
 
     notifyListeners();
     return newlyUnlocked;
+  }
+
+  /// Publishes a level-up signal when an XP action crosses a level. The
+  /// first completion of a session has no watermark, so it is ignored.
+  void _noteLevelUp(int before, int after) {
+    if (after > before) lastLevelUpTo = after;
   }
 
   /// Restores everything to the moment before the last XP-granting action
@@ -885,6 +917,7 @@ class BoredomProvider extends ChangeNotifier {
     if (snapshot == null) return false;
     progress = snapshot;
     achievements = List<UnlockedAchievement>.from(_undoAchievements);
+    _syncAchievementIds();
     // Undoing a finished quest chain must bring the chain back, otherwise
     // the steps completed for it are lost while its XP is rolled back.
     questChainProgress = _undoChainProgress;
@@ -1015,12 +1048,29 @@ class BoredomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool isPinned(String id) => pinnedAchievements.contains(id);
+
+  /// Pins or unpins an achievement. A fourth pin is ignored so the pinned
+  /// row stays short. Always publishes a new Set instance, because
+  /// `context.select` uses `==` and Set equality is identity, so an in-place
+  /// mutation would be invisible to selectors.
+  Future<void> togglePinned(String id) async {
+    if (pinnedAchievements.contains(id)) {
+      pinnedAchievements = {...pinnedAchievements}..remove(id);
+    } else if (pinnedAchievements.length < kMaxPinnedAchievements) {
+      pinnedAchievements = {...pinnedAchievements, id};
+    } else {
+      return;
+    }
+    await StorageService.instance.savePinnedAchievements(pinnedAchievements);
+    notifyListeners();
+  }
+
   bool isDisliked(String missionId) => dislikedIds.contains(missionId);
 
   /// Always publishes a new Set instance for the same reason as
-  /// [toggleFavorite]: an in-place mutation is invisible to the
-  /// DeepCollectionEquality that `context.select` uses, so anything
-  /// selecting the collection itself would freeze.
+  /// [toggleFavorite]: Set equality is identity, so an in-place mutation
+  /// is invisible to `context.select` and anything selecting it freezes.
   Future<void> toggleDislike(String missionId) async {
     if (dislikedIds.contains(missionId)) {
       dislikedIds = {...dislikedIds}..remove(missionId);
@@ -1145,6 +1195,7 @@ class BoredomProvider extends ChangeNotifier {
     }
 
     _captureUndo();
+    final levelBefore = progress.level;
     progress = progress.copyWith(
       totalXp: progress.totalXp + gainedXp,
       streakDays: newStreak,
@@ -1159,6 +1210,7 @@ class BoredomProvider extends ChangeNotifier {
           outcome.countsAsActivity ? resolved.tokensEarned : progress.freezeTokensEarned,
     );
     lastXpGained = gainedXp;
+    _noteLevelUp(levelBefore, progress.level);
 
     final entry = CompletedMission(
       missionId: mission.id,
@@ -1195,7 +1247,7 @@ class BoredomProvider extends ChangeNotifier {
   Future<String> exportBackup() async {
     final data = {
       'app': 'boredom',
-      'version': 1,
+      'version': 2,
       'exportedAt': DateTime.now().toIso8601String(),
       'progress': progress.toJson(),
       'history': history.map((e) => e.toJson()).toList(),
@@ -1218,6 +1270,7 @@ class BoredomProvider extends ChangeNotifier {
       'customMissions': customMissions.map((m) => m.toJson()).toList(),
       'customCategories': customCategories.map((c) => c.toJson()).toList(),
       'favorites': favoriteIds.toList(),
+      'pinnedAchievements': pinnedAchievements.toList(),
       'disliked': dislikedIds.toList(),
       'saved': savedMissions.map((m) => m.toJson()).toList(),
       'mutedCategories': mutedCategories.toList(),
@@ -1278,6 +1331,13 @@ class BoredomProvider extends ChangeNotifier {
           .toList();
       final importedFavorites =
           ((data['favorites'] as List?) ?? []).map((e) => '$e').toSet();
+      // Older backups have no pinned ids; an empty set is their safe
+      // default. Cap the restore at the same limit as a live pin toggle.
+      final importedPinned = ((data['pinnedAchievements'] as List?) ?? [])
+          .map((e) => '$e')
+          .toSet()
+          .take(kMaxPinnedAchievements)
+          .toSet();
       final importedDisliked =
           ((data['disliked'] as List?) ?? []).map((e) => '$e').toSet();
       final importedSaved = ((data['saved'] as List?) ?? [])
@@ -1312,11 +1372,13 @@ class BoredomProvider extends ChangeNotifier {
       progress = importedProgress;
       history = importedHistory;
       achievements = importedAchievements;
+      _syncAchievementIds();
       dailyChallengeState = importedChallenge;
       questChainProgress = importedChainSafe;
       customMissions = importedCustom;
       customCategories = importedCustomCategories;
       favoriteIds = importedFavorites;
+      pinnedAchievements = importedPinned;
       dislikedIds = importedDisliked;
       savedMissions = importedSaved;
       mutedCategories = importedMuted;
@@ -1332,6 +1394,7 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveCustomMissions(customMissions);
       await storage.saveCustomCategories(customCategories);
       await storage.saveFavorites(favoriteIds);
+      await storage.savePinnedAchievements(pinnedAchievements);
       await storage.saveDisliked(dislikedIds);
       await storage.saveSavedMissions(savedMissions);
       await storage.saveMutedCategories(mutedCategories);
@@ -1443,6 +1506,7 @@ class BoredomProvider extends ChangeNotifier {
           (newCategoryCounts[challenge.category.name] ?? 0) + 1;
     }
 
+    final levelBefore = progress.level;
     progress = progress.copyWith(
       totalXp: progress.totalXp + gainedXp,
       streakDays: streakDays,
@@ -1456,6 +1520,7 @@ class BoredomProvider extends ChangeNotifier {
       freezeTokensEarned: freezeTokensEarned,
     );
     lastXpGained = gainedXp;
+    _noteLevelUp(levelBefore, progress.level);
 
     final entry = CompletedMission(
       missionId: challenge.id,
@@ -1577,6 +1642,7 @@ class BoredomProvider extends ChangeNotifier {
       newCategoryCounts[chain.category.name] =
           (newCategoryCounts[chain.category.name] ?? 0) + 1;
 
+      final levelBefore = progress.level;
       progress = progress.copyWith(
         totalXp: progress.totalXp + gainedXp,
         streakDays: newStreak,
@@ -1590,6 +1656,7 @@ class BoredomProvider extends ChangeNotifier {
         freezeTokensEarned: resolved.tokensEarned,
       );
       lastXpGained = gainedXp;
+      _noteLevelUp(levelBefore, progress.level);
 
       final entry = CompletedMission(
         missionId: 'chain_${chain.id}',
@@ -1633,6 +1700,7 @@ class BoredomProvider extends ChangeNotifier {
     await storage.saveCustomMissions(const []);
     await storage.saveCustomCategories(const []);
     await storage.saveFavorites(const {});
+    await storage.savePinnedAchievements(const {});
     await storage.saveDisliked(const {});
     await storage.saveSavedMissions(const []);
     await storage.saveMutedCategories(const {});
@@ -1645,10 +1713,12 @@ class BoredomProvider extends ChangeNotifier {
     progress = const UserProgress();
     history = [];
     achievements = [];
+    _syncAchievementIds();
     questChainProgress = null;
     customMissions = [];
     customCategories = [];
     favoriteIds = {};
+    pinnedAchievements = {};
     dislikedIds = {};
     mutedCategories = {};
     savedMissions = [];

@@ -85,6 +85,24 @@ class HistoryFilters {
         .toList();
   }
 
+  /// Sorts filtered rows for display. Never mutates the input list, so
+  /// provider state stays untouched.
+  static List<CompletedMission> sort(
+    List<CompletedMission> entries,
+    HistorySort order,
+  ) {
+    final copy = List<CompletedMission>.from(entries);
+    switch (order) {
+      case HistorySort.newestFirst:
+        copy.sort((a, b) => b.completedAt.compareTo(a.completedAt));
+      case HistorySort.oldestFirst:
+        copy.sort((a, b) => a.completedAt.compareTo(b.completedAt));
+      case HistorySort.xpHighest:
+        copy.sort((a, b) => b.xpEarned.compareTo(a.xpEarned));
+    }
+    return copy;
+  }
+
   /// True when no narrowing is active, used to pick the empty-state copy.
   static bool isUnfiltered({
     required String query,

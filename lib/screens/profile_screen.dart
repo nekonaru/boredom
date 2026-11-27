@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/mission.dart';
+import '../models/boredom_rank.dart';
 import '../models/custom_mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
@@ -41,8 +42,14 @@ class ProfileScreen extends StatelessWidget {
     final isIndonesian = context.select<LanguageProvider, bool>(
       (p) => p.isIndonesian,
     );
-    final isLight = context.select<ThemeProvider, bool>(
-      (p) => p.isLight,
+    final themeMode = context.select<ThemeProvider, ThemeModeKind>(
+      (p) => p.themeMode,
+    );
+    final fontScale = context.select<ThemeProvider, double>(
+      (p) => p.fontScale,
+    );
+    final reduceMotion = context.select<ThemeProvider, bool>(
+      (p) => p.reduceMotion,
     );
     final accentIndex = context.select<ThemeProvider, int>(
       (p) => p.accentIndex,
@@ -71,6 +78,8 @@ class ProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   XpBar(progress: progress),
+                  const SizedBox(height: AppKit.md),
+                  _RankRow(progress: progress, code: s.code),
                   const SizedBox(height: AppKit.lg),
                   const Divider(height: 1, thickness: 1),
                   const SizedBox(height: AppKit.lg),
@@ -152,7 +161,9 @@ class ProfileScreen extends StatelessWidget {
             _AppearanceSection(
               s: s,
               pal: pal,
-              isLight: isLight,
+              themeMode: themeMode,
+              fontScale: fontScale,
+              reduceMotion: reduceMotion,
               accentIndex: accentIndex,
               hapticsEnabled: hapticsEnabled,
               provider: provider,
@@ -347,7 +358,9 @@ class ProfileScreen extends StatelessWidget {
 class _AppearanceSection extends StatelessWidget {
   final AppStrings s;
   final AppPalette pal;
-  final bool isLight;
+  final ThemeModeKind themeMode;
+  final double fontScale;
+  final bool reduceMotion;
   final int accentIndex;
   final bool hapticsEnabled;
   final BoredomProvider provider;
@@ -355,7 +368,9 @@ class _AppearanceSection extends StatelessWidget {
   const _AppearanceSection({
     required this.s,
     required this.pal,
-    required this.isLight,
+    required this.themeMode,
+    required this.fontScale,
+    required this.reduceMotion,
     required this.accentIndex,
     required this.hapticsEnabled,
     required this.provider,
@@ -374,19 +389,59 @@ class _AppearanceSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SegmentedButton<bool>(
-                segments: [
-                  ButtonSegment(value: false, label: Text(s.themeDark)),
-                  ButtonSegment(value: true, label: Text(s.themeLight)),
+              Text(
+                s.themeModeTitle,
+                style: TextStyle(color: pal.textSecondary, fontSize: 12),
+              ),
+              const SizedBox(height: AppKit.sm),
+              Wrap(
+                spacing: AppKit.sm,
+                children: [
+                  for (final mode in ThemeModeKind.values)
+                    _ThemeChip(
+                      label: switch (mode) {
+                        ThemeModeKind.system => s.themeSystem,
+                        ThemeModeKind.light => s.themeLight,
+                        ThemeModeKind.dark => s.themeDark,
+                        ThemeModeKind.black => s.themeBlack,
+                      },
+                      selected: mode == themeMode,
+                      onTap: () =>
+                          context.read<ThemeProvider>().setThemeMode(mode),
+                    ),
                 ],
-                selected: {isLight},
+              ),
+              const SizedBox(height: AppKit.lg),
+              Text(
+                s.fontScaleTitle,
+                style: TextStyle(color: pal.textSecondary, fontSize: 12),
+              ),
+              const SizedBox(height: AppKit.sm),
+              SegmentedButton<double>(
+                segments: [
+                  ButtonSegment(value: 0.9, label: Text(s.fontScaleSmall)),
+                  ButtonSegment(value: 1.0, label: Text(s.fontScaleNormal)),
+                  ButtonSegment(value: 1.15, label: Text(s.fontScaleLarge)),
+                ],
+                selected: {fontScale},
                 onSelectionChanged: (selected) {
-                  context.read<ThemeProvider>().setLight(selected.first);
+                  context.read<ThemeProvider>().setFontScale(selected.first);
                 },
                 showSelectedIcon: false,
                 style: SegmentedButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                 ),
+              ),
+              const SizedBox(height: AppKit.lg),
+              AppKit.toggleRow(
+                context,
+                emoji: '🎞️',
+                title: s.reduceMotionTitle,
+                subtitle: s.reduceMotionDesc,
+                value: reduceMotion,
+                onChanged: () => context
+                    .read<ThemeProvider>()
+                    .setReduceMotion(!reduceMotion),
               ),
               const SizedBox(height: AppKit.md),
               Text(
@@ -1003,6 +1058,103 @@ class _ProfileStat extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ],
+    );
+  }
+}
+
+/// Cosmetic rank strip. Purely derived from lifetime XP, so it cannot go
+/// out of sync with saved progress.
+class _RankRow extends StatelessWidget {
+  final UserProgress progress;
+  final String code;
+  const _RankRow({required this.progress, required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final s = context.str;
+    final tier = BoredomRanks.forXp(progress.totalXp);
+    final next = BoredomRanks.xpToNext(progress.totalXp);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppKit.md,
+        vertical: AppKit.sm,
+      ),
+      decoration: BoxDecoration(
+        color: pal.accent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppKit.rMd),
+      ),
+      child: Row(
+        children: [
+          Text(tier.emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: AppKit.sm),
+          Text(
+            BoredomRanks.title(progress.totalXp, code: code),
+            style: TextStyle(
+              color: pal.textPrimary,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            next == null
+                ? s.rankMaxed
+                : s.rankToNext(next),
+            style: TextStyle(color: pal.textSecondary, fontSize: 11),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One selectable theme mode chip. Uses a semantic label so screen readers
+/// announce the choice instead of reading only the short text.
+class _ThemeChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _ThemeChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Semantics(
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppKit.rPill),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppKit.md,
+            vertical: AppKit.sm,
+          ),
+          decoration: BoxDecoration(
+            color: selected
+                ? pal.accent.withValues(alpha: 0.2)
+                : pal.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppKit.rPill),
+            border: Border.all(
+              color: selected ? pal.accent : pal.textSecondary.withValues(alpha: 0.25),
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? pal.accent : pal.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

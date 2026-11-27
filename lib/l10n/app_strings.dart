@@ -118,6 +118,17 @@ class AppStrings {
     }
   }
 
+  String historySortLabel(HistorySort order) {
+    switch (order) {
+      case HistorySort.newestFirst:
+        return _pick('Newest', 'Terbaru');
+      case HistorySort.oldestFirst:
+        return _pick('Oldest', 'Terlama');
+      case HistorySort.xpHighest:
+        return _pick('Most XP', 'XP terbesar');
+    }
+  }
+
   String historyCount(int shown, int stored) {
     if (shown == stored) {
       return isId ? '$stored catatan tersimpan' : '$stored saved entries';
@@ -219,6 +230,9 @@ class AppStrings {
   // Missions tab
   String get missionsTitle => _pick('Missions', 'Misi');
   String get historyTitle => _pick('History', 'Riwayat');
+  String get historyEmptyTitle =>
+      _pick('No missions yet', 'Belum ada misi');
+  String get rollMissionShort => _pick('Roll a mission', 'Roll misi');
   String get historyEmpty => _pick(
         "No completed missions yet.\nGo back to Home and tap \"I'M BORED\".",
         'Belum ada misi yang selesai.\nKembali ke Beranda dan tekan "I\'M BORED".',
@@ -294,6 +308,26 @@ class AppStrings {
   String get appearanceTitle => _pick('Appearance', 'Tampilan');
   String get themeDark => _pick('Dark', 'Gelap');
   String get themeLight => _pick('Light', 'Terang');
+  String get themeSystem => _pick('System', 'Sistem');
+  String get themeBlack => _pick('Black', 'Hitam');
+  String get rankTitle => _pick('Rank', 'Peringkat');
+  String rankToNext(int xp) => _pick(
+        '$xp XP to next rank',
+        '$xp XP lagi ke peringkat berikutnya',
+      );
+  String get rankMaxed => _pick('Top rank reached', 'Peringkat tertinggi tercapai');
+  String levelUpTitle(int level) =>
+      _pick('Level $level reached!', 'Level $level tercapai!');
+  String get themeModeTitle => _pick('Theme mode', 'Mode tema');
+  String get fontScaleTitle => _pick('Text size', 'Ukuran teks');
+  String get fontScaleSmall => _pick('Small', 'Kecil');
+  String get fontScaleNormal => _pick('Normal', 'Normal');
+  String get fontScaleLarge => _pick('Large', 'Besar');
+  String get reduceMotionTitle => _pick('Reduce motion', 'Kurangi animasi');
+  String get reduceMotionDesc => _pick(
+        'Keep transitions gentle and still.',
+        'Perubahan tampilan dibuat lebih tenang.',
+      );
   String get accentTitle => _pick('Accent color', 'Warna aksen');
   String get hapticsTitle => _pick('Haptic feedback', 'Getaran haptic');
   String get hapticsDesc => _pick(
@@ -318,6 +352,44 @@ class AppStrings {
   String get onbSkip => _pick('Skip', 'Lewati');
   String get onbNext => _pick('Next', 'Lanjut');
   String get onbStart => _pick('Start playing', 'Mulai main');
+
+  // Interactive onboarding (v5)
+  String get onbWelcomeTitle =>
+      _pick('Boredom, meet the real world', 'Boredom, kenali dunia nyata');
+  String get onbWelcomeBody => _pick(
+        'No feed, no scrolling. Just one small mission you can do right now.',
+        'Tanpa feed, tanpa scroll. Cukup satu misi kecil yang bisa kamu lakukan sekarang.',
+      );
+  String get onbMoodTitle =>
+      _pick('How do you feel?', 'Bagaimana perasaanmu sekarang?');
+  String get onbMoodBody => _pick(
+        'Pick a mood. It quietly steers what kind of mission you get.',
+        'Pilih suasana hati. Pilihan ini diam diam mengarahkan misi yang muncul.',
+      );
+  String get onbRollTitle =>
+      _pick('Meet your first mission', 'Kenali misi pertamamu');
+  String get onbRollBody => _pick(
+        'Tap the button and see a real mission from the catalog.',
+        'Tekan tombol dan lihat misi asli dari katalog.',
+      );
+  String get onbRollBtn => _pick('Roll a mission', 'Roll misi');
+  String get onbRolledLabel => _pick('Your mission:', 'Misi kamu:');
+  String get onbDoneTitle =>
+      _pick('One tap, one win', 'Satu ketuk, satu kemenangan');
+  String get onbDoneBody => _pick(
+        'Accept it when you are done. You earn XP and keep your streak alive.',
+        'Terima misi saat selesai. Kamu dapat XP dan streak tetap hidup.',
+      );
+  String get onbAcceptPreview => _pick('Accept it', 'Terima misi');
+  String get onbSkippedPreview =>
+      _pick('Skip this preview', 'Lewati contoh ini');
+  String get onbRemindTitle =>
+      _pick('Come back tomorrow', 'Kembali besok');
+  String get onbRemindBody => _pick(
+        'An optional daily reminder keeps the streak honest. You can change it anytime.',
+        'Pengingat harian opsional menjaga streak tetap jujur. Bisa diubah kapan saja.',
+      );
+  String get onbRemindToggle => _pick('Remind me daily', 'Pengingat harian');
   String get onb1Title => _pick('One tap, one mission', 'Satu ketuk, satu misi');
   String get onb1Body => _pick(
         'Tell Boredom your mood, time, place, and energy. One tap rolls a real-world mission you can do right now.',
@@ -494,6 +566,7 @@ class AppStrings {
   String get mAvgXp => _pick('XP / Active Day', 'XP / Hari Aktif');
   String get mBestDay => _pick('Busiest Day', 'Hari Tersibuk');
   String get streakCalendarTitle => _pick('Streak Calendar', 'Kalender Streak');
+  String get heatmapTitle => _pick('Year in Review', 'Setahun dalam Sekilas');
   String get xpPerCategoryTitle => _pick('XP per Category', 'XP per Kategori');
 
   String weekdayName(int weekday) {

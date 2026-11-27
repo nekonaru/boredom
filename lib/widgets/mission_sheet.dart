@@ -181,6 +181,7 @@ class _MissionSheetState extends State<MissionSheet> {
                             provider.progress.levelTitleFor(s.code),
                         accent: pal.accent,
                         background: pal.background,
+                        code: s.code,
                         origin: origin,
                       );
                       if (!ok && context.mounted) {

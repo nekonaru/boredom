@@ -1,5 +1,35 @@
 # Changelog
 
+## v5.0.0
+
+Boredom mendapat fondasi baru: empat mode tema, pengalaman pertama yang lebih tenang, dan animasi yang menghormati perangkatmu.
+
+## Fitur baru
+
+- **Empat mode tema.** Pilih sistem, terang, gelap, atau hitam AMOLED. Pilihan lama otomatis dimigrasikan.
+- **Ukuran teks.** Skala kecil, normal, dan besar berlaku di seluruh aplikasi dan tersimpan antar peluncuran.
+- **Onboarding interaktif.** Lima langkah singkat membiarkanmu memilih mood, me-roll misi asli, menerima contoh, dan mengaktifkan pengingat harian.
+- **Urutan riwayat.** Urutkan misi selesai berdasarkan terbaru, terlama, atau XP terbesar.
+- **Empty state beraksi.** Riwayat yang kosong kini menawarkan tombol untuk langsung me-roll misi.
+- **Peringkat Boredom.** Lima tingkat kosmetik dari perunggu hingga mitik, dihitung dari total XP dan ditampilkan di Profile.
+- **Heatmap setahun.** Grid aktivitas 365 hari di Stats yang menunjukkan konsistensimu saat disentuh.
+- **Perayaan naik level.** Menembus level kini punya momen confetti tersendiri dengan gelar absurd yang baru.
+- **Sematkan achievement.** Pasang hingga tiga achievement agar mudah dilihat, dan tetap tersimpan lewat backup dan restore.
+
+## Peningkatan
+
+- **Token desain bersama.** Tipografi, spasi, radius, dan durasi animasi kini ada di satu tempat agar layar tetap konsisten.
+- **Animasi lebih halus.** Perpindahan tab mengikuti arah, XP dan grafik masuk dengan animasi, serta chip dan skeleton memakai satu bahasa animasi.
+- **Pengaturan kurangi animasi.** Aplikasi mengikuti pengaturan sistem dan memungkinkanmu memaksa animasi lebih lembut di Profile.
+- **Kartu bagikan bilingual.** Kartu yang dihasilkan memakai bahasa aktif, bukan selalu Inggris.
+- **Dokumentasi jujur.** Angka README kini cocok dengan 64 misi dan 35 achievement yang sebenarnya ada di kode.
+
+## Perbaikan bug
+
+- **Achievement yang dilewati tidak bocor.** Menyelesaikan tantangan harian kini membersihkan daftar achievement sementara, seperti Home dan History.
+- **Pemetaan kategori misi kustom.** Misi kustom yang kategorinya cocok dengan kategori bawaan kini masuk ke kategori itu di statistik.
+- **Animasi tidak crash saat ketuk.** Pembacaan reduced motion tidak lagi berlangganan dari handler tombol.
+
 ## v4.4.0
 
 Langkah misi akhirnya merespons setiap ketukan, dan setiap kemenangan kini hadir dengan perayaan confetti.

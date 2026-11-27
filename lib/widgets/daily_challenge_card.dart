@@ -153,6 +153,7 @@ class DailyChallengeCard extends StatelessWidget {
                       ),
                     );
                     provider.clearLastXpGained();
+                    provider.clearLastUnlockedAchievements();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

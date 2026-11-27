@@ -19,6 +19,7 @@ class RootShell extends StatefulWidget {
 
 class _RootShellState extends State<RootShell> {
   int _index = 0;
+  bool _forward = true;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -33,14 +34,18 @@ class _RootShellState extends State<RootShell> {
     final s = context.str;
     final pal = context.palette;
     return Scaffold(
-      body: AppKit.pageFadeTransition(
+      body: AppKit.pageDirectionalTransition(
         key: ValueKey<int>(_index),
+        forward: _forward,
         child: IndexedStack(index: _index, children: _screens),
-        duration: const Duration(milliseconds: 300),
+        duration: AppKit.motion(context, const Duration(milliseconds: 240)),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        onDestinationSelected: (i) => setState(() {
+          _forward = i > _index;
+          _index = i;
+        }),
         backgroundColor: pal.surface,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         animationDuration: const Duration(milliseconds: 200),
