@@ -18,12 +18,12 @@ void main() {
     await tester.pumpWidget(const BoredomApp());
 
     // First render: still waiting for progress to load from storage (see
-    // _AppGate in main.dart), so the loading indicator shows first.
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    // _AppGate in main.dart), so the loading skeleton shows first.
+    expect(find.byType(ShaderMask), findsWidgets);
 
     // Give init() (SharedPreferences reads) time to finish. Deliberately
-    // not pumpAndSettle(): CircularProgressIndicator has an infinite
-    // animation that would never let pumpAndSettle() complete.
+    // not pumpAndSettle(): the skeleton shimmer has an infinite animation
+    // that would never let pumpAndSettle() complete.
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('YOU ARE BORED.'), findsOneWidget);

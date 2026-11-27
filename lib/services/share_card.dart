@@ -21,6 +21,7 @@ class ShareCard {
     required int level,
     required String levelTitle,
     required Color accent,
+    String code = 'en',
     Color background = const Color(0xFF0E0E12),
     Rect? origin,
   }) async {
@@ -34,10 +35,13 @@ class ShareCard {
         levelTitle: levelTitle,
         accent: accent,
         background: background,
+        code: code,
       );
       await SharePlus.instance.share(
         ShareParams(
-          text: 'Level $level on Boredom',
+          text: code == 'id'
+              ? 'Level $level di Boredom'
+              : 'Level $level on Boredom',
           files: [XFile.fromData(bytes, mimeType: 'image/png', name: 'boredom.png')],
           fileNameOverrides: const ['boredom.png'],
           sharePositionOrigin: origin,
@@ -72,6 +76,7 @@ class ShareCard {
     required String levelTitle,
     required Color accent,
     required Color background,
+    required String code,
   }) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
@@ -96,7 +101,7 @@ class ShareCard {
     );
     _text(
       canvas,
-      'MISSION COMPLETE',
+      code == 'id' ? 'MISI SELESAI' : 'MISSION COMPLETE',
       Offset(120, 430),
       fontSize: 36,
       color: accent,

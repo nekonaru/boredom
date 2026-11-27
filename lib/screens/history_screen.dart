@@ -12,6 +12,8 @@ import '../services/storage_service.dart';
 import '../utils/date_format.dart';
 import '../utils/feedback.dart';
 import '../widgets/inbox_section.dart';
+import '../widgets/kit.dart';
+import '../widgets/mission_sheet.dart';
 import '../widgets/quest_chain_section.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -309,19 +311,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
               sliver: SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text(
-                    HistoryFilters.isUnfiltered(
-                      query: _query,
-                      range: _range,
-                      outcome: _outcomeFilter,
-                    )
-                        ? s.historyEmpty
-                        : s.searchEmpty,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: pal.textSecondary),
-                  ),
+                child: AppKit.emptyState(
+                  context,
+                  emoji: HistoryFilters.isUnfiltered(
+                          query: _query,
+                          range: _range,
+                          outcome: _outcomeFilter)
+                      ? '🎲'
+                      : '🔍',
+                  title: HistoryFilters.isUnfiltered(
+                          query: _query,
+                          range: _range,
+                          outcome: _outcomeFilter)
+                      ? s.historyEmptyTitle
+                      : s.searchEmpty,
+                  subtitle: HistoryFilters.isUnfiltered(
+                          query: _query,
+                          range: _range,
+                          outcome: _outcomeFilter)
+                      ? s.historyEmpty
+                      : '',
+                  actionLabel: s.rollMissionShort,
+                  onAction: () async {
+                    actions.rollMission();
+                    if (context.mounted) await showMissionSheet(context);
+                  },
                 ),
               ),
             )

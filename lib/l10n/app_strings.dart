@@ -231,6 +231,9 @@ class AppStrings {
   // Missions tab
   String get missionsTitle => _pick('Missions', 'Misi');
   String get historyTitle => _pick('History', 'Riwayat');
+  String get historyEmptyTitle =>
+      _pick('No missions yet', 'Belum ada misi');
+  String get rollMissionShort => _pick('Roll a mission', 'Roll misi');
   String get historyEmpty => _pick(
         "No completed missions yet.\nGo back to Home and tap \"I'M BORED\".",
         'Belum ada misi yang selesai.\nKembali ke Beranda dan tekan "I\'M BORED".',

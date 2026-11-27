@@ -7,6 +7,7 @@ import 'providers/theme_provider.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/root_shell.dart';
 import 'utils/app_theme.dart';
+import 'widgets/kit.dart';
 
 void main() {
   // Loaded here, once, instead of inside the widget tree: calling load()
@@ -81,7 +82,16 @@ class _AppGate extends StatelessWidget {
       return Scaffold(
         backgroundColor: pal.background,
         body: Center(
-          child: CircularProgressIndicator(color: pal.accent),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppKit.skeleton(context, width: 180, height: 24),
+              const SizedBox(height: 16),
+              AppKit.skeleton(context, width: 240, height: 12),
+              const SizedBox(height: 8),
+              AppKit.skeleton(context, width: 200, height: 12),
+            ],
+          ),
         ),
       );
     }
