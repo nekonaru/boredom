@@ -70,14 +70,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _finish(BuildContext context) async {
     final provider = context.read<BoredomProvider>();
     final navigator = Navigator.of(context);
-    if (_remind) {
-      await provider.setReminder(true);
-    }
-    provider.completeOnboarding();
-    // On a replay the startup gate is not driving this widget, so nothing
-    // else would take the user back.
-    if (widget.popOnFinish && navigator.canPop()) {
-      navigator.pop();
+    try {
+      if (_remind) {
+        await provider.setReminder(true);
+      }
+    } finally {
+      // Onboarding must always complete even if the notification plugin
+      // throws, otherwise the user is trapped on the first run.
+      provider.completeOnboarding();
+      if (widget.popOnFinish && navigator.canPop()) {
+        navigator.pop();
+      }
     }
   }
 

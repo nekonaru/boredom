@@ -220,7 +220,6 @@ class AppStrings {
   String get missionStepsTitle => _pick('Mission steps', 'Langkah misi');
   String get missionStepsDone => _pick('All steps done! Nice.', 'Semua langkah selesai! Mantap.');
   String get skipBtn => _pick('Skip for now', 'Lewati dulu');
-  String get reopenChallenge => _pick('Reopen', 'Buka lagi');
   String xpSnack(int xp) =>
       _pick('Nice! +$xp XP', 'Mantap! +$xp XP');
   String get achievementSnack => _pick(

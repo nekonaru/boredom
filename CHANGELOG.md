@@ -22,7 +22,6 @@ Boredom gets a new foundation: four theme modes, a calmer first run, and motion 
 - **Smoother motion.** Tab switches move in the direction you travel, XP and charts animate in, and new chips and skeletons use one animation language.
 - **Reduced motion setting.** The app follows the platform setting and lets you force gentler animations from Profile.
 - **Bilingual share cards.** Generated cards use the active language instead of always showing English.
-- **Reopen the daily challenge.** A finished challenge can be opened again from its card.
 - **Honest documentation.** README counts now match the actual 64 missions and 35 achievements in the code.
 
 ## Bug fixes

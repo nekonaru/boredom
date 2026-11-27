@@ -477,7 +477,7 @@ class AppKit {
       duration: duration,
       switchInCurve: easeOut,
       switchOutCurve: easeInOut,
-      child: child,
+      child: KeyedSubtree(key: key, child: child),
     );
   }
 
@@ -503,7 +503,7 @@ class AppKit {
           child: FadeTransition(opacity: animation, child: widget),
         );
       },
-      child: child,
+      child: KeyedSubtree(key: key, child: child),
     );
   }
 

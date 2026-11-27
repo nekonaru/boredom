@@ -135,7 +135,7 @@ class StatsScreen extends StatelessWidget {
                   child: AppKit.metricCard(context,
                     label: s.mFollowThrough,
                     value: rate == null
-                        ? '—'
+                        ? '-'
                         : '${(rate * 100).round()}%',
                     emoji: '🎖️',
                   ),

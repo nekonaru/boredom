@@ -16,10 +16,10 @@ class AchievementsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = context.str;
     final pal = context.palette;
-    // Cache unlocked ids so the screen does not rebuild everything on every
-    // provider notification (a fresh Set per build never compares equal).
+    // Provider publishes a stable cached Set, so this only rebuilds when
+    // the unlocked set actually changes.
     final unlockedIds = context.select<BoredomProvider, Set<String>>(
-      (p) => p.achievements.map((a) => a.achievementId).toSet(),
+      (p) => p.unlockedAchievementIds,
     );
     final pinnedIds = context.select<BoredomProvider, Set<String>>(
       (p) => p.pinnedAchievements,
@@ -28,7 +28,13 @@ class AchievementsScreen extends StatelessWidget {
       (p) => p.progress,
     );
     final actions = context.read<BoredomProvider>();
+    // Pinned and unlocked achievements lead the grid; the rest keep catalog
+    // order. Recomputed per build from a stable catalog and stable id sets.
     const all = AchievementCatalog.all;
+    final ordered = <Achievement>[
+      ...all.where((a) => pinnedIds.contains(a.id)),
+      ...all.where((a) => !pinnedIds.contains(a.id)),
+    ];
     final unlockedCount = all.where((a) => unlockedIds.contains(a.id)).length;
 
     return SafeArea(
@@ -84,7 +90,7 @@ class AchievementsScreen extends StatelessWidget {
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final a = all[index];
+                  final a = ordered[index];
                   final unlocked = unlockedIds.contains(a.id);
                   final pinned = pinnedIds.contains(a.id);
                   // A locked badge keeps the plain, non-interactive card.
@@ -123,7 +129,7 @@ class AchievementsScreen extends StatelessWidget {
                     ],
                   );
                 },
-                childCount: all.length,
+                childCount: ordered.length,
               ),
             ),
           ),

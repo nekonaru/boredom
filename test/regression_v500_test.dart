@@ -8,6 +8,7 @@ import 'package:boredom/providers/language_provider.dart';
 import 'package:boredom/providers/theme_provider.dart';
 import 'package:boredom/screens/onboarding_screen.dart';
 import 'package:boredom/l10n/app_strings.dart';
+import 'package:boredom/models/boredom_rank.dart';
 import 'package:boredom/models/mission.dart';
 import 'package:boredom/models/user_progress.dart';
 import 'package:boredom/services/history_filter.dart';
@@ -53,6 +54,20 @@ void main() {
       await tp.setThemeMode(ThemeModeKind.system);
       expect(tp.isEffectivelyLight(Brightness.light), isTrue);
       expect(tp.isEffectivelyLight(Brightness.dark), isFalse);
+    });
+  });
+
+  group('v5.0 ranks', () {
+    test('thresholds and next target are monotonic and cap at mythic', () {
+      expect(BoredomRanks.forXp(0).id, BoredomRank.bronze);
+      expect(BoredomRanks.forXp(499).id, BoredomRank.bronze);
+      expect(BoredomRanks.forXp(500).id, BoredomRank.silver);
+      expect(BoredomRanks.forXp(2000).id, BoredomRank.gold);
+      expect(BoredomRanks.forXp(6000).id, BoredomRank.diamond);
+      expect(BoredomRanks.forXp(15000).id, BoredomRank.mythic);
+      expect(BoredomRanks.xpToNext(0), 500);
+      expect(BoredomRanks.xpToNext(15000), isNull);
+      expect(BoredomRanks.title(0, code: 'id'), 'Perunggu');
     });
   });
 

@@ -22,7 +22,6 @@ Boredom mendapat fondasi baru: empat mode tema, pengalaman pertama yang lebih te
 - **Animasi lebih halus.** Perpindahan tab mengikuti arah, XP dan grafik masuk dengan animasi, serta chip dan skeleton memakai satu bahasa animasi.
 - **Pengaturan kurangi animasi.** Aplikasi mengikuti pengaturan sistem dan memungkinkanmu memaksa animasi lebih lembut di Profile.
 - **Kartu bagikan bilingual.** Kartu yang dihasilkan memakai bahasa aktif, bukan selalu Inggris.
-- **Buka lagi tantangan harian.** Tantangan yang selesai bisa dibuka kembali dari kartunya.
 - **Dokumentasi jujur.** Angka README kini cocok dengan 64 misi dan 35 achievement yang sebenarnya ada di kode.
 
 ## Perbaikan bug

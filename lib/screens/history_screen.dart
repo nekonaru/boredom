@@ -335,6 +335,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onAction: () async {
                     actions.rollMission();
                     if (context.mounted) await showMissionSheet(context);
+                    // The level-up toast belongs to this screen when the
+                    // completion happened here; clear it so Home cannot
+                    // replay it later.
+                    actions.clearLastXpGained();
+                    actions.clearLastUnlockedAchievements();
+                    actions.clearLastLevelUp();
                   },
                 ),
               ),
