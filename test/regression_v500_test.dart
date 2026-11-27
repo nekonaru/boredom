@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:boredom/models/user_progress.dart';
+import 'package:boredom/providers/boredom_provider.dart';
+import 'package:boredom/providers/language_provider.dart';
 import 'package:boredom/providers/theme_provider.dart';
+import 'package:boredom/screens/onboarding_screen.dart';
+import 'package:boredom/l10n/app_strings.dart';
+import 'package:boredom/models/mission.dart';
+import 'package:boredom/models/user_progress.dart';
 import 'package:boredom/services/history_filter.dart';
 import 'package:boredom/services/storage_service.dart';
 import 'package:boredom/utils/app_theme.dart';
@@ -95,4 +101,56 @@ void main() {
       expect(base.shouldRepaint(animating), isTrue);
     });
   });
+
+  group('v5.0 interactive onboarding', () {
+    testWidgets('five steps, mood is tappable and a mission can be rolled',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      StorageService.instance.clearCache();
+      final provider = BoredomProvider()..init();
+      await pumpAndSettleSafe(tester);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<BoredomProvider>.value(value: provider),
+            ChangeNotifierProvider<LanguageProvider>.value(
+                value: LanguageProvider.instance),
+            ChangeNotifierProvider<ThemeProvider>.value(
+                value: ThemeProvider.instance),
+          ],
+          child: const MaterialApp(home: OnboardingScreen()),
+        ),
+      );
+      await pumpAndSettleSafe(tester);
+
+      // Step 1: welcome. Next is enabled.
+      expect(find.text('Boredom, meet the real world'), findsOneWidget);
+      await tester.tap(find.text('Next'));
+      await pumpAndSettleSafe(tester);
+
+      // Step 2: mood chips change real provider state.
+      expect(find.text('How do you feel?'), findsOneWidget);
+      final s = AppStrings('en');
+      final moodLabel = s.moodLabel(Mood.energetic);
+      await tester.ensureVisible(find.text(moodLabel));
+      await pumpAndSettleSafe(tester);
+      await tester.tap(find.text(moodLabel));
+      await pumpAndSettleSafe(tester);
+      expect(provider.selectedMood, Mood.energetic);
+
+      // Step 3: roll a preview mission.
+      await tester.tap(find.text('Next'));
+      await pumpAndSettleSafe(tester);
+      expect(find.text('Meet your first mission'), findsOneWidget);
+      await tester.tap(find.text('Roll a mission'));
+      await pumpAndSettleSafe(tester);
+      expect(find.text('Your mission:'), findsOneWidget);
+    });
+  });
+}
+
+Future<void> pumpAndSettleSafe(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
 }

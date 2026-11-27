@@ -49,6 +49,7 @@ class AppKit {
   /// Plain surface card used everywhere. Defaults to a subtle border so
   /// every card reads as a discrete surface in both dark and light themes.
   static Widget card({
+    Key? key,
     required Widget child,
     Color? color,
     double radius = rLg,
@@ -56,6 +57,7 @@ class AppKit {
     Border? border,
   }) {
     return Container(
+      key: key,
       padding: padding,
       decoration: BoxDecoration(
         color: color,

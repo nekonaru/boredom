@@ -342,6 +342,44 @@ class AppStrings {
   String get onbSkip => _pick('Skip', 'Lewati');
   String get onbNext => _pick('Next', 'Lanjut');
   String get onbStart => _pick('Start playing', 'Mulai main');
+
+  // Interactive onboarding (v5)
+  String get onbWelcomeTitle =>
+      _pick('Boredom, meet the real world', 'Boredom, kenali dunia nyata');
+  String get onbWelcomeBody => _pick(
+        'No feed, no scrolling. Just one small mission you can do right now.',
+        'Tanpa feed, tanpa scroll. Cukup satu misi kecil yang bisa kamu lakukan sekarang.',
+      );
+  String get onbMoodTitle =>
+      _pick('How do you feel?', 'Bagaimana perasaanmu sekarang?');
+  String get onbMoodBody => _pick(
+        'Pick a mood. It quietly steers what kind of mission you get.',
+        'Pilih suasana hati. Pilihan ini diam diam mengarahkan misi yang muncul.',
+      );
+  String get onbRollTitle =>
+      _pick('Meet your first mission', 'Kenali misi pertamamu');
+  String get onbRollBody => _pick(
+        'Tap the button and see a real mission from the catalog.',
+        'Tekan tombol dan lihat misi asli dari katalog.',
+      );
+  String get onbRollBtn => _pick('Roll a mission', 'Roll misi');
+  String get onbRolledLabel => _pick('Your mission:', 'Misi kamu:');
+  String get onbDoneTitle =>
+      _pick('One tap, one win', 'Satu ketuk, satu kemenangan');
+  String get onbDoneBody => _pick(
+        'Accept it when you are done. You earn XP and keep your streak alive.',
+        'Terima misi saat selesai. Kamu dapat XP dan streak tetap hidup.',
+      );
+  String get onbAcceptPreview => _pick('Accept it', 'Terima misi');
+  String get onbSkippedPreview =>
+      _pick('Skip this preview', 'Lewati contoh ini');
+  String get onbRemindTitle =>
+      _pick('Come back tomorrow', 'Kembali besok');
+  String get onbRemindBody => _pick(
+        'An optional daily reminder keeps the streak honest. You can change it anytime.',
+        'Pengingat harian opsional menjaga streak tetap jujur. Bisa diubah kapan saja.',
+      );
+  String get onbRemindToggle => _pick('Remind me daily', 'Pengingat harian');
   String get onb1Title => _pick('One tap, one mission', 'Satu ketuk, satu misi');
   String get onb1Body => _pick(
         'Tell Boredom your mood, time, place, and energy. One tap rolls a real-world mission you can do right now.',

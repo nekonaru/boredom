@@ -129,7 +129,10 @@ extension PaletteX on BuildContext {
 
   /// True when the app or platform asked for gentler motion.
   bool get motionReduced {
-    final t = Provider.of<ThemeProvider>(this, listen: true);
+    // Read, do not subscribe. This getter is also used from button handlers,
+    // where Provider forbids a listening read. Theme changes already rebuild
+    // the tree through Consumer2 in main.dart.
+    final t = Provider.of<ThemeProvider>(this, listen: false);
     return t.reduceMotion ||
         (MediaQuery.maybeOf(this)?.disableAnimations ?? false);
   }

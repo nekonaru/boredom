@@ -36,6 +36,6 @@ void main() {
     await tester.pumpWidget(const BoredomApp());
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('One tap, one mission'), findsOneWidget);
+    expect(find.text('Boredom, meet the real world'), findsOneWidget);
   });
 }
