@@ -238,6 +238,30 @@ class AppStrings {
   String get journalMoodGreat => _pick('Great', 'Mantap');
   String get journalMoodOkay => _pick('Okay', 'Biasa');
   String get journalMoodMeh => _pick('Meh', 'Meleset');
+  String get quickFindTitle => _pick('Quick find', 'Pencarian cepat');
+  String get quickFindHint => _pick(
+        'Search missions or your history',
+        'Cari misi atau riwayatmu',
+      );
+  String get quickFindEmptyPrompt => _pick(
+        'Type to search missions and history',
+        'Ketik untuk mencari misi dan riwayat',
+      );
+  String get quickFindMissions => _pick('Missions', 'Misi');
+  String get quickFindHistory => _pick('History', 'Riwayat');
+  String get quickFindNoResults => _pick(
+        'Nothing matches that search',
+        'Tidak ada yang cocok',
+      );
+  String get shareMonthly => _pick('Share monthly recap', 'Bagikan laporan bulanan');
+  String bossHp(int left, int total) => _pick('HP $left/$total', 'HP $left/$total');
+  String get insightRollAction => _pick('Roll one now', 'Roll satu sekarang');
+  String get dayPartTitle => _pick('Time of day', 'Waktu hari ini');
+  String get dayPartAny => _pick('Anytime', 'Kapan saja');
+  String get dayPartMorning => _pick('Morning', 'Pagi');
+  String get dayPartAfternoon => _pick('Afternoon', 'Siang');
+  String get dayPartEvening => _pick('Evening', 'Sore');
+  String get dayPartNight => _pick('Night', 'Malam');
   String xpSnack(int xp) =>
       _pick('Nice! +$xp XP', 'Mantap! +$xp XP');
   String get achievementSnack => _pick(

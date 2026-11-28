@@ -13,6 +13,7 @@ import '../widgets/kit.dart';
 import '../widgets/selector_row.dart';
 import '../widgets/xp_bar.dart';
 import '../widgets/mission_sheet.dart';
+import '../widgets/quick_find.dart';
 import '../widgets/daily_challenge_card.dart';
 import '../widgets/weekly_summary.dart';
 import '../widgets/weekly_insights.dart';
@@ -172,6 +173,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final favoritesOnly = context.select<BoredomProvider, bool>(
       (p) => p.favoritesOnly,
     );
+    final selectedDayPart = context.select<BoredomProvider, DayPart>(
+      (p) => p.selectedDayPart,
+    );
     final freezeTokens = context.select<BoredomProvider, int>(
       (p) => p.progress.freezeTokens,
     );
@@ -183,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: brand + streak chip.
+            // Header: brand + quick find + streak chip.
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -195,6 +199,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
                   ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => showQuickFind(context),
+                  icon: Icon(Icons.search, color: pal.textSecondary),
+                  tooltip: s.quickFindTitle,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.symmetric(horizontal: AppKit.sm),
                 ),
                 if (progress.streakDays > 0)
                   AppKit.card(
@@ -370,6 +382,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       options: TimeBudget.values
                           .map((t) => SelectorOption(t, '⏱️', s.timeLabel(t)))
                           .toList(),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    Text(
+                      s.dayPartTitle,
+                      style: TextStyle(
+                        color: pal.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: AppKit.sm),
+                    Wrap(
+                      spacing: AppKit.sm,
+                      children: [
+                        for (final part in DayPart.values)
+                          AppKit.chip(
+                            context,
+                            label: switch (part) {
+                              DayPart.any => s.dayPartAny,
+                              DayPart.morning => s.dayPartMorning,
+                              DayPart.afternoon => s.dayPartAfternoon,
+                              DayPart.evening => s.dayPartEvening,
+                              DayPart.night => s.dayPartNight,
+                            },
+                            selected: selectedDayPart == part,
+                            onTap: () => actions.setDayPart(part),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: AppKit.lg),
                     SelectorRow<LocationType>(

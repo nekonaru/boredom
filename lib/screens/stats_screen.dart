@@ -5,9 +5,11 @@ import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/share_card.dart';
 import '../utils/app_theme.dart';
 import '../widgets/kit.dart';
 import '../widgets/activity_heatmap.dart';
+import '../widgets/follow_through_ring.dart';
 import '../widgets/weekly_chart.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -82,9 +84,41 @@ class StatsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              s.statsTitle,
-              style: TextStyle(color: pal.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    s.statsTitle,
+                    style: TextStyle(
+                      color: pal.textPrimary,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () async {
+                    final box = context.findRenderObject() as RenderBox?;
+                    final origin = box == null
+                        ? null
+                        : box.localToGlobal(Offset.zero) & box.size;
+                    final top = sortedCategories.first;
+                    await ShareCard.shareMonthly(
+                      missions: progress.totalMissionsCompleted,
+                      xp: progress.totalXp,
+                      streak: progress.streakDays,
+                      topCategory: top.labelFor(s.code),
+                      code: s.code,
+                      accent: pal.accent,
+                      background: pal.background,
+                      origin: origin,
+                    );
+                  },
+                  icon: Icon(Icons.ios_share, color: pal.textSecondary),
+                  tooltip: s.shareMonthly,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
             ),
             const SizedBox(height: AppKit.xl),
             Row(
@@ -132,13 +166,7 @@ class StatsScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: AppKit.metricCard(context,
-                    label: s.mFollowThrough,
-                    value: rate == null
-                        ? '-'
-                        : '${(rate * 100).round()}%',
-                    emoji: '🎖️',
-                  ),
+                  child: FollowThroughRing(rate: rate, label: s.mFollowThrough),
                 ),
                 const SizedBox(width: AppKit.md),
                 Expanded(

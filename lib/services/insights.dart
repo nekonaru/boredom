@@ -10,12 +10,17 @@ class Insight {
   final String detailEn;
   final String detailId;
 
+  /// Optional category this observation is about, so the UI can offer a
+  /// concrete next step instead of only stating a fact.
+  final String? categoryName;
+
   const Insight({
     required this.emoji,
     required this.titleEn,
     required this.titleId,
     required this.detailEn,
     required this.detailId,
+    this.categoryName,
   });
 
   String title(String code) => code == 'id' ? titleId : titleEn;
@@ -179,6 +184,7 @@ class Insights {
               'You most often walk away from ${skipped.label} missions.',
           detailId:
               'Kamu paling sering meninggalkan misi ${skipped.labelFor('id')}.',
+          categoryName: skipped.name,
         ),
       );
     }

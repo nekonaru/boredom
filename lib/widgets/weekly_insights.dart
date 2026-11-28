@@ -5,6 +5,8 @@ import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/insights.dart';
+import '../widgets/kit.dart';
+import '../widgets/mission_sheet.dart';
 
 /// Behavioural observations derived from the completion history.
 ///
@@ -41,7 +43,7 @@ class WeeklyInsights extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ...items.map((i) => _InsightTile(insight: i, code: code)),
+        ...items.map((i) => _InsightTile(insight: i, code: code, s: s)),
         // The gap lives in here, not in the caller. Sibling SizedBoxes in
         // Home left ~56pt of dead space for exactly the new players this
         // widget hides itself from.
@@ -54,7 +56,12 @@ class WeeklyInsights extends StatelessWidget {
 class _InsightTile extends StatelessWidget {
   final Insight insight;
   final String code;
-  const _InsightTile({required this.insight, required this.code});
+  final AppStrings s;
+  const _InsightTile({
+    required this.insight,
+    required this.code,
+    required this.s,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +99,26 @@ class _InsightTile extends StatelessWidget {
                       height: 1.3,
                     ),
                   ),
+                  if (insight.categoryName != null) ...[
+                    const SizedBox(height: AppKit.sm),
+                    TextButton(
+                      onPressed: () async {
+                        final provider = context.read<BoredomProvider>();
+                        final ok = await provider
+                            .rollFromCategory(insight.categoryName!);
+                        if (ok && context.mounted) {
+                          await showMissionSheet(context);
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: pal.accent,
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(44, 32),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(s.insightRollAction),
+                    ),
+                  ],
                 ],
               ),
             ),

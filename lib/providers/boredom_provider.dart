@@ -103,6 +103,7 @@ class BoredomProvider extends ChangeNotifier {
   List<SavedMission> savedMissions = [];
   bool quickWinsOnly = false;
   bool favoritesOnly = false;
+  DayPart selectedDayPart = DayPart.any;
   bool reminderEnabled = false;
   int reminderHour = 19;
   int reminderMinute = 0;
@@ -600,7 +601,7 @@ class BoredomProvider extends ChangeNotifier {
               mood: filter.mood,
               timeBudget: quickWinsOnly && filter.timeBudget.minutes > 15
                   ? TimeBudget.fifteenMin
-                  : filter.timeBudget,
+                  : _budgetForDayPart(filter.timeBudget),
               location: filter.location,
               energy: filter.energy,
             ),
@@ -632,6 +633,42 @@ class BoredomProvider extends ChangeNotifier {
   void setFavoritesOnly(bool value) {
     favoritesOnly = value;
     notifyListeners();
+  }
+
+  void setDayPart(DayPart value) {
+    selectedDayPart = value;
+    notifyListeners();
+  }
+
+  /// Day part maps to a time budget, never to a claim about mission content.
+  TimeBudget _budgetForDayPart(TimeBudget base) => switch (selectedDayPart) {
+        DayPart.any => base,
+        DayPart.morning => TimeBudget.fifteenMin,
+        DayPart.afternoon => TimeBudget.thirtyMin,
+        DayPart.evening => base,
+        DayPart.night => TimeBudget.fifteenMin,
+      };
+
+  /// Rolls one mission from a specific category, ignoring the current filter
+  /// but still honoring the recent-play and dislike guards.
+  Future<bool> rollFromCategory(String categoryName) async {
+    if (currentMission != null) return false;
+    final pool = MissionCatalog.all
+        .where((m) => m.category.name == categoryName)
+        .where((m) => !recentMissionIds.contains(m.id))
+        .where((m) => !dislikedIds.contains(m.id))
+        .toList();
+    if (pool.isEmpty) return false;
+    final mission = pool[_random.nextInt(pool.length)];
+    _missionCounter++;
+    currentMission = MissionInstance(
+      mission: mission,
+      missionNumber: _missionCounter,
+      isChaos: false,
+    );
+    _resetSteps();
+    notifyListeners();
+    return true;
   }
 
   /// Writes or replaces the reflection attached to a mission. One entry per
@@ -807,6 +844,11 @@ class BoredomProvider extends ChangeNotifier {
         m,
         code: LanguageProvider.instance.code,
       );
+      if (streakAtRisk) {
+        await ReminderService.instance.scheduleStreakRisk(
+          code: LanguageProvider.instance.code,
+        );
+      }
     } else {
       await ReminderService.instance.cancelDaily();
     }

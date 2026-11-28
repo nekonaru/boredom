@@ -54,6 +54,83 @@ class ShareCard {
     }
   }
 
+  /// Renders and shares a monthly recap card using the same offline canvas
+  /// pipeline as the mission card. No new dependency, no screenshot plugin.
+  static Future<bool> shareMonthly({
+    required int missions,
+    required int xp,
+    required int streak,
+    required String topCategory,
+    required String code,
+    required Color accent,
+    required Color background,
+    Rect? origin,
+  }) async {
+    try {
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      final size = Size(_width, _height);
+      canvas.drawRect(Offset.zero & size, Paint()..color = background);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(80, 90, _width - 160, 260),
+          const Radius.circular(48),
+        ),
+        Paint()..color = accent.withValues(alpha: 0.12),
+      );
+      _text(
+        canvas,
+        code == 'id' ? 'LAPORAN BULANAN' : 'MONTHLY RECAP',
+        Offset(120, 190),
+        fontSize: 42,
+        color: accent,
+        letterSpacing: 4,
+        bold: true,
+      );
+      _text(canvas, '$missions', Offset(120, 470),
+          fontSize: 110, color: Colors.white, bold: true);
+      _text(
+        canvas,
+        code == 'id' ? 'misi selesai' : 'missions done',
+        Offset(120, 610),
+        fontSize: 36,
+        color: const Color(0xFF9B9BA8),
+      );
+      _text(canvas, '+$xp XP', Offset(120, 720),
+          fontSize: 56, color: const Color(0xFF57D19C), bold: true);
+      _text(
+        canvas,
+        'streak: $streak   |   $topCategory',
+        Offset(120, 830),
+        fontSize: 34,
+        color: const Color(0xFF9B9BA8),
+      );
+      final picture = recorder.endRecording();
+      final image = await picture.toImage(_width.toInt(), _height.toInt());
+      final data = await image.toByteData(format: ui.ImageByteFormat.png);
+      await SharePlus.instance.share(
+        ShareParams(
+          text: code == 'id'
+              ? 'Laporan bulanan Boredom saya'
+              : 'My Boredom monthly recap',
+          files: [
+            XFile.fromData(
+              data!.buffer.asUint8List(),
+              mimeType: 'image/png',
+              name: 'boredom-monthly.png',
+            ),
+          ],
+          fileNameOverrides: const ['boredom-monthly.png'],
+          sharePositionOrigin: origin,
+        ),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('ShareCard monthly failed: $e');
+      return false;
+    }
+  }
+
   /// Shares plain text, used as the lightweight fallback.
   static Future<bool> shareText(String text, {Rect? origin}) async {
     try {

@@ -6,6 +6,7 @@ import '../models/quest_chain.dart';
 import '../providers/boredom_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/feedback.dart';
+import '../widgets/kit.dart';
 
 class QuestChainSection extends StatelessWidget {
   const QuestChainSection({super.key});
@@ -60,14 +61,40 @@ class QuestChainSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: (stepIndex) / chain.steps.length,
-              minHeight: 6,
-              backgroundColor: pal.emptyBar,
-              valueColor: AlwaysStoppedAnimation(pal.accent),
-            ),
+          Row(
+            children: [
+              Text('👾', style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppKit.rPill),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(
+                      begin: 0,
+                      end: (chain.steps.length - stepIndex) / chain.steps.length,
+                    ),
+                    duration: AppKit.motion(
+                        context, const Duration(milliseconds: 450)),
+                    curve: AppKit.easeOut,
+                    builder: (context, hp, _) => LinearProgressIndicator(
+                      value: hp,
+                      minHeight: 8,
+                      backgroundColor: pal.emptyBar,
+                      valueColor: AlwaysStoppedAnimation(pal.danger),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                s.bossHp(chain.steps.length - stepIndex, chain.steps.length),
+                style: TextStyle(
+                  color: pal.danger,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 14),
           Text(

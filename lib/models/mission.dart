@@ -74,6 +74,10 @@ extension MissionCategoryX on MissionCategory {
 
 enum Mood { lazy, bored, normal, energetic, curious }
 
+/// Rough part-of-day suggestion. It narrows the time budget rather than
+/// claiming a mission can only happen at a certain hour.
+enum DayPart { any, morning, afternoon, evening, night }
+
 extension MoodX on Mood {
   String get emoji {
     switch (this) {

@@ -104,6 +104,40 @@ class ReminderService {
     }
   }
 
+  /// Best-effort one-shot nudge when the streak is at risk. Scheduled for
+  /// later today or tomorrow morning and never replaces the daily reminder.
+  Future<void> scheduleStreakRisk({String code = 'en'}) async {
+    await init();
+    final isId = code == 'id';
+    try {
+      final now = tz.TZDateTime.now(tz.local);
+      final when = tz.TZDateTime(tz.local, now.year, now.month, now.day, 20);
+      final scheduled = when.isAfter(now) ? when : when.add(const Duration(days: 1));
+      await _plugin.zonedSchedule(
+        id: 1002,
+        title: 'Boredom',
+        body: isId
+            ? 'Streakmu terancam. Satu misi kecil saja cukup.'
+            : 'Your streak is at risk. One small mission is enough.',
+        scheduledDate: scheduled,
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channelId,
+            _channelName,
+            channelDescription: isId
+                ? 'Pengingat streak agar tetap hidup'
+                : 'Reminder to keep your streak alive',
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    } catch (e) {
+      debugPrint('ReminderService streak nudge failed: $e');
+    }
+  }
+
   Future<void> cancelDaily() async {
     try {
       await _plugin.cancel(id: _dailyId);
