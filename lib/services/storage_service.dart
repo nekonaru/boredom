@@ -6,6 +6,7 @@ import '../models/daily_challenge.dart';
 import '../models/quest_chain.dart';
 import '../models/custom_mission.dart';
 import '../models/saved_mission.dart';
+import '../models/journal_entry.dart';
 
 /// All local reads/writes go through here.
 class StorageService {
@@ -21,6 +22,7 @@ class StorageService {
   static const _kCustomCategories = 'boredom_custom_categories';
   static const _kFavorites = 'boredom_favorites';
   static const _kPinnedAchievements = 'boredom_pinned_achievements';
+  static const _kJournal = 'boredom_journal';
   static const _kDisliked = 'boredom_disliked';
   static const _kHaptics = 'boredom_haptics';
   static const _kOnboarding = 'boredom_onboarding_done';
@@ -140,6 +142,29 @@ class StorageService {
         })
         .whereType<UnlockedAchievement>()
         .toList();
+  }
+
+  Future<List<JournalEntry>> loadJournal() async {
+    final p = await prefs;
+    final raw = p.getStringList(_kJournal) ?? [];
+    return raw
+        .map((e) {
+          try {
+            return JournalEntry.fromJson(jsonDecode(e));
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<JournalEntry>()
+        .toList();
+  }
+
+  Future<void> saveJournal(List<JournalEntry> entries) async {
+    final p = await prefs;
+    await p.setStringList(
+      _kJournal,
+      entries.map((e) => jsonEncode(e.toJson())).toList(),
+    );
   }
 
   Future<void> saveAchievements(List<UnlockedAchievement> unlocked) async {

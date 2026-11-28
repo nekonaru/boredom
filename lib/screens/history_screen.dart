@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/custom_mission.dart';
+import '../models/journal_entry.dart';
 import '../models/mission.dart';
 import '../models/user_progress.dart';
 import '../providers/boredom_provider.dart';
@@ -356,6 +357,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     entry: entry,
                     code: code,
                     catalog: catalogMap,
+                    journal: actions.journalFor(entry.missionId),
+                    s: s,
+                    onReplay: () async {
+                      final ok = await actions.replayMission(entry.missionId);
+                      if (!ok && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(s.replayBlocked)),
+                        );
+                        return;
+                      }
+                      if (context.mounted) await showMissionSheet(context);
+                    },
+                    onJournal: () => _showJournalSheet(context, s, entry),
                   );
                 },
               ),
@@ -363,6 +377,100 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _showJournalSheet(
+    BuildContext context,
+    AppStrings s,
+    CompletedMission entry,
+  ) async {
+    final pal = context.palette;
+    final provider = context.read<BoredomProvider>();
+    final existing = provider.journalFor(entry.missionId);
+    final controller = TextEditingController(text: existing?.note ?? '');
+    var mood = existing?.mood ?? JournalMood.okay;
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+        ),
+        child: StatefulBuilder(
+          builder: (sheetContext, setSheetState) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppKit.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s.journalTitle,
+                    style: TextStyle(
+                      color: pal.textPrimary,
+                      fontSize: AppKit.fsTitle,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppKit.sm),
+                  Text(
+                    s.journalHint,
+                    style: TextStyle(color: pal.textSecondary, fontSize: 12),
+                  ),
+                  const SizedBox(height: AppKit.md),
+                  TextField(
+                    controller: controller,
+                    maxLines: 3,
+                    maxLength: 160,
+                    style: TextStyle(color: pal.textPrimary, fontSize: 14),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: pal.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppKit.rMd),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppKit.md),
+                  Row(
+                    children: [
+                      for (final m in JournalMood.values)
+                        Padding(
+                          padding: const EdgeInsets.only(right: AppKit.sm),
+                          child: AppKit.chip(
+                            sheetContext,
+                            label: switch (m) {
+                              JournalMood.great => s.journalMoodGreat,
+                              JournalMood.okay => s.journalMoodOkay,
+                              JournalMood.meh => s.journalMoodMeh,
+                            },
+                            selected: mood == m,
+                            onTap: () => setSheetState(() => mood = m),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppKit.lg),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(true),
+                      child: Text(s.dialogSave),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (saved == true && context.mounted) {
+      await provider.writeJournal(entry.missionId, controller.text, mood);
+    }
+    controller.dispose();
   }
 
   Future<void> _showAddCustomDialog(BuildContext context, AppStrings s) async {
@@ -666,11 +774,21 @@ class _HistoryTile extends StatelessWidget {
   final CompletedMission entry;
   final String code;
   final Map<String, Mission> catalog;
+  final JournalEntry? journal;
+  final VoidCallback onReplay;
+  final VoidCallback onJournal;
+  final AppStrings s;
   const _HistoryTile({
     required this.entry,
     required this.code,
     required this.catalog,
+    required this.journal,
+    required this.onReplay,
+    required this.onJournal,
+    required this.s,
   });
+
+  AppStrings get _s => s;
 
   @override
   Widget build(BuildContext context) {
@@ -711,16 +829,58 @@ class _HistoryTile extends StatelessWidget {
                     const SizedBox(height: 6),
                     _OutcomeBadge(outcome: entry.outcome!, code: code),
                   ],
+                  if (journal != null && journal!.note.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      journal!.note,
+                      style: TextStyle(
+                        color: pal.textSecondary,
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ),
             ),
-            Text(
-              '+${entry.xpEarned} XP',
-              style: TextStyle(
-                color: pal.success,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '+${entry.xpEarned} XP',
+                  style: TextStyle(
+                    color: pal.success,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: onReplay,
+                      icon: Icon(Icons.replay, size: 18, color: pal.accent),
+                      tooltip: _s.doItAgain,
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(4),
+                    ),
+                    IconButton(
+                      onPressed: onJournal,
+                      icon: Icon(
+                        Icons.note_alt_outlined,
+                        size: 18,
+                        color: pal.textSecondary,
+                      ),
+                      tooltip: _s.journalTitle,
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(4),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

@@ -169,6 +169,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final quickWins = context.select<BoredomProvider, bool>(
       (p) => p.quickWinsOnly,
     );
+    final favoritesOnly = context.select<BoredomProvider, bool>(
+      (p) => p.favoritesOnly,
+    );
     final freezeTokens = context.select<BoredomProvider, int>(
       (p) => p.progress.freezeTokens,
     );
@@ -394,6 +397,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       subtitle: s.quickWinsDesc,
                       value: quickWins,
                       onChanged: () => actions.setQuickWins(!quickWins),
+                    ),
+                    const SizedBox(height: AppKit.lg),
+                    AppKit.toggleRow(
+                      context,
+                      emoji: '❤️',
+                      title: s.favoritesOnlyTitle,
+                      subtitle: s.favoritesOnlyDesc,
+                      value: favoritesOnly,
+                      onChanged: () =>
+                          actions.setFavoritesOnly(!favoritesOnly),
                     ),
                     const SizedBox(height: AppKit.lg),
                     AppKit.toggleRow(

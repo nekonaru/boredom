@@ -220,6 +220,24 @@ class AppStrings {
   String get missionStepsTitle => _pick('Mission steps', 'Langkah misi');
   String get missionStepsDone => _pick('All steps done! Nice.', 'Semua langkah selesai! Mantap.');
   String get skipBtn => _pick('Skip for now', 'Lewati dulu');
+  String get favoritesOnlyTitle => _pick('Only favorites', 'Hanya favorit');
+  String get favoritesOnlyDesc => _pick(
+        'Roll only from missions you pinned.',
+        'Roll hanya dari misi yang kamu simpan.',
+      );
+  String get doItAgain => _pick('Do it again', 'Lakukan lagi');
+  String get replayBlocked => _pick(
+        'Finish or skip the current mission first.',
+        'Selesaikan atau lewati misi saat ini dulu.',
+      );
+  String get journalTitle => _pick('Reflection', 'Renungan');
+  String get journalHint => _pick(
+        'What did this mission feel like? Only you can see this.',
+        'Bagaimana rasanya misi ini? Hanya kamu yang bisa melihat.',
+      );
+  String get journalMoodGreat => _pick('Great', 'Mantap');
+  String get journalMoodOkay => _pick('Okay', 'Biasa');
+  String get journalMoodMeh => _pick('Meh', 'Meleset');
   String xpSnack(int xp) =>
       _pick('Nice! +$xp XP', 'Mantap! +$xp XP');
   String get achievementSnack => _pick(

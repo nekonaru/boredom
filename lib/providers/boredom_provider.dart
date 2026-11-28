@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import '../models/mission.dart';
 import '../models/mission_step.dart';
@@ -7,6 +9,7 @@ import '../models/daily_challenge.dart';
 import '../models/quest_chain.dart';
 import '../models/custom_mission.dart';
 import '../models/saved_mission.dart';
+import '../models/journal_entry.dart';
 import '../services/mission_service.dart';
 import '../services/mission_catalog.dart';
 import '../services/storage_service.dart';
@@ -18,6 +21,7 @@ import '../services/mission_guide.dart';
 import 'language_provider.dart';
 
 const int kMaxRerollsPerDay = 3;
+final math.Random _random = math.Random();
 
 /// Only three achievements can be pinned to the top of the list.
 const int kMaxPinnedAchievements = 3;
@@ -85,6 +89,8 @@ class BoredomProvider extends ChangeNotifier {
   void _syncAchievementIds() => _unlockedAchievementIds =
       achievements.map((a) => a.achievementId).toSet();
 
+  List<JournalEntry> journal = [];
+
   List<UnlockedAchievement> achievements = [];
   DailyChallengeState? dailyChallengeState;
   QuestChainProgress? questChainProgress;
@@ -96,6 +102,7 @@ class BoredomProvider extends ChangeNotifier {
   Set<String> mutedCategories = {};
   List<SavedMission> savedMissions = [];
   bool quickWinsOnly = false;
+  bool favoritesOnly = false;
   bool reminderEnabled = false;
   int reminderHour = 19;
   int reminderMinute = 0;
@@ -179,6 +186,7 @@ class BoredomProvider extends ChangeNotifier {
       storage.loadDefaultLocation(),
       storage.loadDefaultEnergy(),
       storage.loadPinnedAchievements(),
+      storage.loadJournal(),
     ]);
     progress = results[0] as UserProgress;
     history = results[1] as List<CompletedMission>;
@@ -202,6 +210,7 @@ class BoredomProvider extends ChangeNotifier {
     final loadedLocation = results[18] as String?;
     final loadedEnergy = results[19] as String?;
     pinnedAchievements = (results[20] as Set<String>?) ?? {};
+    journal = results[21] as List<JournalEntry>;
     if (loadedMood != null) {
       defaultMood = Mood.values.firstWhere(
         (m) => m.name == loadedMood,
@@ -581,22 +590,28 @@ class BoredomProvider extends ChangeNotifier {
     );
     // Quick wins narrows the time budget to at most 15 minutes, which is
     // what "I only have a little energy" usually means.
-    final mission = MissionService.generate(
-      MissionFilter(
-        mood: filter.mood,
-        timeBudget: quickWinsOnly && filter.timeBudget.minutes > 15
-            ? TimeBudget.fifteenMin
-            : filter.timeBudget,
-        location: filter.location,
-        energy: filter.energy,
-      ),
-      chaosMode: chaosMode,
-      // Disliked missions are excluded alongside recent ones, so the
-      // generator learns what the user does not want to see again.
-      excludeIds: chaosMode ? const {} : {...recentMissionIds, ...dislikedIds},
-      categoryCounts: progress.categoryCounts,
-      excludeCategories: mutedCategories,
-    );
+    final favoritePool = favoritesOnly
+        ? favoriteIds.map(missionById).whereType<Mission>().toList()
+        : const <Mission>[];
+    final mission = favoritePool.isNotEmpty
+        ? favoritePool[_random.nextInt(favoritePool.length)]
+        : MissionService.generate(
+            MissionFilter(
+              mood: filter.mood,
+              timeBudget: quickWinsOnly && filter.timeBudget.minutes > 15
+                  ? TimeBudget.fifteenMin
+                  : filter.timeBudget,
+              location: filter.location,
+              energy: filter.energy,
+            ),
+            chaosMode: chaosMode,
+            // Disliked missions are excluded alongside recent ones, so the
+            // generator learns what the user does not want to see again.
+            excludeIds:
+                chaosMode ? const {} : {...recentMissionIds, ...dislikedIds},
+            categoryCounts: progress.categoryCounts,
+            excludeCategories: mutedCategories,
+          );
     _missionCounter++;
     currentMission = MissionInstance(
       mission: mission,
@@ -610,6 +625,54 @@ class BoredomProvider extends ChangeNotifier {
   void setQuickWins(bool value) {
     quickWinsOnly = value;
     notifyListeners();
+  }
+
+  /// Restricts rolls to favorited missions. Falls back to the normal pool
+  /// when there are no favorites, so the roll is never empty.
+  void setFavoritesOnly(bool value) {
+    favoritesOnly = value;
+    notifyListeners();
+  }
+
+  /// Writes or replaces the reflection attached to a mission. One entry per
+  /// mission id keeps the journal short and avoids duplicate memories.
+  Future<void> writeJournal(String missionId, String note, JournalMood mood) async {
+    final trimmed = note.trim();
+    journal = [
+      ...journal.where((e) => e.missionId != missionId),
+      JournalEntry(
+        missionId: missionId,
+        note: trimmed,
+        mood: mood,
+        writtenAt: DateTime.now(),
+      ),
+    ];
+    await StorageService.instance.saveJournal(journal);
+    notifyListeners();
+  }
+
+  JournalEntry? journalFor(String missionId) {
+    for (final entry in journal) {
+      if (entry.missionId == missionId) return entry;
+    }
+    return null;
+  }
+
+  /// Reopens a catalog mission from history without granting XP until the
+  /// player actually accepts it again. Never overwrites an active mission.
+  Future<bool> replayMission(String missionId) async {
+    if (currentMission != null) return false;
+    final mission = missionById(missionId);
+    if (mission == null) return false;
+    _missionCounter++;
+    currentMission = MissionInstance(
+      mission: mission,
+      missionNumber: _missionCounter,
+      isChaos: false,
+    );
+    _resetSteps();
+    notifyListeners();
+    return true;
   }
 
   bool isCategoryMuted(String categoryName) => mutedCategories.contains(categoryName);
@@ -1271,6 +1334,7 @@ class BoredomProvider extends ChangeNotifier {
       'customCategories': customCategories.map((c) => c.toJson()).toList(),
       'favorites': favoriteIds.toList(),
       'pinnedAchievements': pinnedAchievements.toList(),
+      'journal': journal.map((e) => e.toJson()).toList(),
       'disliked': dislikedIds.toList(),
       'saved': savedMissions.map((m) => m.toJson()).toList(),
       'mutedCategories': mutedCategories.toList(),
@@ -1338,6 +1402,9 @@ class BoredomProvider extends ChangeNotifier {
           .toSet()
           .take(kMaxPinnedAchievements)
           .toSet();
+      final importedJournal = ((data['journal'] as List?) ?? [])
+          .map((e) => JournalEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
       final importedDisliked =
           ((data['disliked'] as List?) ?? []).map((e) => '$e').toSet();
       final importedSaved = ((data['saved'] as List?) ?? [])
@@ -1379,6 +1446,7 @@ class BoredomProvider extends ChangeNotifier {
       customCategories = importedCustomCategories;
       favoriteIds = importedFavorites;
       pinnedAchievements = importedPinned;
+      journal = importedJournal;
       dislikedIds = importedDisliked;
       savedMissions = importedSaved;
       mutedCategories = importedMuted;
@@ -1395,6 +1463,7 @@ class BoredomProvider extends ChangeNotifier {
       await storage.saveCustomCategories(customCategories);
       await storage.saveFavorites(favoriteIds);
       await storage.savePinnedAchievements(pinnedAchievements);
+      await storage.saveJournal(journal);
       await storage.saveDisliked(dislikedIds);
       await storage.saveSavedMissions(savedMissions);
       await storage.saveMutedCategories(mutedCategories);
@@ -1719,9 +1788,11 @@ class BoredomProvider extends ChangeNotifier {
     customCategories = [];
     favoriteIds = {};
     pinnedAchievements = {};
+    journal = [];
     dislikedIds = {};
     mutedCategories = {};
     savedMissions = [];
+    await StorageService.instance.saveJournal(journal);
     // Clear transient completion state too, otherwise a "+XP" toast can
     // still fire (with a dead Undo) on the next Home interaction.
     lastXpGained = null;
