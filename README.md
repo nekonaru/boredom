@@ -58,6 +58,8 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | **Chaos Mode** | Ignores all filters, unlocks chaos-only missions |
 | **Accept / reroll** | Accept missions for XP, reroll up to 3x per day |
 | **Quick wins** | Narrow rolls to missions of 15 minutes or less |
+| **Only favorites** | Restrict rolls to pinned missions, with a safe fallback when none exist |
+| **Time of day** | Let morning, afternoon, evening, or night nudge the mission length |
 | **Inbox** | Save missions for later and roll them when you are ready |
 | **Custom missions** | Create your own missions with your own XP rewards |
 | **Favorites** | Pin catalog missions to find them again fast |
@@ -85,6 +87,9 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | **Weekly recap** | Missions, XP, and streak visible straight on Home |
 | **Weekly insights** | What your history says about you: week over week, your productive hour, the category you bail out of, average XP. Renders nothing rather than guessing |
 | **History search** | Filter completed missions by title or category, then narrow by date (today, 7 days, 30 days, all) and by outcome |
+| **Journal reflections** | Add a private note and mood to a completed mission, carried in backups |
+| **Do it again** | Reopen a catalog mission from History without paying XP until you accept it again |
+| **Quick find** | Search missions and history from one sheet on Home |
 | **Data transparency** | History states how many entries are stored and how many you are viewing, dates show the year when it differs, and orphaned favorites can be cleaned up |
 
 ### Data and Safety
@@ -100,7 +105,9 @@ There is also **Chaos Mode**, which ignores every filter so anything can come ou
 | Feature | Description |
 |---------|-------------|
 | **Daily reminder** | One notification a day at the time you choose, off by default |
+| **Streak nudge** | An optional one-shot reminder when the streak is at risk |
 | **Share card** | Render any mission into a 1080x1080 PNG card, or copy it as text |
+| **Monthly recap** | Share a generated PNG summary of missions, XP, streak, and top category |
 
 ### Appearance and Feel
 

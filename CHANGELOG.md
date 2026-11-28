@@ -1,5 +1,22 @@
 # Changelog
 
+## v5.1.0
+
+More ways to shape your missions, remember what they felt like, and share your progress.
+
+## New features
+
+- **Journal reflections.** Add a short note and mood to any completed mission from History. Entries are private, searchable, and survive backup and restore.
+- **Time of day.** Pick morning, afternoon, evening, or night to nudge the mission length toward what fits the hour.
+- **Only favorites.** Restrict rolls to missions you pinned, with a safe fallback when there are none.
+- **Do it again.** Reopen a catalog mission from History without granting XP until you actually accept it again.
+- **Quick find.** Search missions and history from one sheet on Home, then roll a result straight away.
+- **Monthly recap card.** Share a generated PNG summary of missions, XP, streak, and top category.
+- **Follow-through ring.** A circular progress indicator replaces the plain percentage card on Stats.
+- **Boss battle chains.** Quest chains now show remaining HP that animates down with each step.
+- **Insight actions.** The skipped-category insight offers a button to roll one mission from that category.
+- **Streak nudge.** When reminders are on and the streak is at risk, a one-shot notification reminds you to keep it alive.
+
 ## v5.0.0
 
 Boredom gets a new foundation: four theme modes, a calmer first run, and motion that respects your device.

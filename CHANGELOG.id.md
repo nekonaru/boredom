@@ -1,5 +1,22 @@
 # Changelog
 
+## v5.1.0
+
+Lebih banyak cara mengatur misi, mengingat rasanya, dan membagikan progresmu.
+
+## Fitur baru
+
+- **Renungan misi.** Tambahkan catatan singkat dan mood ke misi selesai dari Riwayat. Catatan bersifat pribadi dan ikut tersimpan lewat backup dan restore.
+- **Waktu hari.** Pilih pagi, siang, sore, atau malam untuk menyesuaikan panjang misi dengan jammu.
+- **Hanya favorit.** Batasi roll pada misi yang kamu simpan, dengan fallback aman bila belum ada.
+- **Lakukan lagi.** Buka kembali misi katalog dari Riwayat tanpa langsung memberi XP sebelum kamu terima lagi.
+- **Pencarian cepat.** Cari misi dan riwayat dari satu sheet di Beranda, lalu langsung roll hasilnya.
+- **Kartu laporan bulanan.** Bagikan PNG ringkasan misi, XP, streak, dan kategori teratas.
+- **Cincin follow-through.** Indikator lingkaran menggantikan kartu persentase polos di Stats.
+- **Boss battle chain.** Rantai misi kini menampilkan sisa HP yang turun animasi tiap langkah.
+- **Aksi insight.** Insight kategori yang paling sering ditinggalkan punya tombol untuk langsung roll satu misi dari kategori itu.
+- **Pengingat streak.** Saat pengingat aktif dan streak terancam, notifikasi sekali kali mengingatkanmu menjaganya.
+
 ## v5.0.0
 
 Boredom mendapat fondasi baru: empat mode tema, pengalaman pertama yang lebih tenang, dan animasi yang menghormati perangkatmu.

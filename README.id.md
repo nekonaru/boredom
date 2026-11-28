@@ -59,6 +59,8 @@ Ada juga **Chaos Mode**, yang mengabaikan semua filter sehingga apa pun bisa mun
 | **Chaos Mode** | Mengabaikan semua filter, membuka misi khusus chaos |
 | **Terima / reroll** | Terima misi untuk XP, reroll hingga 3x per hari |
 | **Quick wins** | Persempit hasil ke misi berdurasi 15 menit atau kurang |
+| **Hanya favorit** | Batasi roll pada misi yang disematkan, dengan fallback aman bila belum ada |
+| **Waktu hari** | Pagi, siang, sore, atau malam membantu menyesuaikan panjang misi |
 | **Inbox** | Simpan misi untuk nanti dan putar saat kamu siap |
 | **Misi kustom** | Buat misimu sendiri dengan hadiah XP sesukamu |
 | **Favorit** | Sematkan misi katalog agar mudah ditemukan lagi |
@@ -86,6 +88,9 @@ Ada juga **Chaos Mode**, yang mengabaikan semua filter sehingga apa pun bisa mun
 | **Rekap mingguan** | Misi, XP, dan streak terlihat langsung di Home |
 | **Insight mingguan** | Apa kata riwayatmu tentang dirimu: dibandingkan minggu lalu, jam produktifmu, kategori yang sering kamu tinggalkan, rata-rata XP. Tidak menampilkan apa pun daripada menebak |
 | **Pencarian riwayat** | Filter misi yang selesai berdasarkan judul atau kategori, lalu persempit berdasarkan tanggal (hari ini, 7 hari, 30 hari, semua) dan hasil |
+| **Renungan misi** | Tambahkan catatan dan mood pribadi ke misi selesai, ikut tersimpan dalam cadangan |
+| **Lakukan lagi** | Buka kembali misi katalog dari Riwayat tanpa langsung memberi XP sebelum diterima lagi |
+| **Pencarian cepat** | Cari misi dan riwayat dari satu sheet di Beranda |
 | **Transparansi data** | Riwayat menyebutkan berapa entri yang tersimpan dan berapa yang sedang kamu lihat, tanggal menampilkan tahun bila berbeda, dan favorit yatim bisa dibersihkan |
 
 ### Data dan Keamanan
@@ -101,7 +106,9 @@ Ada juga **Chaos Mode**, yang mengabaikan semua filter sehingga apa pun bisa mun
 | Fitur | Deskripsi |
 |-------|-----------|
 | **Pengingat harian** | Satu notifikasi per hari pada waktu pilihanmu, mati secara default |
+| **Pengingat streak** | Notifikasi sekali kali saat streak terancam putus, opsional |
 | **Kartu bagikan** | Render misi mana pun menjadi kartu PNG 1080x1080, atau salin sebagai teks |
+| **Laporan bulanan** | Bagikan PNG ringkasan misi, XP, streak, dan kategori teratas |
 
 ### Tampilan dan Nuansa
 
